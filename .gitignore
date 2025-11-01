@@ -1,0 +1,67 @@
+# =====================================================
+# 🌐 FULL-STACK PROJECT (Frontend + Backend)
+# =====================================================
+
+# =============================
+# 📦 Node Dependencies
+# =============================
+node_modules/
+**/node_modules/
+
+# =============================
+# 🏗️ Build & Output Directories
+# =============================
+dist/
+build/
+**/dist/
+**/build/
+dist-ssr/
+.cache/
+.tmp/
+coverage/
+*.lcov
+
+# =============================
+# 🔐 Environment Variables
+# =============================
+.env
+.env.*
+**/.env
+**/.env.*
+
+# =============================
+# 🪵 Logs
+# =============================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =============================
+# ⚙️ Local Config / Runtime Files
+# =============================
+*.local
+*.pid
+*.seed
+*.pid.lock
+
+# =============================
+# 🧠 Editor / IDE Files
+# =============================
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# =============================
+# 🧩 OS Files
+# =============================
+.DS_Store
+Thumbs.db
