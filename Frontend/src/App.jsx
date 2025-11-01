@@ -1,10 +1,8 @@
-function App() {
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
 
-  return (
-    <>
-      
-    </>
-  )
+function App() {
+  return <Login />;
 }
 
-export default App
+export default App;
