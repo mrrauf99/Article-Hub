@@ -2,7 +2,7 @@ import eyeHidden from "../assets/eye-hidden.png";
 import eyeShow from "../assets/eye-show.png";
 import Input from "../components/Input";
 import { useInput } from "../hooks/useInput";
-import { isEmpty, hasMinLength } from "../util/validation";
+import { isPasswordValid } from "../util/validation";
 
 export default function ResetPassword() {
   const {
@@ -10,7 +10,7 @@ export default function ResetPassword() {
     handleChange: handleNewPasswordChange,
     handleBlur: handleNewPasswordBlur,
     hasError: newPasswordError,
-  } = useInput("", (val) => !isEmpty(val) && hasMinLength(val, 8));
+  } = useInput("", (val) => isPasswordValid(val));
 
   const {
     enteredValue: confirmPasswordValue,
@@ -41,10 +41,16 @@ export default function ResetPassword() {
             value={newPasswordValue}
             onChange={handleNewPasswordChange}
             onBlur={handleNewPasswordBlur}
-            error={newPasswordError && "Password must be at least 8 characters"}
             eyeShow={eyeShow}
             eyeHidden={eyeHidden}
           />
+          <p
+            className="error-msg"
+            style={!newPasswordError ? { color: "black" } : undefined}
+          >
+            Password must be at least 8 characters long and include an uppercase
+            letter, a lowercase letter, a number, and a special symbol.
+          </p>
 
           <Input
             label="Confirm Password"
@@ -59,7 +65,7 @@ export default function ResetPassword() {
             eyeHidden={eyeHidden}
           />
 
-          <button className="btn" id="submitBtn" disabled={!isPasswordMatch}>
+          <button className="btn" id="submitBtn">
             Set Password
           </button>
         </form>

@@ -1,5 +1,5 @@
 import { useInput } from "../hooks/useInput";
-import { hasMinLength, isEmailValid, isEmpty } from "../util/validation";
+import { isEmailValid, isEmpty } from "../util/validation";
 import Input from "../components/Input";
 import "./auth.css";
 import eyeHidden from "../assets/eye-hidden.png";
@@ -13,12 +13,8 @@ export default function Login() {
     hasError: emailError,
   } = useInput("", (value) => isEmailValid(value) && !isEmpty(value));
 
-  const {
-    enteredValue: passwordValue,
-    handleChange: handlePasswordChange,
-    handleBlur: handlePasswordBlur,
-    hasError: passwordError,
-  } = useInput("", (val) => !isEmpty(val) && hasMinLength(val, 8));
+  const { enteredValue: passwordValue, handleChange: handlePasswordChange } =
+    useInput("", () => {});
 
   return (
     <div className="auth-container">
@@ -29,7 +25,6 @@ export default function Login() {
         <Input
           label="Email"
           id="email"
-          placeholder="abc@example.com"
           type="email"
           name="email"
           value={emailValue}
@@ -44,8 +39,6 @@ export default function Login() {
           name="password"
           value={passwordValue}
           onChange={handlePasswordChange}
-          onBlur={handlePasswordBlur}
-          error={passwordError && "Password must be at least 8 characters"}
           eyeShow={eyeShow}
           eyeHidden={eyeHidden}
         />
