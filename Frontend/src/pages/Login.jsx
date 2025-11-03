@@ -45,7 +45,7 @@ export default function Login() {
           value={passwordValue}
           onChange={handlePasswordChange}
           onBlur={handlePasswordBlur}
-          error={passwordError && "Enter a valid password"}
+          error={passwordError && "Password must be at least 8 characters"}
           eyeShow={eyeShow}
           eyeHidden={eyeHidden}
         />
