@@ -8,6 +8,7 @@ import Input from "../components/Input";
 import AuthLayout from "../components/AuthLayout";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import Divider from "../components/Divider";
+import SwitchPage from "../components/SwitchPage";
 
 import { useInput } from "../../hooks/auth/useInput";
 import { isEmpty } from "../../util/authValidation";
@@ -24,14 +25,14 @@ export default function Login() {
     handleChange: handleIdentifierChange,
     handleBlur: handleIdentifierBlur,
     hasError: identifierError,
-  } = useInput("", (value) => !isEmpty(value));
+  } = useInput("", (v) => !isEmpty(v));
 
   const {
     enteredValue: password,
     handleChange: handlePasswordChange,
     handleBlur: handlePasswordBlur,
     hasError: passwordError,
-  } = useInput("", (val) => !isEmpty(val));
+  } = useInput("", (v) => !isEmpty(v));
 
   return (
     <AuthLayout title="ArticleHub" subtitle="Welcome Back">
@@ -50,9 +51,9 @@ export default function Login() {
           id="identifier"
           type="text"
           name="identifier"
-          onChange={handleIdentifierChange}
-          onBlur={handleIdentifierBlur}
-          value={identifier}
+          handleChange={handleIdentifierChange}
+          handleBlur={handleIdentifierBlur}
+          enteredValue={identifier}
           error={identifierError && "Please fill out this field."}
         />
         <Input
@@ -60,9 +61,9 @@ export default function Login() {
           id="password"
           type="password"
           name="password"
-          value={password}
-          onChange={handlePasswordChange}
-          onBlur={handlePasswordBlur}
+          enteredValue={password}
+          handleChange={handlePasswordChange}
+          handleBlur={handlePasswordBlur}
           error={passwordError && "Please fill out this field."}
           eyeShow={eyeShow}
           eyeHidden={eyeHidden}
@@ -79,10 +80,11 @@ export default function Login() {
 
       <Divider />
       <GoogleAuthButton>Sign in with Google</GoogleAuthButton>
-
-      <p className="switch-page">
-        Don’t have an account? <Link to="/signup">Sign Up</Link>
-      </p>
+      <SwitchPage
+        question="Don't have an account?"
+        linkText="Sign up"
+        linkTo="/signup"
+      />
     </AuthLayout>
   );
 }
