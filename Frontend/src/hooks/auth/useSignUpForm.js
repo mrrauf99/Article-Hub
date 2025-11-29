@@ -8,14 +8,13 @@ import {
 } from "../../util/authValidation";
 
 export function useSignUpForm() {
-  // calling hooks → allowed only inside a hook/component
   const name = useInput("", (v) => !isEmpty(v));
   const username = useInput("", (v) => !isEmpty(v));
   const email = useInput("", (v) => !isEmpty(v));
   const password = useInput("", (v) => !isEmpty(v));
   const confirmPassword = useInput("", (v) => !isEmpty(v));
+  const country = useInput("", (v) => !isEmpty(v));
 
-  // derived validation states
   const usernameError =
     (username.hasError && "Please fill out this field.") ||
     (username.enteredValue && validateUsername(username.enteredValue));
@@ -31,13 +30,13 @@ export function useSignUpForm() {
     confirmPassword.enteredValue
   );
 
-  // return a bundle for SignUp
   return {
     name,
     username,
     email,
     password,
     confirmPassword,
+    country,
     usernameError,
     emailError,
     passwordErrors,

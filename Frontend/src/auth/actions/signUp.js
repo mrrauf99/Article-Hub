@@ -8,6 +8,7 @@ export default async function signUpAction({ request }) {
     email: data.get("email"),
     password: data.get("password"),
     confirmPassword: data.get("confirm-password"),
+    country: data.get("country"),
   };
 
   try {

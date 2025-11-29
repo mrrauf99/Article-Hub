@@ -11,13 +11,20 @@ export function useAvailability(value, didEdit, hasError, type) {
     // ⛔ Skip availability check if:
     // - user has not blurred yet
     // - OR field is invalid
-    if (!didEdit || hasError || value.trim() === "") return;
+    // - OR value is empty
+    if (!didEdit || hasError) {
+      setState({ status: "idle", message: "" });
+      return;
+    }
 
     async function checkAvailability() {
       try {
         setState({ status: "checking", message: "" });
 
-        const response = await authApi.checkUsername({ [type]: value });
+        const response =
+          type === "email"
+            ? await authApi.checkEmail({ email: value })
+            : await authApi.checkUsername({ username: value });
 
         const messages = {
           available: {
@@ -46,7 +53,7 @@ export function useAvailability(value, didEdit, hasError, type) {
     }
 
     checkAvailability();
-  }, [didEdit]); // Only runs when blur happens
+  }, [didEdit, value, hasError, type]);
 
   return state;
 }

@@ -4,7 +4,6 @@ label {
   margin-bottom: 0.3125rem;
   color: #333;
   font-size: 0.875rem;
-  text-align: left;
 }
 
 .input-wrapper {
@@ -14,9 +13,9 @@ label {
 
 .input-wrapper img {
   position: absolute;
-  right: 0.625rem;
-  top: 0.625rem;
-  height: 1.25rem;
+  right: 3%;
+  top: 25%;
+  height: 1rem;
   cursor: pointer;
 }
 
@@ -26,7 +25,11 @@ input {
   margin-bottom: 0.3125rem;
   border: 0.0625rem solid #ddd;
   border-radius: 0.25rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.2s;
+}
+
+input:hover {
+  border-color: #bbb;
 }
 
 input:focus {
@@ -57,16 +60,9 @@ input[type="password"] {
   background: #3730a3;
 }
 
-.switch-page {
-  margin-top: 1.25rem;
-}
-
-.switch-page a {
-  color: #4f46e5;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.switch-page a:hover {
-  text-decoration: underline;
+.error-msg {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }

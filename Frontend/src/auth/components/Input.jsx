@@ -4,6 +4,7 @@ import "../../styles/auth/loader.css";
 export default function Input({
   label,
   id,
+  name,
   type,
   enteredValue,
   handleChange,
@@ -24,6 +25,7 @@ export default function Input({
         <input
           id={id}
           type={isPassword && showPassword ? "text" : type}
+          name={name}
           value={enteredValue}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -36,7 +38,6 @@ export default function Input({
             src={showPassword ? eyeShow : eyeHidden}
             alt="Toggle Password"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer w-5 h-5"
           />
         )}
 
@@ -44,7 +45,7 @@ export default function Input({
         {isLoading && <span className="absolute right-3 loader"></span>}
       </div>
 
-      {error && <p className="text-red-600 text-sm my-1 text-left">{error}</p>}
+      {error && <p className="error-msg">{error}</p>}
     </div>
   );
 }
