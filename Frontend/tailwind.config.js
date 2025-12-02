@@ -6,6 +6,6 @@ export default {
   },
   plugins: [],
   corePlugins: {
-    preflight: false, // disable Tailwind reset
+    preflight: true,
   },
 };
