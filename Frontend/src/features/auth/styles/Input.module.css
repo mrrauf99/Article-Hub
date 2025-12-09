@@ -1,0 +1,50 @@
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3125rem;
+  color: #333;
+  font-size: 0.875rem;
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 3%;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.3125rem;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.25rem;
+  transition: border-color 0.2s;
+}
+
+.input:hover {
+  border-color: #bbb;
+}
+
+.input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0.3125rem rgba(79, 70, 229, 0.3);
+  outline: none;
+}
+
+.passwordInput {
+  padding-right: 3rem;
+}
+
+.errorMsg {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  padding-left: 0.25rem;
+}
