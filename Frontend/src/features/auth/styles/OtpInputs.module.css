@@ -1,0 +1,43 @@
+.inputs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.input {
+  width: 3rem;
+  height: 3.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: 2px solid #d1d5db;
+  border-radius: 0.75rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.input:hover:not(:disabled) {
+  border-color: #a5b4fc;
+}
+
+.input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (min-width: 640px) {
+  .input {
+    width: 3.5rem;
+    height: 4rem;
+  }
+
+  .inputs {
+    gap: 0.75rem;
+  }
+}
