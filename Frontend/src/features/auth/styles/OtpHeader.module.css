@@ -1,0 +1,40 @@
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.icon {
+  width: 5rem;
+  height: 5rem;
+  background: linear-gradient(to bottom right, #6366f1, #9333ea);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+}
+
+.icon svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: white;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.email {
+  color: #6366f1;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
