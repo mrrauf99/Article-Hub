@@ -18,7 +18,6 @@ export const getNavItemsForRole = (userRole) => {
       ...common,
       { label: "Dashboard", icon: BarChart, href: "/admin/dashboard" },
       { label: "Manage Users", icon: Users, href: "/admin/users" },
-      { label: "All Articles", icon: FileText, href: "/admin/articles" },
     ];
   }
 
