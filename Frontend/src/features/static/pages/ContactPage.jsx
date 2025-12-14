@@ -5,7 +5,6 @@ import ContactForm from "../components/ContactForm";
 
 export default function ContactPage() {
   const handleSubmit = async (data) => {
-    // later: send to your backend or email service
     alert("Message sent! (check console for payload)");
     console.log("Contact data:", data);
   };
