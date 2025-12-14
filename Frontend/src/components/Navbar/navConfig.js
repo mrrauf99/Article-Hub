@@ -1,9 +1,8 @@
-// src/components/Navbar/navConfig.js
-import { Home, FileText, BarChart, Users,Contact } from "lucide-react";
+import { Home, FileText, BarChart, Users,BadgeInfo } from "lucide-react";
 
 export const getNavItemsForRole = (userRole) => {
   const common = [{ label: "Home", icon: Home, href: "/" }
-    ,{ label: "Contact", icon: Contact, href: "/contact" }
+    ,{ label: "About", icon: BadgeInfo, href: "/about" }
   ];
 
   if (userRole === "user") {
