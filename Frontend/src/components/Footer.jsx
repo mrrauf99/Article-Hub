@@ -52,7 +52,7 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottomBar}>
-        <span>COPYRIGHT @ 2025 Article Hub</span>
+        <span>COPYRIGHT @ {new Date().getFullYear()} Article Hub</span>
         <span>
           Developed by:{" "}
           <strong className={styles.devName}>Rauf & Tayyab</strong>

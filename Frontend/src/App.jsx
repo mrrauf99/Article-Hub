@@ -9,6 +9,7 @@ import Home from "./features/guest/Home.jsx";
 import GuestPanel from "./features/guest/GuestPanel.jsx";
 import AboutContent from "./features/static/components/AboutContent.jsx";
 import ContactPage from "./features/static/pages/ContactPage.jsx";
+import ManageUser from "./features/admin/pages/ManageUser.jsx";
 import "./index.css";
 function App() {
   const router = createBrowserRouter([
@@ -44,7 +45,7 @@ function App() {
     },
 
     {
-      path: "/admin/home",
+      path: "/admin/dashboard",
       element: <AdminDashboard />,
     },
     {
@@ -54,6 +55,10 @@ function App() {
     {
       path:"/contact",
       element:<ContactPage/>
+    },
+    {
+      path: "/admin/users",
+      element: <ManageUser />,
     }
   ]);
 
