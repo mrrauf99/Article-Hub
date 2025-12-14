@@ -2,19 +2,20 @@ import React from "react";
 import { Info, User2, PenTool, Code2 } from "lucide-react";
 
 const defaultFounders = [
-  {
-    name: "Tayyab Ali",
-    role: "UI / UX Designer & Frontend",
-    bio: "UI-focused designer and frontend developer who loves clean layouts, smooth interactions, and design systems that feel modern and easy to use.",
-    avatarUrl: "https://avatars.githubusercontent.com/u/192490949?v=4",
-    focusTags: ["UI Design", "Design Systems", "Frontend"],
-  },
+ 
   {
     name: "Abdul Rauf",
     role: "Frontend & Backend Developer",
     bio: "Full-stack problem solver who enjoys building reliable APIs, scalable architecture, and frontend integrations that just work.",
     avatarUrl: "https://avatars.githubusercontent.com/u/216373840?v=4",
     focusTags: ["Full Stack", "APIs", "Performance"],
+  },
+   {
+    name: "Tayyab Ali",
+    role: "UI / UX Designer & Frontend",
+    bio: "UI-focused designer and frontend developer who loves clean layouts, smooth interactions, and design systems that feel modern and easy to use.",
+    avatarUrl: "https://avatars.githubusercontent.com/u/192490949?v=4",
+    focusTags: ["UI Design", "Design Systems", "Frontend"],
   },
 ];
 
