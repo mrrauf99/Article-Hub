@@ -1,4 +1,3 @@
-// src/components/Navbar/MobileMenu.jsx
 import { Link } from "react-router-dom";
 import { User, Settings, LogOut } from "lucide-react";
 import styles from "../styles/navbar.module.css";
@@ -64,14 +63,6 @@ export default function MobileMenu({
             >
               <User className={styles.mobileLinkIcon} />
               Profile
-            </Link>
-            <Link
-              to="/settings"
-              className={styles.mobileLink}
-              onClick={onClose}
-            >
-              <Settings className={styles.mobileLinkIcon} />
-              Settings
             </Link>
 
             <button

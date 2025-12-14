@@ -4,32 +4,32 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NewArticle from "./features/user_panel/pages/NewArticle.jsx";
 import DashBoard from "./features/user_panel/pages/DashBoard.jsx";
 import ProfilePage from "./features/user_panel/pages/Profile.jsx";
-import AdminHome from "./features/admin/pages/AdminHome.jsx";
+import AdminDashboard from "./features/admin/pages/AdminDashboard.jsx";
 import Home from "./features/guest/Home.jsx";
 import GuestPanel from "./features/guest/GuestPanel.jsx";
-
+import AboutContent from "./features/static/components/AboutContent.jsx";
+import ContactPage from "./features/static/pages/ContactPage.jsx";
 import "./index.css";
-
 function App() {
   const router = createBrowserRouter([
-    // Landing page (no navbar / footer)
+
     {
       path: "/",
       element: <Home />,
     },
-    // optional: keep /home working as alias
+   
     {
       path: "/home",
       element: <Home />,
     },
 
-    // Guest panel: navbar + sidebar + approved cards + footer
+
     {
       path: "/guest",
       element: <GuestPanel />,
     },
 
-    // User panel
+ 
     {
       path: "/dashboard",
       element: <DashBoard />,
@@ -43,11 +43,18 @@ function App() {
       element: <ProfilePage />,
     },
 
-    // Admin
     {
       path: "/admin/home",
-      element: <AdminHome />,
+      element: <AdminDashboard />,
     },
+    {
+      path:"/about",
+      element:<AboutContent/>
+    },
+    {
+      path:"/contact",
+      element:<ContactPage/>
+    }
   ]);
 
   return <RouterProvider router={router} />;

@@ -29,9 +29,6 @@ export default function UserMenu({ userRole, userName, onLogout }) {
         >
           <User className={styles.profileIcon} />
           <span>{userName || "User"}</span>
-          {userRole === "admin" && (
-            <span className={styles.adminBadge}>ADMIN</span>
-          )}
         </button>
 
         {open && (
@@ -39,10 +36,6 @@ export default function UserMenu({ userRole, userName, onLogout }) {
             <Link to="/profile" className={styles.profileItem}>
               <User className={styles.profileItemIcon} />
               Profile
-            </Link>
-            <Link to="/settings" className={styles.profileItem}>
-              <Settings className={styles.profileItemIcon} />
-              Settings
             </Link>
             <hr className={styles.menuDivider} />
             <button
