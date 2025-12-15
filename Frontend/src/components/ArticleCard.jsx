@@ -1,212 +1,186 @@
-// src/components/ArticleCard.jsx
-import { useState } from "react";
-import { Calendar, Eye, ThumbsUp, Edit, Trash2 } from "lucide-react";
-import StatusBadge from "./StatusBadge";
+import { Eye, Trash2, Edit } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useCallback, useState, memo } from "react";
 
-export default function ArticleCard({
-  article,
-  mode = "guest", // "guest" | "user" | "admin"
-  isExpanded = false,
-  onToggle = () => {},
-  onUpdate = () => {},
-  onDelete = () => {},
-  onView = () => {},
-  onLike = () => {},
-}) {
-  const [isEditOpen, setIsEditOpen] = useState(false);
+const STATUS_COLORS = {
+  draft: "bg-gray-100 text-gray-700",
+  pending: "bg-yellow-100 text-yellow-700",
+  approved: "bg-green-100 text-green-700",
+  rejected: "bg-red-100 text-red-700",
+};
 
-  const isGuest = mode === "guest";
-  const isUser = mode === "user" || mode === "admin";
+function ArticleCard({ article, onDelete, onEdit }) {
+  const navigate = useNavigate();
+  const [isConfirmOpen, setConfirmOpen] = useState(false);
 
-  // Fallbacks so card works with different shapes (guest/user)
-  const featuredImage = article.featuredImage || article.image;
-  const summary = article.summary || article.intro || "";
-  const createdDate = article.createdDate || article.createdAt;
-  const publishDate = article.publishDate || article.publishedAt;
-  const views = article.views ?? 0;
-  const likes = article.likes ?? 0;
+  /* 🔒 Block background scroll when modal is open */
+  useEffect(() => {
+    document.body.style.overflow = isConfirmOpen ? "hidden" : "";
+    return () => (document.body.style.overflow = "");
+  }, [isConfirmOpen]);
+
+  /* Handlers (memoized) */
+  const handleNavigate = useCallback(() => {
+    if (!isConfirmOpen) {
+      navigate(`/articles/${article.id}`);
+    }
+  }, [isConfirmOpen, navigate, article.id]);
+
+  const handleEdit = useCallback(
+    (e) => {
+      e.stopPropagation();
+      onEdit?.(article.id);
+    },
+    [onEdit, article.id]
+  );
+
+  const handleDeleteClick = useCallback((e) => {
+    e.stopPropagation();
+    setConfirmOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    onDelete?.(article.id);
+    setConfirmOpen(false);
+  }, [onDelete, article.id]);
 
   return (
     <>
+      {/* Article Card */}
       <article
-        className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl 
-        transition-shadow duration-300 border border-gray-200 cursor-pointer"
-        onClick={() => onView(article.id)}
+        onClick={handleNavigate}
+        className="relative bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group"
       >
-        {/* IMAGE */}
-        {featuredImage && (
-          <div className="relative h-48 overflow-hidden bg-gray-200">
-            <img
-              src={featuredImage}
-              alt={article.title}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            />
+        {/* Status */}
+        <span
+          className={`absolute top-3 left-3 z-10 text-xs font-semibold px-3 py-1 rounded-full ${
+            STATUS_COLORS[article.status]
+          }`}
+        >
+          {article.status}
+        </span>
 
-            {/* USER/ADMIN ONLY = STATUS */}
-            {isUser && (
-              <div className="absolute top-3 right-3">
-                <StatusBadge status={article.status} />
-              </div>
-            )}
+        {/* Action Buttons */}
+        <div className="absolute top-3 right-3 z-10 flex gap-2">
+          <ActionButton
+            onClick={handleEdit}
+            title="Edit"
+            hover="hover:bg-indigo-50"
+          >
+            <Edit className="w-4 h-4 text-indigo-600" />
+          </ActionButton>
+
+          <ActionButton
+            onClick={handleDeleteClick}
+            title="Delete"
+            hover="hover:bg-red-50"
+          >
+            <Trash2 className="w-4 h-4 text-red-600" />
+          </ActionButton>
+        </div>
+
+        {/* Image */}
+        {article.featuredImage && (
+          <div className="h-48 overflow-hidden">
+            <img
+              src={article.featuredImage}
+              alt={article.title}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
           </div>
         )}
 
-        {/* CONTENT */}
+        {/* Content */}
         <div className="p-5">
-          {article.category && (
-            <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+          <div className="flex items-center justify-between mb-3">
+            <span className="bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">
               {article.category}
             </span>
-          )}
 
-          <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-indigo-600">
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Eye className="w-3 h-3" />
+              <span>{article.likes}</span>
+            </div>
+          </div>
+
+          <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600">
             {article.title}
           </h3>
 
-          {summary && (
-            <p
-              className={`text-gray-600 text-sm ${
-                isGuest
-                  ? "mb-4 line-clamp-2"
-                  : isExpanded
-                  ? "mb-2"
-                  : "mb-4 line-clamp-2"
-              }`}
-            >
-              {summary}
-            </p>
-          )}
+          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+            {article.summary}
+          </p>
 
-          {/* USER ONLY — FULL CONTENT */}
-          {isUser && isExpanded && (
-            <>
-              {article.introduction && (
-                <p className="text-gray-600 text-sm mb-3">
-                  {article.introduction}
-                </p>
-              )}
-              {article.content && (
-                <p className="text-gray-700 text-sm mb-4 whitespace-pre-line">
-                  {article.content}
-                </p>
-              )}
-            </>
-          )}
-
-          {/* DATES */}
-          {(createdDate || publishDate) && (
-            <div className="space-y-2 mb-4 pb-4 border-b border-gray-100">
-              {createdDate && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {new Date(createdDate).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
-              )}
-              {publishDate && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {new Date(publishDate).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* STATS */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Eye className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-semibold">
-                {views.toLocaleString()}
-              </span>
-              <span className="text-xs text-gray-500">views</span>
-            </div>
-
-            <button
-              type="button"
-              className="flex items-center gap-2 text-gray-700 hover:text-red-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                onLike(article.id);
-              }}
-            >
-              <ThumbsUp className="w-5 h-5 text-red-500" />
-              <span className="text-sm font-semibold">{likes}</span>
-            </button>
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-medium text-gray-700">
+              {article.authorName}
+            </span>
+            <span>
+              {article.publishedAt
+                ? new Date(article.publishedAt).toLocaleDateString()
+                : "Not published"}
+            </span>
           </div>
-
-          {/* USER-ONLY ACTIONS */}
-          {!isGuest && (
-            <>
-              <button
-                type="button"
-                className="text-xs text-indigo-700 hover:text-indigo-900 font-medium underline underline-offset-4 mb-3"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggle(article.id);
-                }}
-              >
-                {isExpanded ? "Show less" : "Show more"}
-              </button>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="flex-1 flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2 px-4 rounded-lg font-medium"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsEditOpen(true);
-                  }}
-                >
-                  <Edit className="w-4 h-4" />
-                  Edit
-                </button>
-
-                <button
-                  type="button"
-                  className="bg-red-50 hover:bg-red-100 text-red-700 py-2 px-4 rounded-lg font-medium"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(article.id);
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </>
-          )}
         </div>
       </article>
 
-      {/* USER EDIT DIALOG (stub) */}
-      {isUser && isEditOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl max-w-md w-full">
-            <h2 className="text-lg font-semibold mb-4">Edit Article</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              Edit form will go here later.
-            </p>
-            <button
-              type="button"
-              className="px-4 py-2 bg-gray-100 rounded-lg"
-              onClick={() => setIsEditOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+      {/* Confirm Dialog */}
+      {isConfirmOpen && (
+        <ConfirmDialog
+          title="Delete Article"
+          description={`Are you sure you want to delete "${article.title}"? This action cannot be undone.`}
+          onCancel={() => setConfirmOpen(false)}
+          onConfirm={handleConfirmDelete}
+        />
       )}
     </>
   );
 }
+
+/* 🔁 Prevent unnecessary re-renders */
+export default memo(ArticleCard);
+
+/* ------------------ */
+/* Reusable Components */
+/* ------------------ */
+
+const ActionButton = memo(({ children, onClick, title, hover }) => (
+  <button
+    onClick={onClick}
+    title={title}
+    className={`p-1.5 rounded-full bg-white/80 transition ${hover}`}
+  >
+    {children}
+  </button>
+));
+
+const ConfirmDialog = memo(({ title, description, onCancel, onConfirm }) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div
+      className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6"
+      role="dialog"
+      aria-modal="true"
+    >
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+
+      <p className="text-sm text-gray-600 mb-6">{description}</p>
+
+      <div className="flex gap-3">
+        <button
+          onClick={onCancel}
+          className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium"
+        >
+          No
+        </button>
+
+        <button
+          onClick={onConfirm}
+          className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"
+        >
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+));
