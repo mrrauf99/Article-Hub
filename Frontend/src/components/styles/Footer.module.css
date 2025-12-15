@@ -51,6 +51,7 @@
 
 .link:hover {
   color: #7dd3fc;
+  text-decoration: underline;
 }
 
 .bottomBar {

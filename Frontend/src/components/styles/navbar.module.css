@@ -7,8 +7,6 @@
 }
 
 .inner {
-  max-width: 1120px;
-  margin: 0 auto;
   height: 64px;
   padding: 0 1rem;
   display: flex;
@@ -34,6 +32,7 @@
   font-weight: 700;
   background: linear-gradient(to right, #e5e7eb, #7dd3fc);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
 }
 
@@ -70,9 +69,7 @@
 
 /* Desktop user area */
 .desktopUser {
-  display: none;
-  align-items: center;
-  gap: 0.5rem;
+  justify-content: flex-end;
 }
 
 .loginBtn {

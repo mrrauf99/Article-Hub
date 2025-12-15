@@ -1,4 +1,3 @@
-// src/App.jsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import NewArticle from "./features/user_panel/pages/NewArticle.jsx";
@@ -10,27 +9,25 @@ import GuestPanel from "./features/guest/pages/GuestPanel.jsx";
 import AboutContent from "./features/static/components/AboutContent.jsx";
 import ContactPage from "./features/static/pages/ContactPage.jsx";
 import ManageUser from "./features/admin/pages/ManageUser.jsx";
+import ArticleDetailPage from "./components/ArticleDetailPage.jsx";
 import "./index.css";
 function App() {
   const router = createBrowserRouter([
-
     {
       path: "/",
       element: <Home />,
     },
-   
+
     {
       path: "/home",
       element: <Home />,
     },
-
 
     {
       path: "/guest",
       element: <GuestPanel />,
     },
 
- 
     {
       path: "/dashboard",
       element: <DashBoard />,
@@ -49,17 +46,21 @@ function App() {
       element: <AdminDashboard />,
     },
     {
-      path:"/about",
-      element:<AboutContent/>
+      path: "/about",
+      element: <AboutContent />,
     },
     {
-      path:"/contact",
-      element:<ContactPage/>
+      path: "/contact",
+      element: <ContactPage />,
     },
     {
       path: "/admin/users",
       element: <ManageUser />,
-    }
+    },
+    {
+      path: "/articles/:id",
+      element: <ArticleDetailPage />,
+    },
   ]);
 
   return <RouterProvider router={router} />;

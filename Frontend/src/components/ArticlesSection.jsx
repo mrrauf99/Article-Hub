@@ -1,44 +1,19 @@
-// src/components/ArticlesSection.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ArticleCard from "./ArticleCard";
 
 export default function ArticlesSection({
   initialArticles = [],
-  mode = "user", // "guest" | "user" | "admin"
   title = "Articles",
   showCreateButton = false,
   createLabel = "+ Create New Article",
   onCreate = () => {},
-  filterFn, // optional (article) => boolean
+  filterFn,
 }) {
   const [articles, setArticles] = useState(initialArticles);
-  const [expandedId, setExpandedId] = useState(null);
 
-  const handleToggle = (id) => {
-    setExpandedId((current) => (current === id ? null : id));
-  };
-
-  const handleViewIncrease = (id) => {
-    setArticles((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, views: (a.views ?? 0) + 1 } : a))
-    );
-  };
-
-  const handleLikeIncrease = (id) => {
-    setArticles((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, likes: (a.likes ?? 0) + 1 } : a))
-    );
-  };
-
-  const handleUpdate = (updatedArticle) => {
-    setArticles((prev) =>
-      prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a))
-    );
-  };
-
-  const handleDelete = (id) => {
-    setArticles((prev) => prev.filter((a) => a.id !== id));
-  };
+  useEffect(() => {
+    setArticles(initialArticles);
+  }, [initialArticles]);
 
   const visibleArticles =
     typeof filterFn === "function" ? articles.filter(filterFn) : articles;
@@ -50,9 +25,8 @@ export default function ArticlesSection({
 
         {showCreateButton && (
           <button
-            type="button"
             onClick={onCreate}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-md"
           >
             {createLabel}
           </button>
@@ -64,13 +38,10 @@ export default function ArticlesSection({
           <div key={article.id} className="masonry-item">
             <ArticleCard
               article={article}
-              mode={mode}
-              isExpanded={expandedId === article.id}
-              onToggle={handleToggle}
-              onUpdate={handleUpdate}
-              onDelete={handleDelete}
-              onView={handleViewIncrease}
-              onLike={handleLikeIncrease}
+              onEdit={(id) => navigate(`/articles/edit/${id}`)}
+              onDelete={(id) =>
+                setArticles((prev) => prev.filter((a) => a.id !== id))
+              }
             />
           </div>
         ))}

@@ -5,7 +5,7 @@ export const initialArticles = [
     category: "Technology",
     summary: "Learn the basics of React Hooks and how to use them effectively.",
     introduction:
-      "React Hooks allow you to use state and other React features without writing a class. They improve code readability and reusability.",
+      "React Hooks allow you to use state and other React features without writing a class.",
     content: `
 React Hooks were introduced in React 16.8.
 
@@ -20,11 +20,12 @@ In this article, we cover:
 3. Basic usage examples
     `,
     featuredImage:
-      "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80",
+      "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1200&q=80",
+    authorId: 1,
+    authorName: "Tayyab",
     status: "approved",
-    createdDate: "2024-11-28",
-    publishDate: "2024-11-29",
-    views: 1243,
+    createdAt: "2024-11-28",
+    publishedAt: "2024-11-29",
     likes: 87,
   },
 
@@ -35,10 +36,9 @@ In this article, we cover:
     summary:
       "An overview of the rapidly growing AI landscape and what to expect in the coming years.",
     introduction:
-      "Artificial Intelligence is becoming an essential part of modern software and industries across the world.",
+      "Artificial Intelligence is becoming an essential part of modern software and industries.",
     content: `
-Artificial Intelligence is no longer a distant dream. 
-It powers products we use every day — from recommendations and search to creative tools and automation.
+Artificial Intelligence is no longer a distant dream.
 
 AI is transforming:
 - Healthcare
@@ -47,16 +47,17 @@ AI is transforming:
 - Entertainment
 
 Major trends shaping the future of AI:
-1. Foundation models and multimodal systems
-2. Responsible and ethical AI
-3. AI-assisted development workflows
+1. Foundation models
+2. Responsible AI
+3. AI-assisted development
     `,
     featuredImage:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
+    authorId: 2,
+    authorName: "Rauf",
     status: "pending",
-    createdDate: "2024-12-01",
-    publishDate: null,
-    views: 0,
+    createdAt: "2024-12-01",
+    publishedAt: null,
     likes: 0,
   },
 
@@ -67,7 +68,7 @@ Major trends shaping the future of AI:
     summary:
       "Simple habits you can adopt to improve your physical and mental well-being.",
     introduction:
-      "Health is not just the absence of disease, but a complete physical, mental, and social well-being.",
+      "Health is not just the absence of disease but a complete physical and mental balance.",
     content: `
 Here are 10 key habits for a healthy lifestyle:
 
@@ -76,18 +77,19 @@ Here are 10 key habits for a healthy lifestyle:
 3. Stay hydrated
 4. Get adequate sleep
 5. Reduce stress
-6. Avoid smoking and alcohol
-7. Maintain healthy relationships
+6. Avoid harmful habits
+7. Maintain relationships
 8. Practice mindfulness
-9. Keep regular medical checkups
-10. Stay active and positive
+9. Regular checkups
+10. Stay active
     `,
     featuredImage:
-      "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
+      "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&q=80",
+    authorId: 3,
+    authorName: "Sara",
     status: "approved",
-    createdDate: "2024-11-25",
-    publishDate: "2024-11-26",
-    views: 2156,
+    createdAt: "2024-11-25",
+    publishedAt: "2024-11-26",
     likes: 142,
   },
 
@@ -95,13 +97,13 @@ Here are 10 key habits for a healthy lifestyle:
     id: 4,
     title: "Understanding Blockchain Technology",
     category: "Technology",
-    summary: "A simple explanation of blockchain and how it works.",
+    summary: "A simple explanation of blockchain technology and how it works.",
     introduction:
-      "Blockchain is a distributed ledger technology enabling secure and decentralized transactions.",
+      "Blockchain is a decentralized ledger system that enables secure transactions.",
     content: `
-Blockchain stores data in blocks, chained together using cryptography.
+Blockchain stores data in blocks chained with cryptography.
 
-Core characteristics:
+Core properties:
 - Decentralized
 - Immutable
 - Transparent
@@ -110,15 +112,16 @@ Core characteristics:
 Common use cases:
 - Cryptocurrency
 - Smart contracts
-- Supply chain tracking
+- Supply chains
 - Voting systems
     `,
     featuredImage:
-      "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
+      "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&q=80",
+    authorId: 1,
+    authorName: "Tayyab",
     status: "rejected",
-    createdDate: "2024-11-20",
-    publishDate: null,
-    views: 0,
+    createdAt: "2024-11-20",
+    publishedAt: null,
     likes: 0,
   },
 
@@ -126,26 +129,26 @@ Common use cases:
     id: 5,
     title: "Digital Marketing Strategies for 2025",
     category: "Marketing",
-    summary:
-      "Top digital marketing trends to help businesses grow in 2025 and beyond.",
+    summary: "Top digital marketing trends to help businesses grow in 2025.",
     introduction:
-      "Digital marketing is constantly evolving with new tools, platforms, and consumer behaviors.",
+      "Digital marketing continues to evolve with AI and data-driven strategies.",
     content: `
-Top marketing strategies for 2025:
+Top strategies for 2025:
 
-1. AI-driven personalization
-2. Short-form content dominance
+1. AI personalization
+2. Short-form video
 3. Voice search optimization
-4. Interactive video marketing
+4. Interactive campaigns
 
-Brands that adapt quickly will stay ahead of the competition.
+Adaptation is key to growth.
     `,
     featuredImage:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
+    authorId: 2,
+    authorName: "Rauf",
     status: "approved",
-    createdDate: "2024-11-30",
-    publishDate: "2024-12-01",
-    views: 856,
+    createdAt: "2024-11-30",
+    publishedAt: "2024-12-01",
     likes: 63,
   },
 
@@ -153,27 +156,26 @@ Brands that adapt quickly will stay ahead of the competition.
     id: 6,
     title: "Climate Change: What We Can Do",
     category: "Environment",
-    summary:
-      "How individuals and businesses can take action to combat climate change.",
-    introduction:
-      "Climate change is one of the most pressing issues of our generation.",
+    summary: "How individuals and organizations can help fight climate change.",
+    introduction: "Climate change is one of the most urgent global challenges.",
     content: `
-Steps we can take to fight climate change:
+Ways to take action:
 
-1. Reduce carbon footprint
+1. Reduce emissions
 2. Support renewable energy
 3. Promote sustainability
-4. Minimize waste
-5. Plant more trees
+4. Reduce waste
+5. Educate communities
 
-Every small action contributes to a global impact.
+Every effort matters.
     `,
     featuredImage:
-      "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800&q=80",
+      "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=1200&q=80",
+    authorId: 3,
+    authorName: "Sara",
     status: "pending",
-    createdDate: "2024-12-02",
-    publishDate: null,
-    views: 0,
+    createdAt: "2024-12-02",
+    publishedAt: null,
     likes: 0,
   },
 ];
