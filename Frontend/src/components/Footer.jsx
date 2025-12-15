@@ -1,4 +1,4 @@
-import styles from "./styles/Footer.module.css";
+import styles from "./styles/footer.module.css";
 
 import {
   Facebook,
@@ -45,14 +45,14 @@ export default function Footer() {
 
         <div className={styles.linksCol}>
           <span className={styles.heading}>About</span>
-          <a className="{styles.link}">Contact</a>
+          <a className={styles.link}>Contact</a>
           <a className={styles.link}>Privacy Policy</a>
           <a className={styles.link}>Terms & Conditions</a>
         </div>
       </div>
 
       <div className={styles.bottomBar}>
-        <span>COPYRIGHT @ {new Date().getFullYear()} Article Hub</span>
+        <span>Copyright @ {new Date().getFullYear()} Article Hub</span>
         <span>
           Developed by:{" "}
           <strong className={styles.devName}>Rauf & Tayyab</strong>
