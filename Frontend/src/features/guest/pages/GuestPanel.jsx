@@ -1,34 +1,42 @@
-import { useState, useMemo } from "react";
-import Navbar from "../../../components/Navbar/Navbar";
-import Footer from "../../../components/Footer";
+import { useMemo } from "react";
+import { useLoaderData, useSearchParams } from "react-router-dom";
+
+import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/Footer";
 import GuestLayout from "../components/GuestLayout";
 import GuestSidebar from "../components/GuestSidebar";
-import ArticlesSection from "../../../components/ArticlesSection";
-import { initialArticles } from "../../user_panel/utility/articles";
+import ArticlesSection from "@/features/articles/components/ArticlesSection";
+
+import { ARTICLE_CATEGORIES } from "@/utils/articleCategories";
 
 export default function GuestPanel() {
-  // Only approved articles
-  const approvedArticles = useMemo(
-    () => initialArticles.filter(a => a.status === "approved"),
-    []
-  );
+  const articles = useLoaderData();
 
-  // Active category state
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawCategory = searchParams.get("category");
 
-  // Categories list
-  const categories = useMemo(
-    () => ["All", ...new Set(approvedArticles.map(a => a.category))],
-    [approvedArticles]
-  );
+  // Validate category from URL
+  const activeCategory =
+    rawCategory && ARTICLE_CATEGORIES.includes(rawCategory)
+      ? rawCategory
+      : "All";
 
-  // FILTERED ARTICLES (THIS DRIVES THE CARDS)
+  // Sidebar categories
+  const categories = ["All", ...ARTICLE_CATEGORIES];
+
+  // Filtered articles
   const filteredArticles = useMemo(() => {
-    if (activeCategory === "All") return approvedArticles;
-    return approvedArticles.filter(
-      article => article.category === activeCategory
-    );
-  }, [activeCategory, approvedArticles]);
+    if (activeCategory === "All") return articles;
+    return articles.filter((article) => article.category === activeCategory);
+  }, [articles, activeCategory]);
+
+  function handleCategorySelect(category) {
+    if (category === "All") {
+      setSearchParams({});
+    } else {
+      setSearchParams({ category });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -39,20 +47,17 @@ export default function GuestPanel() {
           <GuestSidebar
             categories={categories}
             active={activeCategory}
-            onSelect={setActiveCategory}
+            onSelect={handleCategorySelect}
           />
         }
       >
-        {/* Cards update automatically when filteredArticles changes */}
         <ArticlesSection
-          initialArticles={filteredArticles}
-          mode="guest"
+          articles={filteredArticles}
           title={
             activeCategory === "All"
               ? "All Articles"
-              : `Articles · ${activeCategory}`
+              : `${activeCategory} Articles`
           }
-          showCreateButton={false}
         />
       </GuestLayout>
 

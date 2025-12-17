@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { User, LogOut, Settings } from "lucide-react";
-import styles from "../styles/navbar.module.css";
+import styles from "@/styles/navbar.module.css";
 
 export default function UserMenu({ userRole, userName, onLogout }) {
   const [open, setOpen] = useState(false);
