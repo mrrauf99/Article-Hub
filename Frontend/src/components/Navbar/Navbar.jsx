@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import styles from "../styles/navbar.module.css";
+
 import { getNavItemsForRole } from "./navConfig";
+
 import NavLogo from "./NavLogo";
 import NavLinks from "./NavLink";
 import UserMenu from "./UserMenu";
 import MobileMenu from "./MobileMenu";
+
+import styles from "@/styles/navbar.module.css";
 
 const Navbar = ({ userRole = "guest", userName = "", onLogout = () => {} }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -20,11 +23,7 @@ const Navbar = ({ userRole = "guest", userName = "", onLogout = () => {} }) => {
         <NavLinks navItems={navItems} />
 
         {/* Desktop user/auth area */}
-        <UserMenu
-          userRole={userRole}
-          userName={userName}
-          onLogout={onLogout}
-        />
+        <UserMenu userRole={userRole} userName={userName} onLogout={onLogout} />
 
         {/* Mobile toggle button */}
         <button

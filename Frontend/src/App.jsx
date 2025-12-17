@@ -9,8 +9,13 @@ import GuestPanel from "./features/guest/pages/GuestPanel.jsx";
 import AboutContent from "./features/static/components/AboutContent.jsx";
 import ContactPage from "./features/static/pages/ContactPage.jsx";
 import ManageUser from "./features/admin/pages/ManageUser.jsx";
-import ArticleDetailPage from "./components/ArticleDetailPage.jsx";
+import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
+
 import "./index.css";
+
+import { publicArticlesLoader } from "./features/articles/loaders/publicArticles.js";
+import { articleDetailLoader } from "./features/articles/loaders/articleDetail.loader.js";
+
 function App() {
   const router = createBrowserRouter([
     {
@@ -26,6 +31,7 @@ function App() {
     {
       path: "/guest",
       element: <GuestPanel />,
+      loader: publicArticlesLoader,
     },
 
     {
@@ -60,6 +66,7 @@ function App() {
     {
       path: "/articles/:id",
       element: <ArticleDetailPage />,
+      loader: articleDetailLoader,
     },
   ]);
 

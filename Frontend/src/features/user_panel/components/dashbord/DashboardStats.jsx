@@ -32,7 +32,7 @@ export default function DashboardStats({ articles = [] }) {
   );
 }
 
-function StatCard({ label, value, Icon, borderClass, iconClass }) {
+function StatCard({ label, value, borderClass, iconClass }) {
   return (
     <div
       className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${borderClass}`}
