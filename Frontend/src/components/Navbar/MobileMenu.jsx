@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { User, Settings, LogOut } from "lucide-react";
-import styles from "../styles/navbar.module.css";
+import { User, LogOut } from "lucide-react";
+import styles from "@/styles/navbar.module.css";
 
 export default function MobileMenu({
   isOpen,
@@ -32,11 +32,7 @@ export default function MobileMenu({
 
         {userRole === "guest" ? (
           <>
-            <Link
-              to="/login"
-              className={styles.mobileLink}
-              onClick={onClose}
-            >
+            <Link to="/login" className={styles.mobileLink} onClick={onClose}>
               Login
             </Link>
             <Link
@@ -56,11 +52,7 @@ export default function MobileMenu({
               )}
             </div>
 
-            <Link
-              to="/profile"
-              className={styles.mobileLink}
-              onClick={onClose}
-            >
+            <Link to="/profile" className={styles.mobileLink} onClick={onClose}>
               <User className={styles.mobileLinkIcon} />
               Profile
             </Link>

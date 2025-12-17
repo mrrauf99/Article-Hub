@@ -1,6 +1,5 @@
-// src/components/Navbar/NavLinks.jsx
 import { Link } from "react-router-dom";
-import styles from "../styles/navbar.module.css";
+import styles from "@/styles/navbar.module.css";
 
 export default function NavLinks({ navItems }) {
   return (

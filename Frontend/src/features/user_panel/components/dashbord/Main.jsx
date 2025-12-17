@@ -1,5 +1,5 @@
 import DashboardStats from "./DashboardStats";
-import ArticlesSection from "../../../../components/ArticlesSection";
+import ArticlesSection from "@/features/articles/components/ArticlesSection";
 
 export default function Main({ initialArticles }) {
   return (

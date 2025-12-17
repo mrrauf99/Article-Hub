@@ -1,9 +1,9 @@
 import { Form, useNavigation } from "react-router-dom";
 import { useNewArticleForm } from "../hooks/useNewArticleForm.js";
-import Input from "../components/NewArticle/Input.jsx";
-import TextArea from "../components/NewArticle/TextArea.jsx";
-import Category from "../components/NewArticle/Category.jsx";
-import ImageUpload from "../components/NewArticle/ImageUpload.jsx";
+import Input from "../components/new-article/Input.jsx";
+import TextArea from "../components/new-article/TextArea.jsx";
+import Category from "../components/new-article/Category.jsx";
+import ImageUpload from "../components/new-article/ImageUpload.jsx";
 import "../styles/form-layout.css";
 
 export default function NewArticle() {

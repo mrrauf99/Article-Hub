@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import styles from "./styles/confirm-dialog.module.css";
+import styles from "@/styles/confirm-dialog.module.css";
 
 export default function ConfirmDialog({
   open,
