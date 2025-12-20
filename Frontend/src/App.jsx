@@ -1,68 +1,52 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import NewArticle from "./features/user_panel/pages/NewArticle.jsx";
-import DashBoard from "./features/user_panel/pages/DashBoard.jsx";
-import ProfilePage from "./features/user_panel/pages/Profile.jsx";
-import AdminDashboard from "./features/admin/pages/AdminDashboard.jsx";
-import Home from "./features/guest/pages/Home.jsx";
-import GuestPanel from "./features/guest/pages/GuestPanel.jsx";
-import AboutContent from "./features/static/components/AboutContent.jsx";
-import ContactPage from "./features/static/pages/ContactPage.jsx";
-import ManageUser from "./features/admin/pages/ManageUser.jsx";
+import HomePage from "./features/guest/pages/HomePage.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import ContactPage from "./features/contact/pages/ContactPage.jsx";
+import PrivacyPage from "./pages/PrivacyPage.jsx";
+import TermsPage from "./pages/Terms.jsx";
+
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
 
-import "./index.css";
+import PublicLayout from "./layouts/PublicLayout.jsx";
+
+import { submitContactAction } from "./features/contact/actions/submitContact.js";
 
 import { publicArticlesLoader } from "./features/articles/loaders/publicArticles.js";
-import { articleDetailLoader } from "./features/articles/loaders/articleDetail.loader.js";
+import { articleDetailLoader } from "./features/articles/loaders/articleDetail.js";
+
+import "./index.css";
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",
-      element: <Home />,
+      element: <PublicLayout />,
+      children: [
+        {
+          path: "/",
+          element: <HomePage />,
+          loader: publicArticlesLoader,
+        },
+        {
+          path: "/about",
+          element: <AboutPage />,
+        },
+        {
+          path: "/contact",
+          element: <ContactPage />,
+          action: submitContactAction,
+        },
+        {
+          path: "/privacy",
+          element: <PrivacyPage />,
+        },
+        {
+          path: "/terms",
+          element: <TermsPage />,
+        },
+      ],
     },
 
-    {
-      path: "/home",
-      element: <Home />,
-    },
-
-    {
-      path: "/guest",
-      element: <GuestPanel />,
-      loader: publicArticlesLoader,
-    },
-
-    {
-      path: "/dashboard",
-      element: <DashBoard />,
-    },
-    {
-      path: "/new-article",
-      element: <NewArticle />,
-    },
-    {
-      path: "/profile",
-      element: <ProfilePage />,
-    },
-
-    {
-      path: "/admin/dashboard",
-      element: <AdminDashboard />,
-    },
-    {
-      path: "/about",
-      element: <AboutContent />,
-    },
-    {
-      path: "/contact",
-      element: <ContactPage />,
-    },
-    {
-      path: "/admin/users",
-      element: <ManageUser />,
-    },
     {
       path: "/articles/:id",
       element: <ArticleDetailPage />,

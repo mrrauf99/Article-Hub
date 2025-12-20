@@ -1,61 +1,91 @@
 import styles from "@/styles/footer.module.css";
+import { Link } from "react-router-dom";
+import { Facebook, Instagram, X, Linkedin, Youtube, Send } from "lucide-react";
 
-import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Youtube,
-  Slack,
-  Gamepad2,
-} from "lucide-react";
+const SOCIAL_LINKS = [
+  { Icon: Facebook, label: "Facebook", href: "#", brand: "facebook" },
+  { Icon: Instagram, label: "Instagram", href: "#", brand: "instagram" },
+  { Icon: X, label: "X", href: "#", brand: "x" },
+  { Icon: Linkedin, label: "LinkedIn", href: "#", brand: "linkedin" },
+  { Icon: Youtube, label: "YouTube", href: "#", brand: "youtube" },
+  { Icon: Send, label: "Telegram", href: "#", brand: "telegram" },
+];
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        {/* LEFT SECTION */}
+        {/* BRAND */}
         <div className={styles.left}>
           <h2 className={styles.title}>Article Hub</h2>
 
           <p className={styles.description}>
-            We are Computer Science students at UET RCET, currently in our 3rd
-            semester. Article Hub is our semester project, created with the aim
-            of sharing interesting and informative articles on a variety of
-            topics.
+            A modern platform for publishing thoughtful articles on technology,
+            education, and digital trends.
           </p>
 
-          <div className="gap-4 flex mt-4 sm:justify-start justify-center">
-            <Facebook className="w-6 h-6 text-blue-400 cursor-pointer" />
-            <Instagram className="w-6 h-6 text-pink-400 cursor-pointer" />
-            <Twitter className="w-6 h-6 text-sky-400 cursor-pointer" />
-            <Linkedin className="w-6 h-6 text-blue-600 cursor-pointer" />
-            <Youtube className="w-6 h-6 text-red-500 cursor-pointer" />
-            <Slack className="w-6 h-6 text-purple-700 cursor-pointer" />
-            <Gamepad2 className="w-6 h-6 text-green-400 cursor-pointer" />
+          {/* social links */}
+          <div className={styles.socials}>
+            {SOCIAL_LINKS.map(({ Icon, label, href, brand }) => (
+              <a
+                key={label}
+                href={href}
+                aria-label={label}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.socialIcon} ${styles[brand]}`}
+              >
+                <Icon />
+              </a>
+            ))}
           </div>
         </div>
 
+        {/* RESOURCES */}
         <div className={styles.linksCol}>
-          <span className={styles.heading}>Home</span>
-          <a className={styles.link}>Blogs</a>
-          <a className={styles.link}>Courses</a>
-          <a className={styles.link}>YouTube</a>
+          <span className={styles.heading}>Resources</span>
+          <Link to="/" className={styles.link}>
+            Home
+          </Link>
+          <Link to="/" className={styles.link}>
+            Articles
+          </Link>
+          <a
+            href="https://youtube.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.link}
+          >
+            YouTube Channel
+          </a>
         </div>
 
+        {/* COMPANY */}
         <div className={styles.linksCol}>
-          <span className={styles.heading}>About</span>
-          <a className={styles.link}>Contact</a>
-          <a className={styles.link}>Privacy Policy</a>
-          <a className={styles.link}>Terms & Conditions</a>
+          <span className={styles.heading}>Company</span>
+          <Link to="/about" className={styles.link}>
+            About Us
+          </Link>
+          <Link to="/contact" className={styles.link}>
+            Contact Us
+          </Link>
+          <Link to="/privacy" className={styles.link}>
+            Privacy & Data
+          </Link>
+          <Link to="/terms" className={styles.link}>
+            Terms of Use
+          </Link>
         </div>
       </div>
 
+      {/* BOTTOM BAR */}
       <div className={styles.bottomBar}>
-        <span>Copyright @ {new Date().getFullYear()} Article Hub</span>
         <span>
-          Developed by:{" "}
-          <strong className={styles.devName}>Rauf & Tayyab</strong>
+          © {new Date().getFullYear()} Article Hub. All rights reserved.
+        </span>
+        <span>
+          Crafted by{" "}
+          <strong className={styles.devName}>Abdul Rauf & Tayyab Ali</strong>
         </span>
       </div>
     </footer>
