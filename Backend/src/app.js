@@ -2,7 +2,12 @@ import express from "express";
 import session from "express-session";
 import passport from "passport";
 import cors from "cors";
-import authRoutes from "./routes/auth.route.js";
+
+import contactRoutes from "./routes/contact.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import articleRoutes from "./routes/article.routes.js";
+
 import setupPassport from "./config/passport.config.js";
 
 const app = express();
@@ -29,7 +34,10 @@ setupPassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/articles", articleRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((err, req, res, next) => {
   if (err.message === "UserDeleted") {
