@@ -3,8 +3,6 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
 import db from "./db.config.js";
-import env from "dotenv";
-env.config();
 
 export default function setupPassport() {
   passport.use(

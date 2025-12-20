@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { COUNTRIES } from "../util/countries";
+import { COUNTRIES } from "../data/countries";
 
 import styles from "../styles/CountryDropdown.module.css";
 
