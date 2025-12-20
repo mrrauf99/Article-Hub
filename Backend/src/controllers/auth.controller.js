@@ -51,7 +51,7 @@ export async function resendOtp(req, res) {
     );
 
     if (result.rowCount === 0) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "No pending verification found. Please sign up again.",
       });
@@ -84,21 +84,21 @@ export async function verifyOtp(req, res) {
     const record = rows[0];
 
     if (!record) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "No verification code found. Please request a new one.",
       });
     }
 
     if (new Date(record.expires_at) < new Date()) {
-      return res.status(200).json({
+      return res.status(410).json({
         success: false,
         message: "Verification code has expired. Please request a new one.",
       });
     }
 
     if (record.otp !== otp) {
-      return res.status(200).json({
+      return res.status(400).json({
         success: false,
         message: "Incorrect verification code.",
       });
@@ -213,7 +213,7 @@ export async function forgetPassword(req, res) {
     ]);
 
     if (userResult.rowCount === 0) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "No account found with this email.",
       });
@@ -254,7 +254,7 @@ export async function resetPassword(req, res) {
     );
 
     if (userResult.rowCount === 0) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "We couldn't find an account with this email.",
       });
@@ -267,7 +267,7 @@ export async function resetPassword(req, res) {
     );
 
     if (rowCount === 0) {
-      return res.status(200).json({
+      return res.status(401).json({
         success: false,
         message: "Unauthorized or expired password reset request.",
       });
@@ -282,7 +282,7 @@ export async function resetPassword(req, res) {
     );
 
     if (isSamePassword) {
-      return res.status(200).json({
+      return res.status(400).json({
         success: false,
         message: "New password must be different from your current password.",
       });
