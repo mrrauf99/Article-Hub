@@ -1,54 +1,49 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
-import { getNavItemsForRole } from "./navConfig";
+import { useRoleFromPath } from "@/hooks/useRoleFromPath";
+import { getNavItemsForRole } from "@/utils/navConfig";
 
 import NavLogo from "./NavLogo";
-import NavLinks from "./NavLink";
+import DesktopNavLinks from "./DesktopNavLinks";
 import UserMenu from "./UserMenu";
-import MobileMenu from "./MobileMenu";
+import MobileNavMenu from "./MobileNavMenu";
 
 import styles from "@/styles/navbar.module.css";
 
-const Navbar = ({ userRole = "guest", userName = "", onLogout = () => {} }) => {
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const navItems = getNavItemsForRole(userRole);
+export default function Navbar({ userName = "", onLogout }) {
+  const [open, setOpen] = useState(false);
+
+  const role = useRoleFromPath();
+  const navItems = getNavItemsForRole(role);
 
   return (
     <nav className={styles.nav}>
       <div className={styles.inner}>
         <NavLogo />
 
-        {/* Desktop nav links */}
-        <NavLinks navItems={navItems} />
+        {navItems.length > 0 && <DesktopNavLinks navItems={navItems} />}
 
-        {/* Desktop user/auth area */}
-        <UserMenu userRole={userRole} userName={userName} onLogout={onLogout} />
+        <UserMenu role={role} userName={userName} onLogout={onLogout} />
 
-        {/* Mobile toggle button */}
-        <button
-          className={styles.mobileToggle}
-          onClick={() => setIsMobileOpen((v) => !v)}
-        >
-          {isMobileOpen ? (
-            <X className={styles.mobileToggleIcon} />
-          ) : (
-            <Menu className={styles.mobileToggleIcon} />
-          )}
-        </button>
+        {role !== "guest" && (
+          <button
+            className={styles.mobileToggle}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X /> : <Menu />}
+          </button>
+        )}
       </div>
 
-      {/* Mobile menu */}
-      <MobileMenu
-        isOpen={isMobileOpen}
-        onClose={() => setIsMobileOpen(false)}
+      <MobileNavMenu
+        isOpen={open}
+        onClose={() => setOpen(false)}
         navItems={navItems}
-        userRole={userRole}
+        role={role}
         userName={userName}
         onLogout={onLogout}
       />
     </nav>
   );
-};
-
-export default Navbar;
+}

@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Eye, Trash2, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef, memo } from "react";
@@ -13,6 +15,7 @@ const STATUS_COLORS = {
 function ArticleCard({ article, mode }) {
   const navigate = useNavigate();
   const confirmRef = useRef(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const openArticle = () => {
     console.log("Navigating to article:", article.article_id);
@@ -62,13 +65,19 @@ function ArticleCard({ article, mode }) {
         )}
 
         {/* image */}
+
         {article.image_url && (
-          <div className="h-48 overflow-hidden">
+          <div className="h-48 relative overflow-hidden bg-gray-200">
+            {!imgLoaded && (
+              <div className="absolute inset-0 animate-pulse bg-gray-300" />
+            )}
+
             <img
               src={article.image_url}
               alt={article.title}
-              loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition"
+              onLoad={() => setImgLoaded(true)}
+              className={`w-full h-full object-cover transition-opacity duration-300
+        ${imgLoaded ? "opacity-100" : "opacity-0"}`}
             />
           </div>
         )}
