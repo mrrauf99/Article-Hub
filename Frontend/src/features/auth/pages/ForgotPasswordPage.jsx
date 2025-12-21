@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
 import { Form, useActionData, useNavigation } from "react-router-dom";
+import { Mail, ArrowLeft } from "lucide-react";
 
 import AlertMessageBox from "../components/AlertMessageBox";
-import Input from "../components/Input";
+import InputField from "@/components/InputField";
 import AuthLayout from "../components/AuthLayout";
 import SwitchPage from "../components/SwitchPage";
 import Button from "../components/Button";
 
-import { useInput } from "../hooks/useInput";
-import { isEmpty, isEmailValid } from "../util/authValidation";
+import { useForgotPasswordForm } from "../hooks/useForgotPasswordForm";
 
 export default function ForgotPassword() {
-  const [alertMessage, setAlertMessage] = useState("");
-  const actionData = useActionData();
+  const form = useForgotPasswordForm();
   const navigation = useNavigation();
+  const actionData = useActionData();
   const isSubmitting = navigation.state === "submitting";
+
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     if (actionData?.message) {
@@ -22,16 +24,8 @@ export default function ForgotPassword() {
     }
   }, [actionData]);
 
-  const email = useInput("", (v) => !isEmpty(v) && isEmailValid(v));
-
-  const errorMsg =
-    email.hasError &&
-    (!email.value
-      ? "Please fill out this field."
-      : "Please enter a valid email address.");
-
   function handleSubmit(e) {
-    if (errorMsg) {
+    if (!form.validate()) {
       e.preventDefault();
     }
   }
@@ -40,7 +34,11 @@ export default function ForgotPassword() {
     <AuthLayout
       title="Forgot Password?"
       subtitle="Enter your email address and we'll send you a code to reset your password."
-      subtitleStyle={{ fontSize: "1rem", color: "#6b7280", lineHeight: "1.5" }}
+      subtitleStyle={{
+        fontSize: "1rem",
+        color: "#6b7280",
+        lineHeight: "1.5",
+      }}
     >
       {alertMessage && (
         <AlertMessageBox
@@ -54,12 +52,15 @@ export default function ForgotPassword() {
         className="flex flex-col gap-2"
         onSubmit={handleSubmit}
       >
-        <Input
+        <InputField
           label="Email address"
-          id="email"
+          icon={Mail}
+          type="email"
           name="email"
-          {...email}
-          error={errorMsg}
+          value={form.values.email}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          error={form.errors.email}
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>
@@ -67,7 +68,7 @@ export default function ForgotPassword() {
         </Button>
       </Form>
 
-      <SwitchPage linkText="← Back to Sign In" linkTo="/login" />
+      <SwitchPage icon={ArrowLeft} linkText="Back To Login" linkTo="/login" />
     </AuthLayout>
   );
 }

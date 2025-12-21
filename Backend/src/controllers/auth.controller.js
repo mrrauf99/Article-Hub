@@ -119,7 +119,7 @@ export async function verifyOtp(req, res) {
       await db.query("DELETE FROM email_otps WHERE email = $1", [email]);
     }
 
-    if (flow === "reset_password") {
+    if (flow === "reset-password") {
       await db.query(
         `UPDATE email_otps SET is_verified = true WHERE email = $1`,
         [email]

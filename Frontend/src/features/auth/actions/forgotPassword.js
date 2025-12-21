@@ -9,7 +9,7 @@ export default async function forgotPasswordAction({ request }) {
     const { data } = await authApi.forgotPassword({ email });
     if (data.success) {
       return redirect(
-        `/verify-otp?email=${encodeURIComponent(email)}&flow=reset_password`
+        `/verify-otp?email=${encodeURIComponent(email)}&flow=reset-password`
       );
     }
 

@@ -10,16 +10,13 @@ import Button from "../components/Button";
 
 import { useSignUpForm } from "../hooks/useSignUpForm";
 
-import eyeHidden from "../assets/eye-hidden.png";
-import eyeShow from "../assets/eye-show.png";
-
 export default function SignUp() {
   const form = useSignUpForm();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
-  function handleFormSubmit(e) {
-    if (form.isInvalidForm) {
+  function handleSubmit(e) {
+    if (!form.validate()) {
       e.preventDefault();
     }
   }
@@ -29,20 +26,14 @@ export default function SignUp() {
       <Form
         method="POST"
         className="flex flex-col gap-2"
-        onSubmit={handleFormSubmit}
+        onSubmit={handleSubmit}
       >
-        <SignUpFields
-          form={form}
-          usernameCheck={form.usernameCheck}
-          emailCheck={form.emailCheck}
-          eyeShow={eyeShow}
-          eyeHidden={eyeHidden}
-        />
+        <SignUpFields form={form} />
 
         <PasswordRequirements
           errors={form.passwordErrors}
-          passwordEntered={form.password.enteredValue.length > 0}
-          confirmEntered={form.confirmPassword.enteredValue.length > 0}
+          passwordEntered={form.values.password.length > 0}
+          confirmEntered={form.values.confirmPassword.length > 0}
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>

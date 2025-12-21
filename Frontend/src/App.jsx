@@ -31,7 +31,7 @@ import { articleDetailLoader } from "./features/articles/loaders/articleDetail.j
 
 import "./index.css";
 
-function App() {
+export default function App() {
   const router = createBrowserRouter([
     {
       path: "/login",
@@ -98,5 +98,3 @@ function App() {
 
   return <RouterProvider router={router} />;
 }
-
-export default App;
