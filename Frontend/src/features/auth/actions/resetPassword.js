@@ -6,7 +6,7 @@ export default async function resetPasswordAction({ request }) {
   const url = new URL(request.url);
   const email = url.searchParams.get("email");
 
-  const password = formData.get("new-password");
+  const password = formData.get("password");
 
   try {
     const payload = { email, password };

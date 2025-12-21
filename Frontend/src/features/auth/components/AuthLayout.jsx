@@ -1,4 +1,9 @@
-export default function AuthLayout({ title, subtitle, children, subtitleStyle }) {
+export default function AuthLayout({
+  title,
+  subtitle,
+  children,
+  subtitleStyle,
+}) {
   return (
     <div
       className="min-h-screen flex justify-center items-center bg-gradient-to-br
@@ -12,7 +17,7 @@ export default function AuthLayout({ title, subtitle, children, subtitleStyle })
 
           <h2
             style={subtitleStyle}
-            className="text-2xl my-2 text-[#333] text-center max-[480px]:text-[1.125rem]"
+            className="text-2xl mt-2 mb-4 text-[#333] text-center max-[480px]:text-[1.125rem]"
           >
             {subtitle}
           </h2>

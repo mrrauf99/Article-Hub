@@ -1,6 +1,5 @@
-import { useInput } from "./useInput";
+import { useState } from "react";
 import { useAvailability } from "./useAvailability";
-
 import {
   isEmpty,
   isEmailValid,
@@ -8,77 +7,116 @@ import {
   validateUsername,
 } from "../util/authValidation";
 
+const initialValues = {
+  name: "",
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  country: "",
+};
+
 export function useSignUpForm() {
-  const name = useInput("", (v) => !isEmpty(v));
-  const username = useInput("", (v) => !isEmpty(v));
-  const email = useInput("", (v) => !isEmpty(v));
-  const password = useInput("", (v) => !isEmpty(v));
-  const confirmPassword = useInput("", (v) => !isEmpty(v));
-  const country = useInput("", (v) => !isEmpty(v));
+  const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState({});
 
-  const usernameError =
-    (username.hasError && "Please fill out this field.") ||
-    (username.didEdit && validateUsername(username.enteredValue));
+  /* ---------------- Field validation ---------------- */
 
-  const emailError =
-    (email.hasError && "Please fill out this field.") ||
-    (email.didEdit &&
-      !isEmailValid(email.enteredValue) &&
-      "Please enter a valid email.");
+  const validateField = (name, value) => {
+    if (isEmpty(value)) {
+      return "Please fill out this field.";
+    }
+
+    switch (name) {
+      case "username":
+        return validateUsername(value);
+
+      case "email":
+        if (!isEmailValid(value)) {
+          return "Please enter a valid email.";
+        }
+        return null;
+
+      default:
+        return null;
+    }
+  };
+
+  /* ---------------- Password validation ---------------- */
 
   const passwordErrors = validatePassword(
-    password.enteredValue,
-    confirmPassword.enteredValue
+    values.password,
+    values.confirmPassword
   );
 
-  const isUsernameInvalid =
-    isEmpty(username.enteredValue) ||
-    validateUsername(username.enteredValue) !== null;
+  /* ---------------- Availability checks ---------------- */
 
-  const isEmailInvalid =
-    isEmpty(email.enteredValue) || !isEmailValid(email.enteredValue);
+  const isUsernameInvalid =
+    isEmpty(values.username) || validateUsername(values.username) !== null;
+
+  const isEmailInvalid = isEmpty(values.email) || !isEmailValid(values.email);
 
   const usernameCheck = useAvailability(
-    username.enteredValue,
+    values.username,
     isUsernameInvalid,
     "username"
   );
 
-  const emailCheck = useAvailability(
-    email.enteredValue,
-    isEmailInvalid,
-    "email"
-  );
+  const emailCheck = useAvailability(values.email, isEmailInvalid, "email");
 
-  const isInvalidForm =
-    name.hasError ||
-    usernameError ||
-    emailError ||
-    password.hasError ||
-    confirmPassword.hasError ||
-    country.hasError ||
-    Object.values(passwordErrors).some((v) => v === false) ||
-    usernameCheck.status === "unavailable" ||
-    emailCheck.status === "unavailable" ||
-    isEmpty(name.enteredValue) ||
-    isEmpty(username.enteredValue) ||
-    isEmpty(email.enteredValue) ||
-    isEmpty(password.enteredValue) ||
-    isEmpty(confirmPassword.enteredValue) ||
-    isEmpty(country.enteredValue);
+  /* ---------------- Form validation ---------------- */
+
+  const validate = () => {
+    const newErrors = {};
+
+    Object.keys(values).forEach((key) => {
+      const error = validateField(key, values[key]);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.values(passwordErrors).includes(false)) {
+      newErrors.password = "Invalid password.";
+    }
+
+    if (usernameCheck.status === "unavailable") {
+      newErrors.username = usernameCheck.message;
+    }
+
+    if (emailCheck.status === "unavailable") {
+      newErrors.email = emailCheck.message;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  /* ---------------- Handlers ---------------- */
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setValues((v) => ({ ...v, [name]: value }));
+    setErrors((e) => ({ ...e, [name]: null }));
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const error = validateField(name, value);
+
+    setErrors((e) => ({
+      ...e,
+      [name]: error,
+    }));
+  };
 
   return {
-    name,
-    username,
-    email,
-    password,
-    confirmPassword,
-    country,
-    usernameError,
-    emailError,
+    values,
+    errors,
     passwordErrors,
-    isInvalidForm,
     usernameCheck,
     emailCheck,
+    handleChange,
+    handleBlur,
+    validate,
   };
 }

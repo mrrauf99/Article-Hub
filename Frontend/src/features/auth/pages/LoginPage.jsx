@@ -1,26 +1,24 @@
-import { Link, Form } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useActionData, useNavigation } from "react-router-dom";
+import { Link, Form, useActionData, useNavigation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-import eyeHidden from "../assets/eye-hidden.png";
-import eyeShow from "../assets/eye-show.png";
-
+import { User, Lock } from "lucide-react";
 import AlertMessageBox from "../components/AlertMessageBox";
-import Input from "../components/Input";
+import InputField from "@/components/InputField";
 import AuthLayout from "../components/AuthLayout";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import OrDivider from "../components/OrDivider";
 import SwitchPage from "../components/SwitchPage";
 import Button from "../components/Button";
 
-import { useInput } from "../hooks/useInput";
-import { isEmpty } from "../util/authValidation";
+import { useLoginForm } from "../hooks/useLoginForm";
 
 export default function Login() {
-  const [alertMessage, setAlertMessage] = useState("");
-  const actionData = useActionData();
+  const form = useLoginForm();
   const navigation = useNavigation();
+  const actionData = useActionData();
   const isSubmitting = navigation.state === "submitting";
+
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     if (actionData?.message) {
@@ -28,34 +26,8 @@ export default function Login() {
     }
   }, [actionData]);
 
-  const {
-    enteredValue: identifier,
-    handleChange: handleIdentifierChange,
-    handleBlur: handleIdentifierBlur,
-    hasError: identifierError,
-  } = useInput("", (v) => !isEmpty(v));
-
-  const {
-    enteredValue: password,
-    handleChange: handlePasswordChange,
-    handleBlur: handlePasswordBlur,
-    hasError: passwordError,
-    didEdit: passwordDidEdit,
-  } = useInput("", (v) => !isEmpty(v));
-
-  const passwordErrorMsg =
-    (passwordError && "Please fill out this field.") ||
-    (passwordDidEdit &&
-      password.length < 8 &&
-      "Password must be at least 8 characters.") ||
-    (passwordDidEdit &&
-      password.length > 64 &&
-      "Password must be less than 64 characters.");
-
   function handleSubmit(e) {
-    const isInvalidForm = !identifier || !password || passwordErrorMsg;
-
-    if (isInvalidForm) {
+    if (!form.validate()) {
       e.preventDefault();
     }
   }
@@ -74,27 +46,25 @@ export default function Login() {
         className="flex flex-col gap-2"
         onSubmit={handleSubmit}
       >
-        <Input
+        <InputField
           label="Username or email"
-          id="identifier"
-          type="text"
+          icon={User}
           name="identifier"
-          handleChange={handleIdentifierChange}
-          handleBlur={handleIdentifierBlur}
-          enteredValue={identifier}
-          error={identifierError && "Please fill out this field."}
+          value={form.values.identifier}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          error={form.errors.identifier}
         />
-        <Input
+
+        <InputField
           label="Password"
-          id="password"
+          icon={Lock}
           type="password"
           name="password"
-          enteredValue={password}
-          handleChange={handlePasswordChange}
-          handleBlur={handlePasswordBlur}
-          error={passwordErrorMsg}
-          eyeShow={eyeShow}
-          eyeHidden={eyeHidden}
+          value={form.values.password}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          error={form.errors.password}
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>
@@ -105,7 +75,7 @@ export default function Login() {
       <div className="text-right mt-2">
         <Link
           to="/forgot-password"
-          className="inline-block text-indigo-600 hover:underline focus:outline-none px-1"
+          className="inline-block text-indigo-600 hover:underline px-1"
         >
           Forgot password?
         </Link>

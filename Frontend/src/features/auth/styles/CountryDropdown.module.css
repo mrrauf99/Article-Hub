@@ -19,16 +19,6 @@
   transition: border-color 0.2s;
 }
 
-.input:hover {
-  border-color: #bbb;
-}
-
-.input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0.3125rem rgba(79, 70, 229, 0.3);
-  outline: none;
-}
-
 .selectedValue {
   color: #1f2937;
 }
@@ -90,8 +80,7 @@
 }
 
 .searchInput:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0.3125rem rgba(79, 70, 229, 0.3);
+  border-color: #2563eb;
   outline: none;
 }
 

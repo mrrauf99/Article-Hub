@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useContactForm } from "../hooks/useContactForm";
 
 import { Send, User, Mail, MessageSquare } from "lucide-react";
-import { Field } from "./Field";
+import InputField from "@/components/InputField";
 
 export default function ContactForm() {
   const fetcher = useFetcher();
@@ -41,7 +41,7 @@ export default function ContactForm() {
       </p>
 
       <fetcher.Form method="post" onSubmit={handleSubmit} className="space-y-6">
-        <Field
+        <InputField
           label="Your Name"
           icon={User}
           name="name"
@@ -53,7 +53,7 @@ export default function ContactForm() {
           error={errors.name}
         />
 
-        <Field
+        <InputField
           label="Email Address"
           icon={Mail}
           name="email"
@@ -66,7 +66,7 @@ export default function ContactForm() {
           error={errors.email}
         />
 
-        <Field
+        <InputField
           label="Subject"
           icon={MessageSquare}
           name="subject"

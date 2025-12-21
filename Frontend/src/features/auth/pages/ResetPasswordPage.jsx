@@ -1,24 +1,23 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Form, useActionData, useNavigation } from "react-router-dom";
 
+import { Lock } from "lucide-react";
 import AlertMessageBox from "../components/AlertMessageBox";
-import Input from "../components/Input";
+import InputField from "@/components/InputField";
 import AuthLayout from "../components/AuthLayout";
 import PasswordRequirements from "../components/PasswordRequirements";
 import SwitchPage from "../components/SwitchPage";
 import Button from "../components/Button";
 
-import eyeHidden from "../assets/eye-hidden.png";
-import eyeShow from "../assets/eye-show.png";
-
-import { useInput } from "../hooks/useInput";
-import { isEmpty, validatePassword } from "../util/authValidation";
+import { useResetPasswordForm } from "../hooks/useResetPasswordForm";
 
 export default function ResetPassword() {
-  const [alertMessage, setAlertMessage] = useState("");
+  const form = useResetPasswordForm();
   const actionData = useActionData();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     if (actionData?.message) {
@@ -26,20 +25,8 @@ export default function ResetPassword() {
     }
   }, [actionData]);
 
-  const newPassword = useInput("", (v) => !isEmpty(v));
-  const confirmPassword = useInput("", (v) => !isEmpty(v));
-  const passwordErrors = validatePassword(
-    newPassword.enteredValue,
-    confirmPassword.enteredValue
-  );
-
   function handleSubmit(e) {
-    const isInvalidForm =
-      Object.values(passwordErrors).some((v) => v === false) ||
-      newPassword.hasError ||
-      confirmPassword.hasError;
-
-    if (isInvalidForm) {
+    if (!form.validate()) {
       e.preventDefault();
     }
   }
@@ -62,33 +49,32 @@ export default function ResetPassword() {
         className="flex flex-col gap-2"
         onSubmit={handleSubmit}
       >
-        <Input
+        <InputField
           label="New Password"
-          id="new-password"
-          name="new-password"
+          icon={Lock}
           type="password"
-          handleChange={newPassword.handleChange}
-          handleBlur={newPassword.handleBlur}
-          error={newPassword.hasError && "Please fill out this field."}
-          eyeShow={eyeShow}
-          eyeHidden={eyeHidden}
+          name="password"
+          value={form.values.password}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          error={form.errors.password}
         />
-        <Input
+
+        <InputField
           label="Confirm Password"
-          id="confirm-password"
-          name="confirm-password"
+          icon={Lock}
           type="password"
-          handleChange={confirmPassword.handleChange}
-          handleBlur={confirmPassword.handleBlur}
-          error={confirmPassword.hasError && "Please fill out this field."}
-          eyeShow={eyeShow}
-          eyeHidden={eyeHidden}
+          name="confirmPassword"
+          value={form.values.confirmPassword}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          error={form.errors.confirmPassword}
         />
 
         <PasswordRequirements
-          errors={passwordErrors}
-          passwordEntered={newPassword.enteredValue.length > 0}
-          confirmEntered={confirmPassword.enteredValue.length > 0}
+          errors={form.passwordErrors}
+          passwordEntered={form.values.password.length > 0}
+          confirmEntered={form.values.confirmPassword.length > 0}
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>

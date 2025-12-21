@@ -47,7 +47,7 @@ export default async function verifyOtpAction({ request }) {
         };
       }
 
-      if (flow === "reset_password")
+      if (flow === "reset-password")
         return redirect(`/reset-password?email=${encodeURIComponent(email)}`);
 
       if (flow === "signup") return redirect("/dashboard");

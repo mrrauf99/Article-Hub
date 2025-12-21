@@ -7,22 +7,34 @@ export default function OTPInputs({
   handleKeyDown,
   handlePaste,
   isSubmitting,
+  status = "idle",
+  onUserInput,
 }) {
   return (
-    <div className={styles.inputs}>
+    <div className={`${styles.inputs} ${styles[status] || ""}`}>
       {otp.map((digit, index) => (
         <input
           key={index}
           ref={(el) => (inputRefs.current[index] = el)}
           type="text"
+          inputMode="numeric"
           maxLength={1}
           value={digit}
           disabled={isSubmitting}
-          inputMode="numeric"
-          onChange={(e) => handleChange(index, e.target.value)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          onPaste={index === 0 ? handlePaste : null}
           className={styles.input}
+          onChange={(e) => {
+            onUserInput?.();
+            handleChange(index, e.target.value);
+          }}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={
+            index === 0
+              ? (e) => {
+                  onUserInput?.();
+                  handlePaste(e);
+                }
+              : undefined
+          }
         />
       ))}
     </div>
