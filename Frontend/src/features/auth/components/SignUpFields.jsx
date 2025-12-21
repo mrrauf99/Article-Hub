@@ -1,83 +1,94 @@
-import Input from "../components/Input";
-import CountryDropdown from "../components/CountryDropdown";
+import InputField from "@/components/InputField";
+import CountryDropdown from "./CountryDropdown";
+import { User, AtSign, Mail, Lock } from "lucide-react";
 
-export default function SignUpFields({
-  form,
-  usernameCheck,
-  emailCheck,
-  eyeShow,
-  eyeHidden,
-}) {
+export default function SignUpFields({ form }) {
   return (
     <>
-      <Input
-        type="text"
+      {/* Name */}
+      <InputField
         label="Name"
-        id="name"
+        icon={User}
         name="name"
-        {...form.name}
-        error={form.name.hasError && "Please fill out this field."}
+        value={form.values.name}
+        onChange={form.handleChange}
+        onBlur={form.handleBlur}
+        error={form.errors.name}
       />
 
-      <Input
-        type="text"
+      {/* Username */}
+      <InputField
         label="Username"
-        id="username"
+        icon={AtSign}
         name="username"
-        {...form.username}
+        value={form.values.username}
+        onChange={form.handleChange}
+        onBlur={form.handleBlur}
+        loading={form.usernameCheck.status === "checking"}
         error={
-          form.usernameError ||
-          (usernameCheck.status === "unavailable" && usernameCheck.message) ||
-          (usernameCheck.status === "error" && usernameCheck.message)
+          form.errors.username ||
+          (form.usernameCheck.status === "unavailable" &&
+            form.usernameCheck.message) ||
+          (form.usernameCheck.status === "error" && form.usernameCheck.message)
         }
-        isLoading={usernameCheck.status === "checking"}
+        success={form.usernameCheck.status === "available"}
       />
 
-      <Input
+      {/* Email */}
+      <InputField
         label="Email"
-        id="email"
+        icon={Mail}
+        type="email"
         name="email"
         placeholder="abc@example.com"
-        {...form.email}
+        value={form.values.email}
+        onChange={form.handleChange}
+        onBlur={form.handleBlur}
+        loading={form.emailCheck.status === "checking"}
         error={
-          form.emailError ||
-          (emailCheck.status === "unavailable" && emailCheck.message) ||
-          (emailCheck.status === "error" && emailCheck.message)
+          form.errors.email ||
+          (form.emailCheck.status === "unavailable" &&
+            form.emailCheck.message) ||
+          (form.emailCheck.status === "error" && form.emailCheck.message)
         }
-        isLoading={emailCheck.status === "checking"}
+        success={form.emailCheck.status === "available"}
       />
 
+      {/* Country */}
       <CountryDropdown
-        value={form.country.enteredValue}
-        hasError={form.country.hasError}
-        onChange={form.country.handleChange}
-        onBlur={form.country.handleBlur}
+        name="country"
+        value={form.values.country}
+        onChange={form.handleChange}
+        onBlur={form.handleBlur}
+        hasError={Boolean(form.errors.country)}
       />
 
-      <Input
+      {/* Password */}
+      <InputField
         label="Password"
-        id="password"
+        icon={Lock}
+        type="password"
         name="password"
-        type="password"
-        {...form.password}
-        eyeShow={eyeShow}
-        eyeHidden={eyeHidden}
-        error={form.password.hasError && "Please fill out this field."}
+        value={form.values.password}
+        onChange={form.handleChange}
+        onBlur={form.handleBlur}
+        error={form.errors.password}
       />
 
-      <Input
+      {/* Confirm Password */}
+      <InputField
         label="Confirm Password"
-        id="confirm-password"
-        name="confirmPassword"
+        icon={Lock}
         type="password"
-        {...form.confirmPassword}
-        eyeShow={eyeShow}
-        eyeHidden={eyeHidden}
-        error={form.confirmPassword.hasError && "Please fill out this field."}
+        name="confirmPassword"
+        value={form.values.confirmPassword}
+        onChange={form.handleChange}
+        onBlur={form.handleBlur}
+        error={form.errors.confirmPassword}
       />
 
-      {/* Hidden input to send country data with form */}
-      <input type="hidden" name="country" value={form.country.enteredValue} />
+      {/* Hidden country input for POST */}
+      <input type="hidden" name="country" value={form.values.country} />
     </>
   );
 }

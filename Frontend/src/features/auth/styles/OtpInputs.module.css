@@ -14,11 +14,7 @@
   border-radius: 0.75rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.input:hover:not(:disabled) {
-  border-color: #a5b4fc;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .input:focus {
@@ -29,6 +25,40 @@
 .input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.error {
+  animation: shake 0.35s ease-in-out;
+}
+
+.error .input {
+  border-color: #ef4444;
+}
+
+.success .input {
+  border-color: #22c55e;
+}
+
+/* SHAKE */
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 @media (min-width: 640px) {
