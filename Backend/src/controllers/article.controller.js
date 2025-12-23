@@ -49,9 +49,8 @@ export const getApprovedArticles = async (req, res) => {
   }
 };
 
-/**
- * GET articles of logged-in user
- */
+//  GET articles of logged-in user
+
 export const getMyArticles = async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -119,9 +118,8 @@ export const getArticleById = async (req, res) => {
   }
 };
 
-/**
- * CREATE article
- */
+// CREATE article
+
 export const createArticle = async (req, res) => {
   const { title, introduction, content, conclusion, category } = req.body;
 
@@ -147,9 +145,8 @@ export const createArticle = async (req, res) => {
   }
 };
 
-/**
- * UPDATE article (owner only → resets status)
- */
+//  UPDATE article (owner only → resets status)
+
 export const updateArticle = async (req, res) => {
   const { articleId } = req.params;
   const { title, introduction, content, conclusion, category } = req.body;
@@ -191,9 +188,8 @@ export const updateArticle = async (req, res) => {
   }
 };
 
-/**
- * DELETE article (owner only)
- */
+// DELETE article (owner only)
+
 export const deleteArticle = async (req, res) => {
   const { articleId } = req.params;
 

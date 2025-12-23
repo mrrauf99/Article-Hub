@@ -21,7 +21,7 @@ export default function Login() {
   const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
-    if (actionData?.message) {
+    if (actionData?.success === false) {
       setAlertMessage(actionData.message);
     }
   }, [actionData]);

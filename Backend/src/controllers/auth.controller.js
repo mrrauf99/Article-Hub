@@ -6,137 +6,164 @@ import { sendEmailVerificationOtp } from "../services/email.service.js";
 export async function signUp(req, res) {
   const { email, username, name, password, country } = req.body;
 
+  const hashedPassword = await bcrypt.hash(
+    password,
+    Number(process.env.SALT_ROUNDS)
+  );
+
+  const otp = crypto.randomInt(100000, 1000000).toString();
+
+  req.session.otp = {
+    flow: "signup",
+    email,
+    code: otp,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+    verified: false,
+    payload: {
+      email,
+      username,
+      name,
+      password: hashedPassword,
+      country,
+    },
+  };
+
+  await sendEmailVerificationOtp(email, otp);
+
+  return res.status(200).json({
+    success: true,
+    message: "Verification code sent to your email.",
+  });
+}
+
+export async function login(req, res) {
+  const { identifier, password } = req.body;
+
   try {
-    const hashedPassword = await bcrypt.hash(
-      password,
-      Number(process.env.SALT_ROUNDS)
+    const { rows } = await db.query(
+      "SELECT id, password FROM users WHERE email = $1 OR username = $1",
+      [identifier]
     );
 
-    const otp = crypto.randomInt(100000, 1000000).toString();
+    if (!rows.length) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
 
-    await db.query(
-      `INSERT INTO email_otps 
-        (email, otp, name, username, password, country, expires_at)
-       VALUES ($1,$2,$3,$4,$5,$6, NOW() + INTERVAL '5 minutes')`,
-      [email, otp, name, username, hashedPassword, country]
-    );
+    const user = rows[0];
+    const match = await bcrypt.compare(password, user.password);
 
-    await sendEmailVerificationOtp(email, otp);
+    if (!match) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
 
-    return res.status(200).json({
-      success: true,
-      message: "Verification code sent to your email. Please check your inbox.",
-      email: email,
+    req.session.regenerate((err) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: "Session error. Please try again.",
+        });
+      }
+
+      req.session.userId = user.id;
+      req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000;
+
+      res.status(200).json({
+        success: true,
+        message: "Logged in successfully.",
+      });
     });
   } catch (err) {
-    console.error("SignUp server error:", err);
-
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: "Unable to create account. Please try again later.",
+      message: "Something went wrong. Please try again later.",
     });
   }
 }
 
 export async function resendOtp(req, res) {
-  const { email } = req.body;
-
   try {
-    const otp = crypto.randomInt(100000, 1000000).toString();
+    const otpSession = req.session.otp;
 
-    const result = await db.query(
-      `UPDATE email_otps SET otp = $1,
-       expires_at = NOW() + INTERVAL '5 minutes' WHERE email = $2 RETURNING 1`,
-      [otp, email]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({
+    if (!otpSession) {
+      return res.status(401).json({
         success: false,
-        message: "No pending verification found. Please sign up again.",
+        message: "Session expired. Please login again.",
       });
     }
 
-    await sendEmailVerificationOtp(email, otp);
+    const otp = crypto.randomInt(100000, 1000000).toString();
+
+    otpSession.code = otp;
+    otpSession.expiresAt = Date.now() + 5 * 60 * 1000;
+    otpSession.verified = false;
+
+    await sendEmailVerificationOtp(otpSession.email, otp);
 
     return res.status(200).json({
       success: true,
-      message: "New verification code sent. Please check your email.",
+      message: "New verification code sent.",
     });
   } catch (err) {
     console.error("Resend OTP error:", err);
+
     return res.status(500).json({
       success: false,
-      message: "Failed to send verification code. Please try again.",
+      message: "Failed to resend code. Please try again.",
     });
   }
 }
 
 export async function verifyOtp(req, res) {
-  const { email, otp, flow } = req.body;
+  const { otp } = req.body;
+  const sessionOtp = req.session.otp;
 
-  try {
-    const { rows } = await db.query(
-      `SELECT *FROM email_otps WHERE email = $1 ORDER BY id DESC`,
-      [email]
-    );
-
-    const record = rows[0];
-
-    if (!record) {
-      return res.status(404).json({
-        success: false,
-        message: "No verification code found. Please request a new one.",
-      });
-    }
-
-    if (new Date(record.expires_at) < new Date()) {
-      return res.status(410).json({
-        success: false,
-        message: "Verification code has expired. Please request a new one.",
-      });
-    }
-
-    if (record.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Incorrect verification code.",
-      });
-    }
-
-    if (flow === "signup") {
-      await db.query(
-        "INSERT INTO users (username, email, name, password, country) VALUES ($1,$2,$3,$4,$5)",
-        [
-          record.username,
-          record.email,
-          record.name,
-          record.password,
-          record.country,
-        ]
-      );
-
-      await db.query("DELETE FROM email_otps WHERE email = $1", [email]);
-    }
-
-    if (flow === "reset-password") {
-      await db.query(
-        `UPDATE email_otps SET is_verified = true WHERE email = $1`,
-        [email]
-      );
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Account verified successfully!",
-    });
-  } catch (err) {
-    console.error("OTP verify error:", err);
-    return res.status(500).json({
+  if (!sessionOtp) {
+    return res.status(401).json({
       success: false,
-      message: "Verification failed. Please try again.",
+      message: "Verification session expired. Please request a new code.",
     });
   }
+
+  if (Date.now() > sessionOtp.expiresAt) {
+    req.session.destroy(() => {});
+    return res.status(410).json({
+      success: false,
+      message: "OTP expired.",
+    });
+  }
+
+  if (sessionOtp.code !== otp) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid verification code.",
+    });
+  }
+
+  // mark verified
+  sessionOtp.verified = true;
+
+  // SIGNUP FINALIZATION
+  if (sessionOtp.flow === "signup") {
+    const p = sessionOtp.payload;
+
+    await db.query(
+      "INSERT INTO users (email, username, name, password, country) VALUES ($1,$2,$3,$4,$5)",
+      [p.email, p.username, p.name, p.password, p.country]
+    );
+
+    req.session.destroy(() => {});
+  }
+
+  res.status(200).json({
+    success: true,
+    next: sessionOtp.flow === "reset-password" ? "/reset-password" : "/login",
+  });
 }
 
 export async function checkEmailAvailability(req, res) {
@@ -206,112 +233,102 @@ export async function checkUsernameAvailability(req, res) {
 export async function forgetPassword(req, res) {
   const { email } = req.body;
 
-  try {
-    // Check if email exists
-    const userResult = await db.query("SELECT id FROM users WHERE email = $1", [
-      email,
-    ]);
+  const { rowCount } = await db.query("SELECT 1 FROM users WHERE email = $1", [
+    email,
+  ]);
 
-    if (userResult.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No account found with this email.",
-      });
-    }
-
-    const otp = crypto.randomInt(100000, 1000000).toString();
-
-    await db.query(
-      `INSERT INTO email_otps (email, otp, expires_at)VALUES ($1,$2, NOW() + INTERVAL '5 minutes')`,
-      [email, otp]
-    );
-
-    await sendEmailVerificationOtp(email, otp);
-
-    return res.status(200).json({
-      success: true,
-      message: "Verification code sent to your email. Please check your inbox.",
-      email: email,
-    });
-  } catch (err) {
-    console.error("Forgot Password Error:", err);
-
-    return res.status(500).json({
+  if (!rowCount) {
+    return res.status(404).json({
       success: false,
-      message: "Failed to send verification code. Please try again.",
+      message: "No account found with this email.",
     });
   }
+
+  const otp = crypto.randomInt(100000, 1000000).toString();
+
+  req.session.otp = {
+    flow: "reset-password",
+    email,
+    code: otp,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+    verified: false,
+  };
+
+  await sendEmailVerificationOtp(email, otp);
+
+  res.status(200).json({
+    success: true,
+    message: "Verification code sent to your email.",
+  });
 }
 
 export async function resetPassword(req, res) {
-  const { email, password: newPassword } = req.body;
+  const { password } = req.body;
+  const otp = req.session.otp;
 
-  try {
-    // Check if user exists
-    const userResult = await db.query(
-      "SELECT password FROM users WHERE email = $1",
-      [email]
-    );
+  if (!otp.verified || otp.flow !== "reset-password") {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized reset attempt.",
+    });
+  }
 
-    if (userResult.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "We couldn't find an account with this email.",
-      });
-    }
+  const { rows } = await db.query(
+    "SELECT password FROM users WHERE email = $1",
+    [otp.email]
+  );
 
-    // Check OTP validity
-    const { rowCount } = await db.query(
-      "SELECT 1 FROM email_otps WHERE email = $1 AND is_verified = true",
-      [email]
-    );
-
-    if (rowCount === 0) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized or expired password reset request.",
-      });
-    }
-
-    const currentHashedPassword = userResult.rows[0].password;
-
-    // Compare new password with old password
-    const isSamePassword = await bcrypt.compare(
-      newPassword,
-      currentHashedPassword
-    );
-
+  if (rows.length > 0) {
+    const isSamePassword = await bcrypt.compare(password, rows[0].password);
     if (isSamePassword) {
       return res.status(400).json({
         success: false,
-        message: "New password must be different from your current password.",
+        message: "New password cannot be the same as the old password.",
       });
     }
+  }
 
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(
-      newPassword,
-      Number(process.env.SALT_ROUNDS)
-    );
+  const hashedPassword = await bcrypt.hash(
+    password,
+    Number(process.env.SALT_ROUNDS)
+  );
 
-    // Update password
-    await db.query("UPDATE users SET password = $1 WHERE email = $2", [
-      hashedPassword,
-      email,
-    ]);
+  await db.query("UPDATE users SET password = $1 WHERE email = $2", [
+    hashedPassword,
+    otp.email,
+  ]);
 
-    // Delete OTP record
-    await db.query("DELETE FROM email_otps WHERE email = $1", [email]);
+  req.session.destroy(() => {});
 
-    return res.status(200).json({
-      success: true,
-      message: "Password reset successful.",
-    });
-  } catch (err) {
-    console.error("Reset password error:", err);
-    return res.status(500).json({
+  res.status(200).json({
+    success: true,
+    message: "Password reset successful.",
+  });
+}
+
+export async function completeGoogleSignup(req, res) {
+  const { username } = req.body;
+  const oauth = req.session.oauth;
+
+  if (!oauth || oauth.completed) {
+    return res.status(401).json({
       success: false,
-      message: "Unable to reset password. Please try again.",
+      message: "OAuth session expired.",
     });
   }
+
+  const { rows } = await db.query(
+    `INSERT INTO users (email, name, username, avatar)
+     VALUES ($1,$2,$3,$4) returning id`,
+    [oauth.email, oauth.name, username, oauth.avatar]
+  );
+
+  oauth.completed = true;
+
+  req.session.userId = rows[0].id;
+
+  // destroy temp oauth data
+  delete req.session.oauth;
+
+  res.redirect(`${process.env.CLIENT_BASE_URL}/dashboard`);
 }

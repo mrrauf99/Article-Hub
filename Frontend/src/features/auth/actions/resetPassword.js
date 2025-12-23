@@ -3,15 +3,11 @@ import { redirect } from "react-router-dom";
 
 export default async function resetPasswordAction({ request }) {
   const formData = await request.formData();
-  const url = new URL(request.url);
-  const email = url.searchParams.get("email");
 
   const password = formData.get("password");
 
   try {
-    const payload = { email, password };
-
-    const { data } = await authApi.resetPassword(payload);
+    const { data } = await authApi.resetPassword({ password });
     if (data.success) {
       return redirect("/login");
     }

@@ -1,8 +1,7 @@
 import { apiClient } from "./apiClient";
 
 export const authApi = {
-  login: (data) =>
-    apiClient.post("/api/auth/login", data, { withCredentials: true }),
+  login: (data) => apiClient.post("/api/auth/login", data),
 
   signup: (data) => apiClient.post("/api/auth/register", data),
 
@@ -10,8 +9,7 @@ export const authApi = {
 
   checkUsername: (data) => apiClient.post("/api/auth/check-username", data),
 
-  logout: () =>
-    apiClient.post("/api/auth/logout", {}, { withCredentials: true }),
+  logout: () => apiClient.post("/api/auth/logout"),
 
   verifyOTP: (data) => apiClient.post("/api/auth/verify-otp", data),
 
@@ -20,4 +18,10 @@ export const authApi = {
   forgotPassword: (data) => apiClient.post("/api/auth/forgot-password", data),
 
   resetPassword: (data) => apiClient.post("/api/auth/reset-password", data),
+
+  oauthComplete: (data) => apiClient.post("/api/auth/oauth/complete", data),
+
+  oauthSession: () => apiClient.get("/api/auth/oauth-session"),
+
+  otpSession: () => apiClient.get("/api/auth/otp-session"),
 };

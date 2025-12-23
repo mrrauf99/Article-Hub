@@ -1,82 +1,48 @@
-import express from "express";
+import { Router } from "express";
 import passport from "passport";
 
 import {
   signUp,
+  login,
   verifyOtp,
   resendOtp,
   forgetPassword,
   resetPassword,
   checkEmailAvailability,
   checkUsernameAvailability,
+  completeGoogleSignup,
 } from "../controllers/auth.controller.js";
 
-import { requireAuth } from "../middlewares/auth.middleware.js";
+import { requireOAuthSession } from "../middlewares/oauth.middleware.js";
+import { requireOtpSession } from "../middlewares/otp.middleware.js";
+import { otpLimiter } from "../middlewares/rateLimit.middleware.js";
 
-const authRoutes = express.Router();
+const authRoutes = Router();
 
-// Register new user
+// Register new user (signup + send OTP)
+authRoutes.post("/register", otpLimiter, signUp);
 
-authRoutes.post("/register", signUp);
+// Verify signup OTP
+authRoutes.post("/verify-otp", requireOtpSession, verifyOtp);
 
-// Verify OTP
-
-authRoutes.post("/verify-otp", verifyOtp);
-
-// Resend OTP
-
+// Resend OTP (signup / reset)
 authRoutes.post("/resend-otp", resendOtp);
 
-// Login with email/password
+// Login with email & password
+authRoutes.post("/login", otpLimiter, login);
 
-authRoutes.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    // Handle authentication errors
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Authentication service error",
-      });
-    }
-
-    // Authentication failed (invalid credentials or user not found)
-    if (!user) {
-      return res.status(200).json({
-        success: false,
-        message: info.message,
-      });
-    }
-
-    // Log in the authenticated user
-    req.logIn(user, (err) => {
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          message: "Session creation failed",
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        message: "Login successful",
-        user: {
-          id: user.id,
-        },
-      });
-    });
-  })(req, res, next);
-});
-
-// Logout
-
-authRoutes.post("/logout", (req, res) => {
-  req.logout((err) => {
+// Logout user and destroy session
+authRoutes.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
     if (err) {
       return res.status(500).json({
         success: false,
         message: "Logout failed",
       });
     }
+
+    res.clearCookie("articlehub.sid");
+
     res.status(200).json({
       success: true,
       message: "Logout successful",
@@ -84,10 +50,10 @@ authRoutes.post("/logout", (req, res) => {
   });
 });
 
-/* -------------------------- GOOGLE AUTH ROUTES ------------------------ */
+// Complete Google signup (username / profile completion)
+authRoutes.post("/oauth/complete", requireOAuthSession, completeGoogleSignup);
 
-// Redirect to Google
-
+// Redirect user to Google OAuth
 authRoutes.get(
   "/google",
   passport.authenticate("google", {
@@ -95,46 +61,56 @@ authRoutes.get(
   })
 );
 
-// Google callback
-
+// Google OAuth callback handler
 authRoutes.get(
   "/google/callback",
   passport.authenticate("google", {
-    session: true,
-    failureRedirect: `${process.env.CLIENT_BASE_URL}/login?error=google_auth_failed`,
+    session: false,
+    failureRedirect: "/login",
   }),
   (req, res) => {
-    res.redirect(`${process.env.CLIENT_BASE_URL}/dashboard`);
+    const user = req.user;
+
+    // Existing user → login directly
+    if (user.id) {
+      req.session.userId = user.id;
+      return res.redirect(`${process.env.CLIENT_BASE_URL}/dashboard`);
+    }
+
+    // New OAuth user → store temporary session
+    req.session.oauth = {
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      completed: false,
+    };
+
+    return res.redirect(`${process.env.CLIENT_BASE_URL}/complete-profile`);
   }
 );
 
-// Check authentication status
-authRoutes.get("/me", requireAuth, (req, res) => {
-  res.status(200).json({
-    success: true,
-    user: {
-      id: req.user.id,
-      username: req.user.username,
-      email: req.user.email,
-      name: req.user.name,
-      avatar: req.user.avatar,
-      country: req.user.country,
-    },
-  });
-});
-
-// Check email & username availability
-
+// Check if email already exists
 authRoutes.post("/check-email", checkEmailAvailability);
+
+// Check if username already exists
 authRoutes.post("/check-username", checkUsernameAvailability);
 
-/* ------------------------ FORGOT PASSWORD FLOW ------------------------ */
-
-// Request password reset (send OTP)
-
+// Start forgot-password flow (send OTP)
 authRoutes.post("/forgot-password", forgetPassword);
 
 // Reset password after OTP verification
+authRoutes.post("/reset-password", requireOtpSession, resetPassword);
 
-authRoutes.post("/reset-password", resetPassword);
+/* ========================= FRONTEND LOADERS ========================= */
+
+// OTP session validation
+authRoutes.get("/otp-session", requireOtpSession, (req, res) => {
+  res.status(200).json({ success: true, email: req.session.otp.email });
+});
+
+// OAuth session validation
+authRoutes.get("/oauth-session", requireOAuthSession, (req, res) => {
+  res.status(200).json({ success: true });
+});
+
 export default authRoutes;

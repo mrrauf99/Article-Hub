@@ -26,7 +26,7 @@ export default function Button({ children, disabled, isLoading, ...props }) {
     >
       {isLoading ? (
         <>
-          <Loader2 className="w-5 h-5 animate-spin" aria-hidden />
+          <Loader2 className="w-5 h-5 mt-0.5 animate-spin" aria-hidden />
           {children ? children : "Loading..."}
         </>
       ) : (

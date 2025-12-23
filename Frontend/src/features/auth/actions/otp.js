@@ -1,22 +1,19 @@
 import { authApi } from "../../api/authApi";
 import { redirect } from "react-router-dom";
 
-export default async function verifyOtpAction({ request }) {
+export default async function otpAction({ request }) {
   const formData = await request.formData();
-  const url = new URL(request.url);
-  const flow = url.searchParams.get("flow");
-  const email = url.searchParams.get("email");
 
   const otp = formData.get("otp");
   const intent = formData.get("intent");
 
-  //  RESEND OTP
+  /* ---------------- RESEND OTP ---------------- */
   if (intent === "resend") {
     try {
-      const { data } = await authApi.resendOTP({ email });
+      const { data } = await authApi.resendOTP();
 
       return {
-        success: data.success,
+        success: true,
         message: data.message,
       };
     } catch (err) {
@@ -29,16 +26,10 @@ export default async function verifyOtpAction({ request }) {
     }
   }
 
-  //  VERIFY OTP
+  /* ---------------- VERIFY OTP ---------------- */
   if (intent === "verify") {
-    const payload = {
-      email,
-      otp,
-      flow,
-    };
-
     try {
-      const { data } = await authApi.verifyOTP(payload);
+      const { data } = await authApi.verifyOTP({ otp });
 
       if (!data.success) {
         return {
@@ -47,10 +38,8 @@ export default async function verifyOtpAction({ request }) {
         };
       }
 
-      if (flow === "reset-password")
-        return redirect(`/reset-password?email=${encodeURIComponent(email)}`);
-
-      if (flow === "signup") return redirect("/dashboard");
+      // backend decides next route
+      return redirect(data.next);
     } catch (err) {
       return {
         success: false,
@@ -61,7 +50,7 @@ export default async function verifyOtpAction({ request }) {
     }
   }
 
-  // FALLBACK
+  /* ---------------- FALLBACK ---------------- */
   return {
     success: false,
     message: "Invalid request.",
