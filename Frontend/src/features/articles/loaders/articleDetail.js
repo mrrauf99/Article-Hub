@@ -1,6 +1,6 @@
 import { apiClient } from "../../api/apiClient";
 
-export async function articleDetailLoader({ params }) {
+export default async function articleDetailLoader({ params }) {
   const { id } = params;
 
   try {

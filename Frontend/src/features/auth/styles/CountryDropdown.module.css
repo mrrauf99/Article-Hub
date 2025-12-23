@@ -2,36 +2,46 @@
   display: block;
   font-weight: 600;
   margin-bottom: 0.3125rem;
-  color: #333;
+  color: #334155;
   font-size: 0.875rem;
 }
 
 .input {
   width: 100%;
-  padding: 0.625rem 0.75rem;
-  border: 0.0625rem solid #ddd;
-  border-radius: 0.25rem;
-  cursor: pointer;
+  height: 3rem;
+  padding: 0 1rem;
+  border: 0.0625rem solid #d1d5db;
+  border-radius: 0.5rem;
+
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.75rem;
+
   background-color: #fff;
+  cursor: pointer;
   transition: border-color 0.2s;
 }
 
 .selectedValue {
-  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  color: #111827;
 }
 
 .placeholderValue {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.25rem;
   color: #9ca3af;
 }
 
 .dropdownArrow {
-  width: 1.15rem;
+  margin-left: auto;
+  width: 1.125rem;
+  height: 1.125rem;
   color: #6b7280;
   transition: transform 0.2s;
-  flex-shrink: 0;
 }
 
 .open {

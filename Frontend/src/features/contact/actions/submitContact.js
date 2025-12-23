@@ -1,6 +1,6 @@
 import { apiClient } from "../../api/apiClient";
 
-export async function submitContactAction({ request }) {
+export default async function submitContactAction({ request }) {
   try {
     const formData = await request.formData();
 

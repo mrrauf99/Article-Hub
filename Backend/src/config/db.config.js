@@ -1,6 +1,6 @@
 import pg from "pg";
 
-const pool = new pg.Pool({
+const db = new pg.Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
@@ -8,4 +8,4 @@ const pool = new pg.Pool({
   port: process.env.DB_PORT,
 });
 
-export default pool;
+export default db;
