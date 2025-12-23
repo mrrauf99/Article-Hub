@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   getApprovedArticles,
   createArticle,
@@ -10,7 +10,7 @@ import {
 
 import { requireAuth } from "../middlewares/auth.middleware.js";
 
-const articleRoutes = express.Router();
+const articleRoutes = Router();
 
 articleRoutes.get("/", getApprovedArticles);
 
@@ -18,7 +18,7 @@ articleRoutes.get("/me", requireAuth, getMyArticles);
 
 articleRoutes.get("/:id", getArticleById);
 
-articleRoutes.post("/new-article", requireAuth, createArticle);
+articleRoutes.post("/", requireAuth, createArticle);
 
 articleRoutes.patch("/:id", requireAuth, updateArticle);
 

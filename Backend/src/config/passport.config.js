@@ -6,41 +6,37 @@ import db from "./db.config.js";
 
 export default function setupPassport() {
   passport.use(
-    "google",
     new GoogleStrategy(
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: `${process.env.SERVER_BASE_URL}/api/auth/google/callback`,
+        callbackURL: "/api/auth/google/callback",
       },
-      async (accessToken, refreshToken, profile, cb) => {
+      async (_, __, profile, done) => {
         try {
+          const email = profile.emails?.[0]?.value;
           const name = profile.displayName;
-          const email = profile.emails[0].value;
-          const googleAvatar = profile.photos?.[0]?.value || null;
+          const avatar = profile.photos?.[0]?.value || null;
 
-          const { rows, rowCount } = await db.query(
+          const { rows } = await db.query(
             "SELECT id FROM users WHERE email = $1",
             [email]
           );
 
-          // If user does NOT exist → create new user
-          if (rowCount === 0) {
-            const insertResult = await db.query(
-              "INSERT INTO users (email, name, avatar) VALUES ($1, $2, $3) RETURNING id",
-              [email, name, googleAvatar]
-            );
-
-            return cb(null, insertResult.rows[0].id);
+          // Existing user → login directly
+          if (rows.length > 0) {
+            return done(null, { id: rows[0].id });
           }
 
-          // If user exists → return existing ID
-          return cb(null, rows[0].id);
-        } catch (err) {
-          console.error("Login server error:", err);
-          return cb(null, false, {
-            message: "Internal server error. Please try again later.",
+          // New user → TEMP session data
+          return done(null, {
+            oauthPending: true,
+            email,
+            name,
+            avatar,
           });
+        } catch (err) {
+          done(err);
         }
       }
     )
@@ -86,20 +82,4 @@ export default function setupPassport() {
       }
     )
   );
-
-  passport.serializeUser((id, cb) => cb(null, id));
-  passport.deserializeUser(async (id, cb) => {
-    try {
-      const { rows } = await db.query("SELECT * FROM users WHERE id = $1", [
-        id,
-      ]);
-      if (rows.length === 0) {
-        // user deleted → tell app.js to destroy session
-        return cb(new Error("UserDeleted"), null);
-      }
-      cb(null, rows[0]); // user found → attach to req.user
-    } catch (err) {
-      cb(err);
-    }
-  });
 }

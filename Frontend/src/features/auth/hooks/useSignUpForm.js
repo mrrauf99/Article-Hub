@@ -86,6 +86,16 @@ export function useSignUpForm() {
       newErrors.email = emailCheck.message;
     }
 
+    // NETWORK ERROR BLOCK
+    if (usernameCheck.status === "error") {
+      newErrors.username =
+        "Unable to verify username. Please check your connection.";
+    }
+
+    if (emailCheck.status === "error") {
+      newErrors.email = "Unable to verify email. Please check your connection.";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

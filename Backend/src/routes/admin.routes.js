@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   getPendingArticles,
   approveArticle,
@@ -8,7 +8,7 @@ import {
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { requireAdmin } from "../middlewares/admin.middleware.js";
 
-const adminRoutes = express.Router();
+const adminRoutes = Router();
 
 adminRoutes.get(
   "/articles/pending",

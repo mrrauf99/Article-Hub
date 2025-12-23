@@ -1,6 +1,6 @@
 import InputField from "@/components/InputField";
 import CountryDropdown from "./CountryDropdown";
-import { User, AtSign, Mail, Lock } from "lucide-react";
+import { UserCircle, User, Mail, Lock } from "lucide-react";
 
 export default function SignUpFields({ form }) {
   return (
@@ -8,7 +8,7 @@ export default function SignUpFields({ form }) {
       {/* Name */}
       <InputField
         label="Name"
-        icon={User}
+        icon={UserCircle}
         name="name"
         value={form.values.name}
         onChange={form.handleChange}
@@ -19,7 +19,7 @@ export default function SignUpFields({ form }) {
       {/* Username */}
       <InputField
         label="Username"
-        icon={AtSign}
+        icon={User}
         name="username"
         value={form.values.username}
         onChange={form.handleChange}

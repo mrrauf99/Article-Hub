@@ -1,8 +1,7 @@
 import db from "../config/db.config.js";
 
-/**
- * GET all pending articles
- */
+// GET all pending articles
+
 export const getPendingArticles = async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -26,9 +25,8 @@ export const getPendingArticles = async (req, res) => {
   }
 };
 
-/**
- * APPROVE article
- */
+// APPROVE article
+
 export const approveArticle = async (req, res) => {
   const { articleId } = req.params;
 
@@ -55,9 +53,8 @@ export const approveArticle = async (req, res) => {
   }
 };
 
-/**
- * REJECT article
- */
+// REJECT article
+
 export const rejectArticle = async (req, res) => {
   const { articleId } = req.params;
 

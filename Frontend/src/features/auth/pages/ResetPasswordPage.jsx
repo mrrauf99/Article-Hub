@@ -20,7 +20,7 @@ export default function ResetPassword() {
   const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
-    if (actionData?.message) {
+    if (actionData?.success === false) {
       setAlertMessage(actionData.message);
     }
   }, [actionData]);
@@ -82,7 +82,7 @@ export default function ResetPassword() {
         </Button>
       </Form>
 
-      <SwitchPage linkText="← Back to Sign In" linkTo="/login" />
+      <SwitchPage linkText="← Back To Login" linkTo="/login" />
     </AuthLayout>
   );
 }

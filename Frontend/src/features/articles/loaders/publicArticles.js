@@ -1,6 +1,6 @@
 import { apiClient } from "../../api/apiClient";
 
-export async function publicArticlesLoader({ request }) {
+export default async function publicArticlesLoader({ request }) {
   const url = new URL(request.url);
   const category = url.searchParams.get("category");
 

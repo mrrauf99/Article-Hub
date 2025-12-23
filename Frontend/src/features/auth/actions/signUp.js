@@ -13,13 +13,16 @@ export default async function signUpAction({ request }) {
   };
 
   try {
-    const response = await authApi.signup(payload);
+    const { data } = await authApi.signup(payload);
 
-    if (response.data.success) {
-      return redirect(
-        `/verify-otp?email=${encodeURIComponent(payload.email)}&flow=signup`
-      );
+    if (data.success) {
+      return redirect("/verify-otp");
     }
+
+    return {
+      success: false,
+      message: data.message,
+    };
   } catch (err) {
     return {
       success: false,
