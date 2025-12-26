@@ -1,36 +1,23 @@
 import { useState } from "react";
+import { ARTICLE_CATEGORIES as categories } from "@/data/articleCategories";
 
-export function useNewArticleForm() {
+export function useNewArticleForm(article) {
   const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    intro: "",
-    mainContent: "",
-    summary: "",
+    title: article?.title ?? "",
+    category: article?.category ?? "",
+    intro: article?.intro ?? "",
+    mainContent: article?.mainContent ?? "",
+    summary: article?.summary ?? "",
     image: null,
-    imagePreview: "",
+    imagePreview: article?.imageUrl ?? null,
   });
 
   const [charCounts, setCharCounts] = useState({
-    intro: 0,
-    summary: 0,
+    intro: article?.intro?.length ?? 0,
+    summary: article?.summary?.length ?? 0,
   });
 
   const [errors, setErrors] = useState({});
-
-  const categories = [
-    "Technology",
-    "Business",
-    "Lifestyle",
-    "Health & Wellness",
-    "Education",
-    "Entertainment",
-    "Travel",
-    "Food & Cooking",
-    "Science",
-    "Sports",
-    "Others",
-  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;

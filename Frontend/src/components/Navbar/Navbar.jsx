@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
-import { useRoleFromPath } from "@/hooks/useRoleFromPath";
 import { getNavItemsForRole } from "@/utils/navConfig";
 
 import NavLogo from "./NavLogo";
@@ -9,12 +8,10 @@ import DesktopNavLinks from "./DesktopNavLinks";
 import UserMenu from "./UserMenu";
 import MobileNavMenu from "./MobileNavMenu";
 
-import styles from "@/styles/navbar.module.css";
+import styles from "@/styles/Navbar.module.css";
 
-export default function Navbar({ userName = "", onLogout }) {
+export default function Navbar({ userName, role, onLogout }) {
   const [open, setOpen] = useState(false);
-
-  const role = useRoleFromPath();
   const navItems = getNavItemsForRole(role);
 
   return (

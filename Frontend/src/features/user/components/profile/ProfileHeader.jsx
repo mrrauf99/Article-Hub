@@ -1,4 +1,4 @@
-import layoutStyles from "../../styles/profileLayout.module.css";
+import layoutStyles from "../../styles/ProfileLayout.module.css";
 
 export default function ProfileHeader({ user }) {
   return (

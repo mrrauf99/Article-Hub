@@ -4,48 +4,44 @@ import { useLoaderData, useSearchParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import Sidebar from "../components/Sidebar";
 import ArticlesSection from "@/features/articles/components/ArticlesSection";
-
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 
 export default function HomePage() {
-  const articles = useLoaderData();
-
+  const { articles } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const rawCategory = searchParams.get("category");
   const pageParam = Number(searchParams.get("page")) || 1;
 
-  const activeCategory =
-    rawCategory && ARTICLE_CATEGORIES.includes(rawCategory)
+  const activeCategory = useMemo(() => {
+    return rawCategory && ARTICLE_CATEGORIES.includes(rawCategory)
       ? rawCategory
       : "All";
+  }, [rawCategory]);
 
-  const categories = ["All", ...ARTICLE_CATEGORIES];
+  const categories = useMemo(() => ["All", ...ARTICLE_CATEGORIES], []);
 
-  // Filter by category
   const filteredArticles = useMemo(() => {
     if (activeCategory === "All") return articles;
     return articles.filter((a) => a.category === activeCategory);
   }, [articles, activeCategory]);
 
-  // When category changes → reset page to 1
   function handleCategorySelect(category) {
+    const params = new URLSearchParams(searchParams);
+
     if (category === "All") {
-      setSearchParams({ page: "1" });
+      params.delete("category");
     } else {
-      setSearchParams({ category, page: "1" });
+      params.set("category", category);
     }
+
+    params.set("page", "1");
+    setSearchParams(params);
   }
 
-  // Page change handler
   function handlePageChange(page) {
-    const params = {};
-
-    if (activeCategory !== "All") {
-      params.category = activeCategory;
-    }
-
-    params.page = String(page);
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
     setSearchParams(params);
   }
 
@@ -63,6 +59,8 @@ export default function HomePage() {
         articles={filteredArticles}
         page={pageParam}
         onPageChange={handlePageChange}
+        showCreateButton={false}
+        mode="guest"
         title={
           activeCategory === "All"
             ? "All Articles"

@@ -41,7 +41,7 @@ export async function login(req, res) {
 
   try {
     const { rows } = await db.query(
-      "SELECT id, password FROM users WHERE email = $1 OR username = $1",
+      "SELECT id, password, role FROM users WHERE email = $1 OR username = $1",
       [identifier]
     );
 
@@ -76,6 +76,7 @@ export async function login(req, res) {
       res.status(200).json({
         success: true,
         message: "Logged in successfully.",
+        role: user.role,
       });
     });
   } catch (err) {

@@ -11,7 +11,9 @@ export default async function loginAction({ request }) {
   try {
     const { data } = await authApi.login(payload);
     if (data.success) {
-      return redirect("/dashboard");
+      if (data.role === "user") return redirect("/user/dashboard");
+
+      if (data.role === "admin") return redirect("/admin/dashboard");
     }
 
     return {
@@ -19,6 +21,17 @@ export default async function loginAction({ request }) {
       message: data.message,
     };
   } catch (err) {
+    // RATE LIMIT ERROR
+    if (err.response?.status === 429) {
+      const { message, retryAfterSeconds } = err.response.data;
+
+      return {
+        success: false,
+        retryAfterSeconds,
+      };
+    }
+
+    // AUTH ERROR
     return {
       success: false,
       message:

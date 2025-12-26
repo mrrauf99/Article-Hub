@@ -4,13 +4,17 @@ export default async function articleDetailLoader({ params }) {
   const { id } = params;
 
   try {
-    const res = await apiClient.get(`/api/articles/${id}`);
+    const { data } = await apiClient.get(`/api/articles/${id}`);
 
-    return res.data.data;
+    if (!data.success) {
+      return {
+        article: null,
+      };
+    }
+
+    return { article: data.data };
   } catch (error) {
-    //Loaders → throw Response on failure
-
-    throw new Response("Article not found", {
+    throw new Response(error.response?.data?.message || "Article not found", {
       status: error.response?.status || 500,
     });
   }
