@@ -1,13 +1,16 @@
-import { Form, useNavigation } from "react-router-dom";
+import { Form, useNavigation, useLoaderData } from "react-router-dom";
 import { useNewArticleForm } from "../hooks/useNewArticleForm.js";
-import Input from "../components/new-article/Input.jsx";
+
 import TextArea from "../components/new-article/TextArea.jsx";
 import Category from "../components/new-article/Category.jsx";
 import ImageUpload from "../components/new-article/ImageUpload.jsx";
+import Input from "../components/new-article/Input.jsx";
 
-import "../styles/form-layout.css";
+import styles from "../styles/ArticleForm.module.css";
 
-export default function NewArticle() {
+export default function CreateArticlePage() {
+  const data = useLoaderData();
+
   const {
     formData,
     charCounts,
@@ -16,7 +19,7 @@ export default function NewArticle() {
     handleChange,
     handleImageChange,
     validateForm,
-  } = useNewArticleForm();
+  } = useNewArticleForm(data?.article);
 
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -24,19 +27,18 @@ export default function NewArticle() {
   const handleSubmit = (e) => {
     const isValid = validateForm();
     if (!isValid) e.preventDefault();
-    console.log(formData);
   };
 
   return (
-    <div className="container ">
-      <div className="form-wrapper">
-        <div className="form-header">
+    <div className={styles.container}>
+      <div className={styles.formWrapper}>
+        <div className={styles.formHeader}>
           <h1>Submit Your Article</h1>
           <p>Share your knowledge with the Article Hub community</p>
         </div>
 
         <Form
-          className="article-form"
+          className={styles.articleForm}
           onSubmit={handleSubmit}
           method="post"
           encType="multipart/form-data"
@@ -45,7 +47,6 @@ export default function NewArticle() {
             label="Article Title"
             id="title"
             name="title"
-            type="text"
             value={formData.title}
             onChange={handleChange}
             error={errors.title}
@@ -71,7 +72,6 @@ export default function NewArticle() {
             onChange={handleChange}
             error={errors.intro}
             placeholder="Write the introduction of your article..."
-            rows={4}
             maxLength={500}
             charCount={charCounts.intro}
           />
@@ -95,7 +95,6 @@ export default function NewArticle() {
             onChange={handleChange}
             error={errors.summary}
             placeholder="Write a brief summary to wrap up your article..."
-            rows={4}
             maxLength={300}
             charCount={charCounts.summary}
           />
@@ -110,7 +109,7 @@ export default function NewArticle() {
             imagePreview={formData.imagePreview}
           />
 
-          <button className="btn" disabled={isSubmitting}>
+          <button className={styles.submitBtn} disabled={isSubmitting}>
             {isSubmitting ? "Submitting..." : "Publish Article"}
           </button>
         </Form>

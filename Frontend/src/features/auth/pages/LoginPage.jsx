@@ -22,7 +22,24 @@ export default function Login() {
 
   useEffect(() => {
     if (actionData?.success === false) {
-      setAlertMessage(actionData.message);
+      let msg = actionData.message || "Too many login attempts.";
+      const seconds = actionData.retryAfterSeconds;
+
+      if (seconds && seconds > 0) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+
+        if (mins > 0 && secs > 0) {
+          msg += ` Try again in ${mins} min ${secs} s.`;
+        } else if (mins > 0) {
+          msg += ` Try again in ${mins} min.`;
+        } else {
+          msg += ` Try again in ${secs} s.`;
+        }
+      }
+
+      setAlertMessage(msg);
+      form.handlePasswordReset();
     }
   }, [actionData]);
 

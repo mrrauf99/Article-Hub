@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
-import styles from "@/styles/navbar.module.css";
+import styles from "@/styles/Navbar.module.css";
 
 export default function UserMenu({ role, userName, onLogout }) {
   const [open, setOpen] = useState(false);
@@ -24,12 +24,12 @@ export default function UserMenu({ role, userName, onLogout }) {
         className={styles.profileButton}
       >
         <User className={styles.profileIcon} />
-        <span>{userName || "User"}</span>
+        <span>{userName}</span>
       </button>
 
       {open && (
         <div className={styles.profileMenu}>
-          <Link to="/profile" className={styles.profileItem}>
+          <Link to="/user/profile" className={styles.profileItem}>
             <User className={styles.profileItemIcon} />
             Profile
           </Link>

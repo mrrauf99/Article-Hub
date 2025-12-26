@@ -1,5 +1,5 @@
 import { useState } from "react";
-import layoutStyles from "../../styles/profileLayout.module.css";
+import layoutStyles from "../styles/ProfileLayout.module.css";
 import ProfileHeader from "../components/profile/ProfileHeader.jsx";
 import ProfileSummary from "../components/profile/ProfileSummry.jsx";
 import ProfileForm from "../components/profile/ProfileForm.jsx";
@@ -16,7 +16,7 @@ const mockUser = {
   joinedAt: "2024-01-15",
 };
 
-export default function Profile() {
+export default function UserProfilePage() {
   const [user, setUser] = useState(mockUser);
   const [isSaving, setIsSaving] = useState(false);
 

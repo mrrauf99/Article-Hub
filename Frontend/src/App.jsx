@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+// Auth
 import LoginPage from "./features/auth/pages/LoginPage.jsx";
 import SignUpPage from "./features/auth/pages/SignUpPage.jsx";
 import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage.jsx";
@@ -14,29 +15,42 @@ import forgotPasswordAction from "./features/auth/actions/forgotPassword";
 import resetPasswordAction from "./features/auth/actions/resetPassword";
 import completeProfileAction from "./features/auth/actions/completeProfile.js";
 
-import CompleteProfileLoader from "./features/auth/loaders/CompleteProfile.js";
+import completeProfileLoader from "./features/auth/loaders/completeProfile.js";
 import resetPasswordLoader from "./features/auth/loaders/resetPassword.js";
 import verifyOtpPageLoader from "./features/auth/loaders/verifyOtpPage.js";
 
+// Public
 import HomePage from "./features/guest/pages/HomePage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import ContactPage from "./features/contact/pages/ContactPage.jsx";
 import PrivacyPage from "./pages/PrivacyPage.jsx";
 import TermsPage from "./pages/Terms.jsx";
 
-import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
-
-import PublicLayout from "./layouts/PublicLayout.jsx";
-
 import submitContactAction from "./features/contact/actions/submitContact.js";
-
 import publicArticlesLoader from "./features/articles/loaders/publicArticles.js";
+
+// User
+import UserDashBoardPage from "./features/user/pages/UserDashBoardPage.jsx";
+import CreateArticlePage from "./features/user/pages/CreateArticlePage.jsx";
+import UserProfilePage from "./features/user/pages/UserProfilePage.jsx";
+
+import editArticleLoader from "./features/user/loaders/editArticle.js";
+import myArticlesLoader from "./features/user/loaders/myArticles.js";
+import userProfileLoader from "./features/user/loaders/userProfile.js";
+
+// Layouts
+import PublicLayout from "./layouts/PublicLayout.jsx";
+import UserLayout from "./layouts/UserLayout.jsx";
+
+// (Admin, User and Public)
+import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
 
 import "./index.css";
 
 export default function App() {
   const router = createBrowserRouter([
+    /* ---------- AUTH ---------- */
     {
       path: "/login",
       element: <LoginPage />,
@@ -68,40 +82,70 @@ export default function App() {
       path: "/complete-profile",
       element: <CompleteProfile />,
       action: completeProfileAction,
-      loader: CompleteProfileLoader,
+      loader: completeProfileLoader,
     },
+
+    /* ---------- PUBLIC ---------- */
     {
       element: <PublicLayout />,
       children: [
         {
-          path: "/",
+          index: true, // "/"
           element: <HomePage />,
           loader: publicArticlesLoader,
         },
+        { path: "about", element: <AboutPage /> },
         {
-          path: "/about",
-          element: <AboutPage />,
-        },
-        {
-          path: "/contact",
+          path: "contact",
           element: <ContactPage />,
           action: submitContactAction,
         },
-        {
-          path: "/privacy",
-          element: <PrivacyPage />,
-        },
-        {
-          path: "/terms",
-          element: <TermsPage />,
-        },
+        { path: "privacy", element: <PrivacyPage /> },
+        { path: "terms", element: <TermsPage /> },
       ],
     },
 
+    /* ---------- USER ---------- */
     {
-      path: "/articles/:id",
-      element: <ArticleDetailPage />,
-      loader: articleDetailLoader,
+      id: "user-layout",
+      path: "/user",
+      element: <UserLayout />,
+      loader: userProfileLoader,
+      children: [
+        {
+          path: "dashboard",
+          element: <UserDashBoardPage />,
+          loader: myArticlesLoader,
+        },
+        {
+          path: "articles",
+          children: [
+            {
+              index: true,
+              element: <UserDashBoardPage />,
+              loader: myArticlesLoader,
+            },
+            {
+              path: "new",
+              element: <CreateArticlePage />,
+            },
+            {
+              path: ":id/edit",
+              element: <CreateArticlePage />,
+              loader: editArticleLoader,
+            },
+            {
+              path: ":id",
+              element: <ArticleDetailPage />,
+              loader: articleDetailLoader,
+            },
+          ],
+        },
+        {
+          path: "profile",
+          element: <UserProfilePage />,
+        },
+      ],
     },
   ]);
 

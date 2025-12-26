@@ -71,11 +71,16 @@ export function useLoginForm() {
     }
   };
 
+  const handlePasswordReset = () => {
+    setValues((prev) => ({ ...prev, password: "" }));
+  };
+
   return {
     values,
     errors,
     handleChange,
     handleBlur,
     validate,
+    handlePasswordReset,
   };
 }

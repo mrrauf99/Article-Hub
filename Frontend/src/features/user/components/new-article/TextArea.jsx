@@ -1,4 +1,4 @@
-import "../../styles/textarea.css";
+import styles from "../../styles/ArticleForm.module.css";
 
 export default function TextArea({
   label,
@@ -15,19 +15,21 @@ export default function TextArea({
   required,
 }) {
   return (
-    <div className="textarea-group">
+    <div className={styles.group}>
       {label && (
-        <label htmlFor={id}>
+        <label htmlFor={id} className={styles.label}>
           <span>
-            {label} {required && <span className="required">*</span>}
+            {label} {required && <span className={styles.required}>*</span>}
           </span>
+
           {charCount !== undefined && maxLength && (
-            <span className="char-count">
+            <span className={styles.charCount}>
               {charCount} / {maxLength}
             </span>
           )}
         </label>
       )}
+
       <textarea
         id={id}
         name={name}
@@ -37,9 +39,12 @@ export default function TextArea({
         placeholder={placeholder}
         rows={rows}
         maxLength={maxLength}
-        className={error ? "error" : ""}
+        className={`${styles.control} ${styles.textarea} ${
+          error ? styles.errorControl : ""
+        }`}
       />
-      {error && <p className="error-msg">{error}</p>}
+
+      {error && <p className={styles.errorMsg}>{error}</p>}
     </div>
   );
 }

@@ -42,7 +42,6 @@
 .navLink:hover {
   background: rgba(148, 163, 184, 0.15);
   color: #f9fafb;
-  transform: translateY(-1px);
 }
 
 /* Desktop user area */
@@ -66,7 +65,8 @@
   background: rgba(15, 23, 42, 0.8);
 }
 
-.signupBtn {
+.signupBtn,
+.active {
   padding: 0.45rem 1rem;
   border-radius: 0.5rem;
   border: none;
@@ -79,7 +79,8 @@
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.signupBtn:hover {
+.signupBtn:hover,
+.active:hover {
   background: #0ea5e9;
 }
 

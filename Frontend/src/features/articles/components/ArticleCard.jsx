@@ -1,16 +1,9 @@
-import { useState } from "react";
-
+import { useState, useRef, memo } from "react";
 import { Eye, Trash2, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useRef, memo } from "react";
-import ConfirmModal from "../ui/ConfirmModal";
 
-const STATUS_COLORS = {
-  draft: "bg-gray-100 text-gray-700",
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-green-100 text-green-700",
-  rejected: "bg-red-100 text-red-700",
-};
+import ConfirmModal from "../ui/ConfirmModal";
+import StatusBadge from "./StatusBadge";
 
 function ArticleCard({ article, mode }) {
   const navigate = useNavigate();
@@ -18,13 +11,12 @@ function ArticleCard({ article, mode }) {
   const [imgLoaded, setImgLoaded] = useState(false);
 
   const openArticle = () => {
-    console.log("Navigating to article:", article.article_id);
-    navigate(`/articles/${article.article_id}`);
+    navigate(`/user/articles/${article.article_id}`);
   };
 
   const handleEdit = (e) => {
     e.stopPropagation();
-    navigate(`/dashboard/articles/edit/${article.article_id}`);
+    navigate(`/user/articles/${article.article_id}/edit`);
   };
 
   const handleDelete = (e) => {
@@ -43,17 +35,14 @@ function ArticleCard({ article, mode }) {
         className="relative bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-xl transition cursor-pointer group overflow-hidden"
       >
         {/* status */}
-        <span
-          className={`absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full ${
-            STATUS_COLORS[article.status]
-          }`}
-        >
-          {article.status}
-        </span>
-
-        {/* action buttons */}
         {mode !== "guest" && (
-          <div className="absolute top-3 right-3 flex gap-2">
+          <div className="absolute top-3 left-3 z-10">
+            <StatusBadge status={article.status} />
+          </div>
+        )}
+
+        {mode !== "guest" && (
+          <div className="absolute top-3 right-3 z-10 flex gap-2">
             <ActionButton title="Edit" onClick={handleEdit}>
               <Edit className="w-4 h-4 text-indigo-600" />
             </ActionButton>

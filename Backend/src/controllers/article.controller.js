@@ -58,7 +58,7 @@ export const getMyArticles = async (req, res) => {
        FROM articles
        WHERE author_id = $1
        ORDER BY created_at DESC`,
-      [req.user.id]
+      [req.session.userId]
     );
 
     res.json({ success: true, data: rows });
@@ -70,9 +70,8 @@ export const getMyArticles = async (req, res) => {
   }
 };
 
-/**
- * GET single approved article by ID (public)
- */
+// GET single approved article by ID (public)
+
 export const getArticleById = async (req, res) => {
   const { id } = req.params;
 
@@ -129,7 +128,14 @@ export const createArticle = async (req, res) => {
        (title, introduction, content, conclusion, category, author_id)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING article_id`,
-      [title, introduction, content, conclusion ?? null, category, req.user.id]
+      [
+        title,
+        introduction,
+        content,
+        conclusion ?? null,
+        category,
+        req.session.userId,
+      ]
     );
 
     res.status(201).json({
@@ -170,7 +176,7 @@ export const updateArticle = async (req, res) => {
         conclusion ?? null,
         category,
         articleId,
-        req.user.id,
+        req.session.userId,
       ]
     );
 
@@ -197,7 +203,7 @@ export const deleteArticle = async (req, res) => {
     const { rowCount } = await db.query(
       `DELETE FROM articles
        WHERE article_id = $1 AND author_id = $2`,
-      [articleId, req.user.id]
+      [articleId, req.session.userId]
     );
 
     if (!rowCount) {

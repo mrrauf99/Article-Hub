@@ -9,7 +9,7 @@ export default async function publicArticlesLoader({ request }) {
       params: category && category !== "All" ? { category } : {},
     });
 
-    return res.data.data;
+    return { articles: res.data.data };
   } catch (error) {
     console.error("articlesLoader error:", error);
 

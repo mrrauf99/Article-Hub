@@ -8,8 +8,8 @@ export default function PublicLayout() {
   return (
     <>
       <ScrollToTop />
-      <Navbar />
-      <main className="min-h-screen bg-slate-50">
+      <Navbar role="guest" />
+      <main>
         <Outlet />
       </main>
       <Footer />
