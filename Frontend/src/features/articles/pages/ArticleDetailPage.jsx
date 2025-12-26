@@ -1,87 +1,103 @@
-import { useNavigate, useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { useState } from "react";
 
-import {
-  ArrowLeft,
-  Calendar,
-  User,
-  Tag,
-  Clock,
-  Share2,
-  Eye,
-  Heart,
-} from "lucide-react";
+import { Calendar, User, Tag, Clock, Share2, Eye, Heart } from "lucide-react";
 
 export default function ArticleDetailPage() {
-  const article = useLoaderData();
-  const navigate = useNavigate();
+  const { article } = useLoaderData();
 
   const [isLiked, setIsLiked] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
 
+  /* ---------------- Guards ---------------- */
+  if (!article) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Article not found</p>
+      </div>
+    );
+  }
+
+  /* ---------------- Utils ---------------- */
   function formatReadingTime(content = "") {
     const wordsPerMinute = 200;
-    const words = content.split(/\s+/).length;
-    return `${Math.ceil(words / wordsPerMinute)} min read`;
+    const words = content.trim().split(/\s+/).length;
+    return `${Math.max(1, Math.ceil(words / wordsPerMinute))} min read`;
   }
 
   async function handleShare() {
     const url = window.location.href;
 
-    if (navigator.share) {
-      await navigator.share({
-        title: article.title,
-        text: article.introduction,
-        url,
-      });
-    } else {
-      await navigator.clipboard.writeText(url);
-      setShowShareTooltip(true);
-      setTimeout(() => setShowShareTooltip(false), 2000);
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: article.title,
+          text: article.introduction,
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setShowShareTooltip(true);
+        setTimeout(() => setShowShareTooltip(false), 2000);
+      }
+    } catch {
+      // silent fail (user canceled share)
     }
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-4xl mx-auto px-6 py-10">
-        {/* Header */}
+        {/* ================= HEADER ================= */}
         <div className="mb-10">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-sm font-semibold">
-            <Tag className="w-3 h-3" />
-            {article.category}
-          </span>
+          {/* Category */}
+          {article.category && (
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-sm font-semibold">
+              <Tag className="w-3 h-3" />
+              {article.category}
+            </span>
+          )}
 
-          <h1 className="text-4xl font-bold text-gray-900 mt-6 mb-6">
+          {/* Title */}
+          <h1 className="text-4xl font-bold text-gray-900 mt-6 mb-6 leading-tight">
             {article.title}
           </h1>
 
-          <div className="flex flex-wrap gap-6 text-gray-600">
+          {/* Meta */}
+          <div className="flex flex-wrap gap-6 text-gray-600 text-sm">
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              <span>{article.author_name || "Unknown"}</span>
+              <span>{article.author_name || "Unknown author"}</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              {new Date(article.published_at).toLocaleDateString()}
-            </div>
+            {article.published_at && (
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  {new Date(article.published_at).toLocaleDateString()}
+                </span>
+              </div>
+            )}
+
+            {article.content && (
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{formatReadingTime(article.content)}</span>
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              {formatReadingTime(article.content)}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Eye className="w-5 h-5" />
-              {article.views ?? 0}
+              <Eye className="w-4 h-4" />
+              <span>{article.views ?? 0}</span>
             </div>
           </div>
 
-          {/* Actions */}
+          {/* ================= ACTIONS ================= */}
           <div className="flex gap-3 mt-6">
+            {/* Share */}
             <button
               onClick={handleShare}
-              className="relative inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-indigo-50"
+              className="relative inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-indigo-50 transition"
             >
               <Share2 className="w-4 h-4" />
               Share
@@ -92,40 +108,52 @@ export default function ArticleDetailPage() {
               )}
             </button>
 
+            {/* Like */}
             <button
               onClick={() => setIsLiked((v) => !v)}
-              className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg"
+              aria-pressed={isLiked}
+              className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg
+                         hover:bg-red-50 transition"
             >
               <Heart
-                className={`w-4 h-4 ${isLiked && "fill-current text-red-500"}`}
+                className={`w-5 h-5 transition ${
+                  isLiked
+                    ? "fill-red-500 text-red-500 scale-110"
+                    : "text-gray-500"
+                }`}
               />
-              Like
+              <span className="text-sm font-medium">
+                {isLiked ? "Liked" : "Like"}
+              </span>
             </button>
           </div>
         </div>
 
-        {/* Image */}
+        {/* ================= IMAGE ================= */}
         {article.image_url && (
           <img
             src={article.image_url}
             alt={article.title}
-            className="w-full rounded-xl mb-8"
+            className="w-full rounded-xl mb-8 object-cover"
+            loading="lazy"
           />
         )}
 
-        {/* Introduction */}
+        {/* ================= INTRO ================= */}
         {article.introduction && (
           <p className="text-base text-gray-700 leading-relaxed mb-6">
             {article.introduction}
           </p>
         )}
 
-        {/* Content */}
-        <div className="prose max-w-none">
-          <p className="whitespace-pre-line">{article.content}</p>
-        </div>
+        {/* ================= CONTENT ================= */}
+        {article.content && (
+          <div className="prose max-w-none">
+            <p className="whitespace-pre-line">{article.content}</p>
+          </div>
+        )}
 
-        {/* Conclusion */}
+        {/* ================= CONCLUSION ================= */}
         {article.conclusion && (
           <p className="mt-8 text-base text-gray-700 leading-relaxed whitespace-pre-line">
             {article.conclusion}

@@ -22,7 +22,7 @@ export default function InputField({
 
   const hasValue = value.toString().length > 0;
 
-  // ✅ Password fields NEVER show X icon
+  // Password fields NEVER show X icon
   const showErrorIcon = Boolean(error) && hasValue && !loading && !isPassword;
 
   const showSuccessIcon = Boolean(success) && hasValue && !loading;

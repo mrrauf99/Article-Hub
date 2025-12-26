@@ -5,6 +5,11 @@ export async function sendEmailVerificationOtp(email, otp) {
     from: process.env.MAIL_FROM,
     to: email,
     subject: "Verify your email address",
+    replyTo: "no-reply@articlehub.me", // disable replies
+    headers: {
+      "X-Auto-Response-Suppress": "All", // block auto replies
+    },
+    text: `Your Article Hub verification code is ${otp}. It expires in 5 minutes.`,
     html: `
       <div style="font-family: Arial; line-height: 1.6">
         <h2>Email Verification</h2>

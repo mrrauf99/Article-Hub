@@ -1,4 +1,4 @@
-import "../../styles/category.css";
+import styles from "../../styles/ArticleForm.module.css";
 
 export default function Category({
   label,
@@ -13,19 +13,24 @@ export default function Category({
   required,
 }) {
   return (
-    <div className="category-group">
+    <div className={styles.group}>
       {label && (
-        <label htmlFor={id}>
-          {label} {required && <span className="required">*</span>}
+        <label htmlFor={id} className={styles.label}>
+          <span>
+            {label} {required && <span className={styles.required}>*</span>}
+          </span>
         </label>
       )}
+
       <select
         id={id}
         name={name}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
-        className={error ? "error" : ""}
+        className={`${styles.control} ${styles.select} ${
+          error ? styles.errorControl : ""
+        }`}
       >
         <option value="">{placeholder}</option>
         {options.map((option) => (
@@ -34,7 +39,8 @@ export default function Category({
           </option>
         ))}
       </select>
-      {error && <p className="error-msg">{error}</p>}
+
+      {error && <p className={styles.errorMsg}>{error}</p>}
     </div>
   );
 }

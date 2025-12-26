@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
-import styles from "@/styles/navbar.module.css";
+import styles from "@/styles/Navbar.module.css";
 
 export default function MobileNavMenu({
   isOpen,
@@ -38,7 +38,7 @@ export default function MobileNavMenu({
         ) : (
           <>
             <div className={styles.mobileUserInfo}>
-              {userName || "User"}
+              {userName}
               {role === "admin" && (
                 <span className={styles.adminBadge}>ADMIN</span>
               )}
