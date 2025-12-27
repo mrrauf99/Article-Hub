@@ -6,8 +6,8 @@ export default function ImageUpload({
   name,
   onChange,
   error,
-  image,
-  imagePreview,
+  imageFile,
+  imageUrl,
   required,
 }) {
   return (
@@ -30,18 +30,24 @@ export default function ImageUpload({
 
         <label htmlFor={id} className={styles.fileLabel}>
           <span className={styles.uploadIcon}>📁</span>
+
           <span className={styles.uploadText}>
-            {image ? image.name : "Choose an image file"}
+            {imageFile
+              ? imageFile.name
+              : imageUrl
+              ? "Current image selected"
+              : "Choose an image file"}
           </span>
+
           <span className={styles.uploadHint}>JPG, PNG, GIF (Max 5MB)</span>
         </label>
       </div>
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
-      {imagePreview && (
+      {imageUrl && (
         <div className={styles.imagePreview}>
-          <img src={imagePreview} alt="Preview" />
+          <img src={imageUrl} alt="Preview" />
         </div>
       )}
     </div>

@@ -10,7 +10,6 @@ import styles from "../styles/ArticleForm.module.css";
 
 export default function CreateArticlePage() {
   const data = useLoaderData();
-
   const {
     formData,
     charCounts,
@@ -26,7 +25,9 @@ export default function CreateArticlePage() {
 
   const handleSubmit = (e) => {
     const isValid = validateForm();
-    if (!isValid) e.preventDefault();
+    if (!isValid) {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -39,9 +40,8 @@ export default function CreateArticlePage() {
 
         <Form
           className={styles.articleForm}
-          onSubmit={handleSubmit}
           method="post"
-          encType="multipart/form-data"
+          onSubmit={handleSubmit}
         >
           <Input
             label="Article Title"
@@ -66,23 +66,23 @@ export default function CreateArticlePage() {
 
           <TextArea
             label="Introduction"
-            id="intro"
-            name="intro"
-            value={formData.intro}
+            id="introduction"
+            name="introduction"
+            value={formData.introduction}
             onChange={handleChange}
-            error={errors.intro}
+            error={errors.introduction}
             placeholder="Write the introduction of your article..."
             maxLength={500}
-            charCount={charCounts.intro}
+            charCount={charCounts.introduction}
           />
 
           <TextArea
             label="Main Content"
-            id="mainContent"
-            name="mainContent"
-            value={formData.mainContent}
+            id="content"
+            name="content"
+            value={formData.content}
             onChange={handleChange}
-            error={errors.mainContent}
+            error={errors.content}
             placeholder="Write the main content of your article..."
             rows={12}
           />
@@ -105,8 +105,8 @@ export default function CreateArticlePage() {
             name="image"
             onChange={handleImageChange}
             error={errors.image}
-            image={formData.image}
-            imagePreview={formData.imagePreview}
+            imageFile={formData.imageFile}
+            imageUrl={formData.imageUrl}
           />
 
           <button className={styles.submitBtn} disabled={isSubmitting}>

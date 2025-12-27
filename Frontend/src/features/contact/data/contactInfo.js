@@ -4,8 +4,8 @@ export const CONTACT_INFO = [
   {
     icon: Mail,
     title: "Email",
-    content: "itxrauf99@gmail.com",
-    link: "mailto:itxrauf99@gmail.com",
+    content: "support@articlehub.me",
+    link: "mailto:support@articlehub.me",
   },
   {
     icon: Phone,

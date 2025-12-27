@@ -1,4 +1,5 @@
 import db from "../config/db.config.js";
+import cloudinary from "../config/cloudinary.config.js";
 
 /**
  * GET all approved articles (public)
@@ -17,7 +18,7 @@ export const getApprovedArticles = async (req, res) => {
         a.published_at,
         a.image_url,
         a.views,
-        a.conclusion,
+        a.summary,
         u.name AS author_name
       FROM articles a
       JOIN users u ON u.id = a.author_id
@@ -74,6 +75,7 @@ export const getMyArticles = async (req, res) => {
 
 export const getArticleById = async (req, res) => {
   const { id } = req.params;
+  const userId = req.session?.userId ?? null;
 
   try {
     const { rows } = await db.query(
@@ -83,24 +85,28 @@ export const getArticleById = async (req, res) => {
         a.title,
         a.introduction,
         a.content,
-        a.conclusion,
+        a.summary,
         a.category,
+        a.status,
         a.published_at,
-        a.image_url,
+        a.image_url as "imageUrl",
         a.views,
         u.name AS author_name
       FROM articles a
       JOIN users u ON u.id = a.author_id
       WHERE a.article_id = $1
-        AND a.status = 'approved'
+        AND (
+          a.status = 'approved'
+          OR a.author_id = $2
+        )
       `,
-      [id]
+      [id, userId]
     );
 
-    if (rows.length === 0) {
+    if (!rows.length) {
       return res.status(404).json({
         success: false,
-        message: "Article not found",
+        message: "Article not found.",
       });
     }
 
@@ -112,7 +118,7 @@ export const getArticleById = async (req, res) => {
     console.error("getArticleById error:", err);
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch article",
+      message: "Failed to fetch article.",
     });
   }
 };
@@ -120,20 +126,24 @@ export const getArticleById = async (req, res) => {
 // CREATE article
 
 export const createArticle = async (req, res) => {
-  const { title, introduction, content, conclusion, category } = req.body;
+  const { title, introduction, content, summary, category, imageUrl } =
+    req.body;
 
   try {
     const { rows } = await db.query(
-      `INSERT INTO articles
-       (title, introduction, content, conclusion, category, author_id)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING article_id`,
+      `
+      INSERT INTO articles
+        (title, introduction, content, summary, category, image_url, author_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING article_id
+      `,
       [
         title,
         introduction,
         content,
-        conclusion ?? null,
+        summary,
         category,
+        imageUrl,
         req.session.userId,
       ]
     );
@@ -144,10 +154,11 @@ export const createArticle = async (req, res) => {
       articleId: rows[0].article_id,
     });
   } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ success: false, message: "Article creation failed" });
+    console.error("createArticle error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Article creation failed",
+    });
   }
 };
 
@@ -155,26 +166,32 @@ export const createArticle = async (req, res) => {
 
 export const updateArticle = async (req, res) => {
   const { articleId } = req.params;
-  const { title, introduction, content, conclusion, category } = req.body;
+  const { title, introduction, content, summary, category, imageUrl } =
+    req.body;
 
   try {
     const { rowCount } = await db.query(
-      `UPDATE articles
-       SET
-         title = $1,
-         introduction = $2,
-         content = $3,
-         conclusion = $4,
-         category = $5,
-         status = 'pending',
-         published_at = NULL
-       WHERE article_id = $6 AND author_id = $7`,
+      `
+      UPDATE articles
+      SET
+        title = $1,
+        introduction = $2,
+        content = $3,
+        summary = $4,
+        category = $5,
+        image_url = $6,
+        status = 'pending',
+        published_at = NULL
+      WHERE article_id = $7
+        AND author_id = $8
+      `,
       [
         title,
         introduction,
         content,
-        conclusion ?? null,
+        summary,
         category,
+        imageUrl,
         articleId,
         req.session.userId,
       ]
@@ -183,14 +200,20 @@ export const updateArticle = async (req, res) => {
     if (!rowCount) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized or article not found",
+        message: "Not authorized or article not found.",
       });
     }
 
-    res.json({ success: true, message: "Article updated and sent for review" });
+    res.json({
+      success: true,
+      message: "Article updated and sent for review.",
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Update failed" });
+    console.error("updateArticle error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Update failed",
+    });
   }
 };
 
@@ -217,5 +240,39 @@ export const deleteArticle = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Delete failed" });
+  }
+};
+
+export const uploadImageToCloudinary = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image file provided",
+      });
+    }
+
+    const base64 = req.file.buffer.toString("base64");
+    const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: "article-hub",
+      resource_type: "image",
+      transformation: [
+        { width: 1200, height: 630, crop: "limit" },
+        { quality: "auto", fetch_format: "auto" },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      imageUrl: result.secure_url,
+    });
+  } catch (err) {
+    console.error("Cloudinary upload error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Image upload failed",
+    });
   }
 };

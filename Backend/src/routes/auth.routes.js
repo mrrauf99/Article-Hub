@@ -14,14 +14,12 @@ import {
   completeGoogleSignup,
 } from "../controllers/auth.controller.js";
 
-import { requireAuth } from "../middlewares/auth.middleware.js";
-
 import { requireOAuthSession } from "../middlewares/oauth.middleware.js";
 import { requireOtpSession } from "../middlewares/otp.middleware.js";
 import {
   otpResendLimiter,
   loginLimiter,
-  otpVerifyLimiter
+  otpVerifyLimiter,
 } from "../middlewares/rateLimiters.middleware.js";
 
 const authRoutes = Router();
@@ -118,19 +116,6 @@ authRoutes.get("/otp-session", requireOtpSession, (req, res) => {
 // OAuth session validation
 authRoutes.get("/oauth-session", requireOAuthSession, (req, res) => {
   res.status(200).json({ success: true });
-});
-
-authRoutes.get("/me", requireAuth, async (req, res) => {
-  const userId = req.session.userId;
-
-  const { rows } = await db.query(`SELECT * FROM users WHERE id = $1`, [
-    userId,
-  ]);
-console.log("Fetched User Data:", rows[0]);
-  res.status(200).json({
-    success: true,
-    data: rows[0],
-  });
 });
 
 export default authRoutes;

@@ -87,7 +87,7 @@ function ArticleCard({ article, mode }) {
           <h3 className="text-lg font-bold line-clamp-2">{article.title}</h3>
 
           <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-            {article.conclusion}
+            {article.summary}
           </p>
 
           <div className="flex justify-between text-xs text-gray-500">
