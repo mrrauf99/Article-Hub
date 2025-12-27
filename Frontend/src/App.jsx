@@ -37,6 +37,10 @@ import UserProfilePage from "./features/user/pages/UserProfilePage.jsx";
 import editArticleLoader from "./features/user/loaders/editArticle.js";
 import myArticlesLoader from "./features/user/loaders/myArticles.js";
 import userProfileLoader from "./features/user/loaders/userProfile.js";
+import userStatsLoader from "./features/user/loaders/userStats.js";
+
+import createArticleAction from "./features/user/actions/createArticle.js";
+import updateProfileAction from "./features/user/actions/updateProfile.js";
 
 // Layouts
 import PublicLayout from "./layouts/PublicLayout.jsx";
@@ -122,12 +126,13 @@ export default function App() {
           children: [
             {
               index: true,
-              element: <UserDashBoardPage />,
-              loader: myArticlesLoader,
+              element: <HomePage />,
+              loader: publicArticlesLoader,
             },
             {
               path: "new",
               element: <CreateArticlePage />,
+              action: createArticleAction,
             },
             {
               path: ":id/edit",
@@ -144,6 +149,8 @@ export default function App() {
         {
           path: "profile",
           element: <UserProfilePage />,
+          loader: userStatsLoader,
+          action: updateProfileAction,
         },
       ],
     },

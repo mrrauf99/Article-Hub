@@ -6,7 +6,6 @@ import { Calendar, User, Tag, Clock, Share2, Eye, Heart } from "lucide-react";
 export default function ArticleDetailPage() {
   const { article } = useLoaderData();
 
-  const [isLiked, setIsLiked] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
 
   /* ---------------- Guards ---------------- */
@@ -107,25 +106,6 @@ export default function ArticleDetailPage() {
                 </span>
               )}
             </button>
-
-            {/* Like */}
-            <button
-              onClick={() => setIsLiked((v) => !v)}
-              aria-pressed={isLiked}
-              className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg
-                         hover:bg-red-50 transition"
-            >
-              <Heart
-                className={`w-5 h-5 transition ${
-                  isLiked
-                    ? "fill-red-500 text-red-500 scale-110"
-                    : "text-gray-500"
-                }`}
-              />
-              <span className="text-sm font-medium">
-                {isLiked ? "Liked" : "Like"}
-              </span>
-            </button>
           </div>
         </div>
 
@@ -154,9 +134,9 @@ export default function ArticleDetailPage() {
         )}
 
         {/* ================= CONCLUSION ================= */}
-        {article.conclusion && (
+        {article.summary && (
           <p className="mt-8 text-base text-gray-700 leading-relaxed whitespace-pre-line">
-            {article.conclusion}
+            {article.summary}
           </p>
         )}
       </div>
