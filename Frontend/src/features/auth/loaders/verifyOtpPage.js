@@ -8,6 +8,6 @@ export default async function verifyOtpPageLoader() {
       return res.data;
     }
   } catch {
-    throw redirect("/register");
+    throw redirect("/login");
   }
 }

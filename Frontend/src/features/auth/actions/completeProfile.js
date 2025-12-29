@@ -1,3 +1,4 @@
+import { redirect } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 
 export default async function completeProfileAction({ request }) {
@@ -6,6 +7,7 @@ export default async function completeProfileAction({ request }) {
 
   try {
     await authApi.oauthComplete({ username });
+    return redirect("/user/dashboard");
   } catch (err) {
     return {
       message: err.response?.data?.message || "Something went wrong",

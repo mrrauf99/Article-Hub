@@ -7,13 +7,15 @@ export async function submitContact(req, res) {
     await sendContactEmail({ name, email, subject, message });
 
     return res.status(201).json({
+      success: true,
       message: "Message sent successfully.",
     });
   } catch (err) {
     console.error("Contact error:", err);
 
     return res.status(500).json({
-      error: "Internal server error",
+      success: false,
+      message: "Internal server error",
     });
   }
 }

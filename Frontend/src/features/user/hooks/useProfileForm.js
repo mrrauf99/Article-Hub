@@ -19,7 +19,7 @@ function normalizeUser(user) {
 }
 
 export function useProfileForm(user) {
-  const initialRef = useRef(null);
+  const initialRef = useRef(() => normalizeUser(user));
 
   const [formData, setFormData] = useState(() => normalizeUser(user));
 

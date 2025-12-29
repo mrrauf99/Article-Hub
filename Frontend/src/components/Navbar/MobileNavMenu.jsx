@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Shield } from "lucide-react";
 import styles from "@/styles/Navbar.module.css";
 
 export default function MobileNavMenu({
@@ -8,57 +8,119 @@ export default function MobileNavMenu({
   navItems,
   role,
   userName,
+  avatar,
   onLogout,
 }) {
   if (!isOpen) return null;
 
+  const isAdmin = role === "admin";
+  const profilePath = isAdmin ? "/admin/profile" : "/user/profile";
+
+  // Get initials for avatar fallback
+  const initials = userName
+    ? userName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "U";
+
   return (
     <div className={styles.mobileMenu}>
       <div className={styles.mobileMenuInner}>
-        {navItems.map(({ label, href, icon: Icon }) => (
-          <Link key={label} to={href} onClick={onClose} className={styles.mobileLink}>
-            <Icon className={styles.mobileLinkIcon} />
-            {label}
-          </Link>
-        ))}
+        {/* User info for logged-in users */}
+        {role !== "guest" && (
+          <div className={styles.mobileUserHeader}>
+            <div className={styles.mobileAvatarContainer}>
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt={userName}
+                  className={styles.mobileAvatar}
+                />
+              ) : (
+                <span className={styles.mobileAvatarFallback}>{initials}</span>
+              )}
+            </div>
+            <div className={styles.mobileUserDetails}>
+              <span className={styles.mobileUserName}>{userName}</span>
+              <span className={styles.mobileUserRole}>
+                {isAdmin ? (
+                  <>
+                    <Shield className={styles.mobileRoleIcon} />
+                    Administrator
+                  </>
+                ) : (
+                  "Member"
+                )}
+              </span>
+            </div>
+          </div>
+        )}
 
+        {/* Navigation links */}
+        {navItems.length > 0 && (
+          <div className={styles.mobileNavSection}>
+            {navItems.map(({ label, href, icon: Icon }) => (
+              <Link
+                key={label}
+                to={href}
+                onClick={onClose}
+                className={styles.mobileLink}
+              >
+                {Icon && <Icon className={styles.mobileLinkIcon} />}
+                {label}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Guest actions */}
         {role === "guest" ? (
-          <>
-            <Link to="/login" onClick={onClose} className={styles.mobileLink}>
-              Login
+          <div className={styles.mobileGuestActions}>
+            <Link
+              to="/login"
+              onClick={onClose}
+              className={styles.mobileLoginBtn}
+            >
+              Log in
             </Link>
             <Link
-              to="/signup"
+              to="/register"
               onClick={onClose}
-              className={`${styles.mobileLink} ${styles.mobileSignup}`}
+              className={styles.mobileSignupBtn}
             >
               Sign Up
             </Link>
-          </>
+          </div>
         ) : (
           <>
-            <div className={styles.mobileUserInfo}>
-              {userName}
-              {role === "admin" && (
-                <span className={styles.adminBadge}>ADMIN</span>
-              )}
+            {/* User menu links */}
+            <div className={styles.mobileNavSection}>
+              <Link
+                to={profilePath}
+                onClick={onClose}
+                className={styles.mobileLink}
+              >
+                <User className={styles.mobileLinkIcon} />
+                Profile
+              </Link>
             </div>
 
-            <Link to="/profile" onClick={onClose} className={styles.mobileLink}>
-              <User className={styles.mobileLinkIcon} />
-              Profile
-            </Link>
-
-            <button
-              onClick={() => {
-                onLogout();
-                onClose();
-              }}
-              className={`${styles.mobileLink} ${styles.mobileLogout}`}
-            >
-              <LogOut className={styles.mobileLinkIcon} />
-              Logout
-            </button>
+            {/* Logout */}
+            <div className={styles.mobileLogoutSection}>
+              <button
+                onClick={() => {
+                  onLogout();
+                  onClose();
+                }}
+                className={styles.mobileLogoutBtn}
+              >
+                <LogOut className={styles.mobileLinkIcon} />
+                Log out
+              </button>
+            </div>
           </>
         )}
       </div>
