@@ -10,7 +10,7 @@ import MobileNavMenu from "./MobileNavMenu";
 
 import styles from "@/styles/Navbar.module.css";
 
-export default function Navbar({ userName, role, onLogout }) {
+export default function Navbar({ userName, avatar, role, onLogout }) {
   const [open, setOpen] = useState(false);
   const navItems = getNavItemsForRole(role);
 
@@ -21,16 +21,21 @@ export default function Navbar({ userName, role, onLogout }) {
 
         {navItems.length > 0 && <DesktopNavLinks navItems={navItems} />}
 
-        <UserMenu role={role} userName={userName} onLogout={onLogout} />
+        <UserMenu
+          role={role}
+          userName={userName}
+          avatar={avatar}
+          onLogout={onLogout}
+        />
 
-        {role !== "guest" && (
-          <button
-            className={styles.mobileToggle}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? <X /> : <Menu />}
-          </button>
-        )}
+        <button
+          className={styles.mobileToggle}
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+        >
+          {open ? <X /> : <Menu />}
+        </button>
       </div>
 
       <MobileNavMenu
@@ -39,6 +44,7 @@ export default function Navbar({ userName, role, onLogout }) {
         navItems={navItems}
         role={role}
         userName={userName}
+        avatar={avatar}
         onLogout={onLogout}
       />
     </nav>

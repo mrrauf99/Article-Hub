@@ -21,15 +21,20 @@ export default function OTPInputs({
           maxLength={1}
           value={digit}
           disabled={isSubmitting}
-          className={styles.input}
+          className={`${styles.input} ${isSubmitting ? styles.disabled : ""}`}
           onChange={(e) => {
+            if (isSubmitting) return;
             onUserInput?.();
             handleChange(index, e.target.value);
           }}
-          onKeyDown={(e) => handleKeyDown(index, e)}
+          onKeyDown={(e) => {
+            if (isSubmitting) return;
+            handleKeyDown(index, e);
+          }}
           onPaste={
             index === 0
               ? (e) => {
+                  if (isSubmitting) return;
                   onUserInput?.();
                   handlePaste(e);
                 }

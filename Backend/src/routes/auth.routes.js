@@ -1,6 +1,5 @@
 import { Router } from "express";
 import passport from "passport";
-import db from "../config/db.config.js";
 
 import {
   signUp,
@@ -16,22 +15,18 @@ import {
 
 import { requireOAuthSession } from "../middlewares/oauth.middleware.js";
 import { requireOtpSession } from "../middlewares/otp.middleware.js";
-import {
-  otpResendLimiter,
-  loginLimiter,
-  otpVerifyLimiter,
-} from "../middlewares/rateLimiters.middleware.js";
+import { loginLimiter } from "../middlewares/rateLimiters.middleware.js";
 
 const authRoutes = Router();
 
 // Register new user (signup + send OTP)
 authRoutes.post("/register", signUp);
 
-// Verify signup OTP
-authRoutes.post("/verify-otp", otpVerifyLimiter, requireOtpSession, verifyOtp);
+// Verify signup OTP (5 attempts per OTP, tracked in session)
+authRoutes.post("/verify-otp", requireOtpSession, verifyOtp);
 
-// Resend OTP (signup / reset)
-authRoutes.post("/resend-otp", otpResendLimiter, resendOtp);
+// Resend OTP (signup / reset) - no rate limit, resets attempt counter
+authRoutes.post("/resend-otp", resendOtp);
 
 // Login with email & password
 authRoutes.post("/login", loginLimiter, login);
@@ -79,7 +74,7 @@ authRoutes.get(
     // Existing user → login directly
     if (user.id) {
       req.session.userId = user.id;
-      return res.redirect(`${process.env.CLIENT_BASE_URL}/dashboard`);
+      return res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
     }
 
     // New OAuth user → store temporary session

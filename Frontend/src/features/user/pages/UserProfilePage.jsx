@@ -46,7 +46,7 @@ export default function UserProfilePage() {
     setFeedback(actionData);
     if (actionData.success) setIsEditing(false);
 
-    const t = setTimeout(() => setFeedback(null), 3000);
+    const t = setTimeout(() => setFeedback(null), 5000);
     return () => clearTimeout(t);
   }, [actionData]);
 

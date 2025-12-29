@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { useMemo } from "react";
+import { FileX } from "lucide-react";
 import ArticleCard from "./ArticleCard";
 import Pagination from "./Pagination";
+import StatusFilter from "./StatusFilter";
 
 const PER_PAGE = 9;
 
@@ -13,36 +15,73 @@ export default function ArticlesSection({
   mode,
   showCreateButton,
   onCreate,
+  statusFilter = "all",
+  onStatusChange,
+  showStatusFilter = false,
 }) {
-  const totalPages = Math.ceil(articles.length / PER_PAGE);
+  // Filter articles by status
+  const filteredByStatus = useMemo(() => {
+    if (!showStatusFilter || statusFilter === "all") return articles;
+    return articles.filter((a) => a.status === statusFilter);
+  }, [articles, statusFilter, showStatusFilter]);
+
+  const totalPages = Math.ceil(filteredByStatus.length / PER_PAGE);
 
   const safePage = Math.min(Math.max(page, 1), totalPages || 1);
 
   const paginatedArticles = useMemo(() => {
     const start = (safePage - 1) * PER_PAGE;
-    return articles.slice(start, start + PER_PAGE);
-  }, [articles, safePage]);
+    return filteredByStatus.slice(start, start + PER_PAGE);
+  }, [filteredByStatus, safePage]);
 
   return (
     <>
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
 
-        {showCreateButton && (
-          <Link
-            to={onCreate}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-md"
-          >
-            + Create Article
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {/* Status Filter */}
+          {showStatusFilter && onStatusChange && (
+            <StatusFilter value={statusFilter} onChange={onStatusChange} />
+          )}
+
+          {/* Create Button */}
+          {showCreateButton && (
+            <Link
+              to={onCreate}
+              className="inline-flex items-center gap-2 
+                bg-gradient-to-br from-indigo-500 to-indigo-600 
+                hover:from-indigo-600 hover:to-indigo-700 
+                text-white px-5 py-2.5 rounded-full font-medium 
+                shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30
+                hover:-translate-y-0.5
+                transition-all duration-300 ease-out
+                focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2"
+            >
+              <span className="text-lg leading-none">+</span>
+              Create Article
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Content */}
       {paginatedArticles.length === 0 ? (
-        <div className="py-20 text-center text-gray-500">
-          No articles found.
+        <div className="py-24 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 mb-5">
+            <FileX className="w-9 h-9 text-slate-400" />
+          </div>
+          <p className="text-slate-500 text-lg font-medium">
+            {showStatusFilter && statusFilter !== "all"
+              ? `No ${statusFilter} articles found.`
+              : "No articles found."}
+          </p>
+          <p className="text-slate-400 text-sm mt-1">
+            {showStatusFilter && statusFilter !== "all"
+              ? "Try selecting a different filter."
+              : "Start by creating your first article."}
+          </p>
         </div>
       ) : (
         <>
