@@ -1,5 +1,4 @@
 import { authApi } from "../../api/authApi";
-import { redirect } from "react-router-dom";
 
 export default async function otpAction({ request }) {
   const formData = await request.formData();
@@ -38,8 +37,11 @@ export default async function otpAction({ request }) {
         };
       }
 
-      // backend decides next route
-      return redirect(data.next);
+      return {
+        success: true,
+        message: "OTP verified successfully.",
+        next: data.next,
+      };
     } catch (err) {
       return {
         success: false,

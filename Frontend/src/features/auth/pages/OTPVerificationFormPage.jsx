@@ -3,12 +3,12 @@ import {
   useActionData,
   useFetcher,
   useNavigation,
-  useSearchParams,
+  useNavigate,
   useLoaderData,
 } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 
-import { useEffect, useState } from "react";
 import { useOTPForm } from "../hooks/useOTPForm";
 import OTPHeader from "../components/OTPHeader";
 import OTPInputs from "../components/OTPInputs";
@@ -19,41 +19,86 @@ import SwitchPage from "../components/SwitchPage";
 export default function OTPVerificationForm() {
   const otpForm = useOTPForm();
   const { reset } = otpForm;
-
   const { email } = useLoaderData();
 
   const resendFetcher = useFetcher();
   const actionData = useActionData();
   const navigation = useNavigation();
+  const navigate = useNavigate();
 
-  // UI mode: controls which message + color is active
   const [mode, setMode] = useState("idle"); // idle | verify | resend
+  const [message, setMessage] = useState(null); // { success, message }
+
+  // Track the last actionData to detect new responses
+  const lastActionDataRef = useRef(null);
 
   const isVerifying = navigation.state === "submitting";
   const isResending = resendFetcher.state === "submitting";
 
-  /* ---------------- STATUS (INPUT COLOR) ---------------- */
+  /* ---------- Update message when new response arrives ---------- */
+  // Handle verify action response
+  useEffect(() => {
+    if (
+      mode === "verify" &&
+      actionData &&
+      actionData !== lastActionDataRef.current
+    ) {
+      lastActionDataRef.current = actionData;
+      setMessage({ success: actionData.success, message: actionData.message });
+    }
+  }, [actionData, mode]);
 
-  const messageData =
-    mode === "verify" && !isVerifying
-      ? actionData
-      : mode === "resend"
-      ? resendFetcher.data
-      : null;
+  // Handle resend fetcher response
+  useEffect(() => {
+    if (mode === "resend" && resendFetcher.data) {
+      setMessage({
+        success: resendFetcher.data.success,
+        message: resendFetcher.data.message,
+      });
+    }
+  }, [resendFetcher.data, mode]);
+
+  // Clear message when user starts typing (mode becomes idle)
+  useEffect(() => {
+    if (mode === "idle") {
+      setMessage(null);
+    }
+  }, [mode]);
+
+  // Clear message when submitting
+  useEffect(() => {
+    if (isVerifying || isResending) {
+      setMessage(null);
+    }
+  }, [isVerifying, isResending]);
 
   const status =
-    messageData?.success === true
+    message?.success === true
       ? "success"
-      : messageData?.success === false
+      : message?.success === false
       ? "error"
       : "idle";
 
-  // After resend success, ensure OTP is reset
+  const isVerifySuccess = mode === "verify" && actionData?.success === true;
+
+  /* ---------- effects ---------- */
+
+  // reset OTP after resend success
   useEffect(() => {
     if (mode === "resend" && resendFetcher.data?.success) {
       reset();
     }
   }, [mode, resendFetcher.data?.success, reset]);
+
+  // redirect after verify success
+  useEffect(() => {
+    if (mode === "verify" && actionData?.success && actionData?.next) {
+      const t = setTimeout(() => {
+        navigate(actionData.next, { replace: true });
+      }, 1200);
+      return () => clearTimeout(t);
+    }
+  }, [mode, actionData, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-indigo-50 via-indigo-100 to-purple-50">
@@ -67,12 +112,12 @@ export default function OTPVerificationForm() {
             handleChange={otpForm.handleChange}
             handleKeyDown={otpForm.handleKeyDown}
             handlePaste={otpForm.handlePaste}
-            isSubmitting={isVerifying}
+            isSubmitting={isVerifying || isVerifySuccess}
             status={status}
             onUserInput={() => setMode("idle")}
           />
 
-          {messageData?.message && status !== "idle" && (
+          {message?.message && status !== "idle" && (
             <div
               className={`text-center text-sm font-medium px-4 py-2 rounded-md ${
                 status === "success"
@@ -80,35 +125,51 @@ export default function OTPVerificationForm() {
                   : "bg-red-50 text-red-700"
               }`}
             >
-              {messageData.message}
+              {message.message}
             </div>
           )}
 
-          {/* RESEND OTP */}
-          <resendFetcher.Form
+          {/* ----- RESEND OTP (hidden after success) ----- */}
+          {!isVerifySuccess && (
+            <resendFetcher.Form
+              method="post"
+              className="text-center"
+              onSubmit={() => setMode("resend")}
+            >
+              <input type="hidden" name="intent" value="resend" />
+
+              <OTPTimer
+                timer={otpForm.timer}
+                canResend={otpForm.canResend}
+                isResending={isResending}
+              />
+            </resendFetcher.Form>
+          )}
+
+          {/* ----- VERIFY OTP ----- */}
+          <Form
             method="post"
-            className="text-center"
-            onSubmit={() => setMode("resend")}
+            onSubmit={() => {
+              setMode("verify");
+            }}
           >
-            <input type="hidden" name="intent" value="resend" />
-
-            <OTPTimer
-              timer={otpForm.timer}
-              canResend={otpForm.canResend}
-              isResending={isResending}
-            />
-          </resendFetcher.Form>
-
-          {/* VERIFY OTP */}
-          <Form method="post" onSubmit={() => setMode("verify")}>
             <input type="hidden" name="otp" value={otpForm.otp.join("")} />
             <input type="hidden" name="intent" value="verify" />
 
             <Button
-              disabled={!otpForm.isOtpComplete || isVerifying || isResending}
+              disabled={
+                !otpForm.isOtpComplete || isResending || isVerifySuccess
+              }
               isLoading={isVerifying}
             >
-              {isVerifying ? "Verifying..." : "Verify OTP"}
+              {isVerifySuccess ? (
+                <>
+                  <CheckCircle className="w-5 h-5 text-white" />
+                  Verified
+                </>
+              ) : (
+                "Verify OTP"
+              )}
             </Button>
           </Form>
 

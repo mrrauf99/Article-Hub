@@ -3,6 +3,12 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { sendEmailVerificationOtp } from "../services/email.service.js";
 
+/* ===================== CONSTANTS ===================== */
+const OTP_TTL_MS = 5 * 60 * 1000;
+const OTP_HASH_ROUNDS = 10;
+const MAX_VERIFY_ATTEMPTS = 5;
+const MAX_RESEND_COUNT = 3;
+
 export async function signUp(req, res) {
   const { email, username, name, password, country } = req.body;
 
@@ -12,12 +18,15 @@ export async function signUp(req, res) {
   );
 
   const otp = crypto.randomInt(100000, 1000000).toString();
+  const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
   req.session.otp = {
     flow: "signup",
     email,
-    code: otp,
-    expiresAt: Date.now() + 5 * 60 * 1000,
+    code: otpHash,
+    expiresAt: Date.now() + OTP_TTL_MS,
+    attempts: 0,
+    resendCount: 0,
     verified: false,
     payload: {
       email,
@@ -28,11 +37,170 @@ export async function signUp(req, res) {
     },
   };
 
+  req.session.cookie.maxAge = OTP_TTL_MS;
+
   await sendEmailVerificationOtp(email, otp);
 
-  return res.status(200).json({
+  res.json({
     success: true,
     message: "Verification code sent to your email.",
+  });
+}
+
+export async function forgetPassword(req, res) {
+  const { email } = req.body;
+
+  const { rowCount } = await db.query("SELECT 1 FROM users WHERE email = $1", [
+    email,
+  ]);
+
+  if (!rowCount) {
+    return res.json({
+      success: true,
+      message: "If an account exists, a verification code has been sent.",
+    });
+  }
+
+  const otp = crypto.randomInt(100000, 1000000).toString();
+  const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
+
+  req.session.otp = {
+    flow: "reset-password",
+    email,
+    code: otpHash,
+    expiresAt: Date.now() + OTP_TTL_MS,
+    attempts: 0,
+    resendCount: 0,
+    verified: false,
+  };
+
+  req.session.cookie.maxAge = OTP_TTL_MS;
+
+  await sendEmailVerificationOtp(email, otp);
+
+  res.json({
+    success: true,
+    message: "Verification code sent to your email.",
+  });
+}
+
+export async function resendOtp(req, res) {
+  const oldOtp = req.session.otp;
+
+  if (!oldOtp) {
+    return res.status(401).json({
+      success: false,
+      message: "Session expired. Please start again.",
+    });
+  }
+
+  const currentResendCount = oldOtp.resendCount || 0;
+
+  if (currentResendCount >= MAX_RESEND_COUNT) {
+    return res.status(429).json({
+      success: false,
+      message: "Maximum resend limit reached. Please start again.",
+      resendsRemaining: 0,
+    });
+  }
+
+  const otp = crypto.randomInt(100000, 1000000).toString();
+  const hashedOtp = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
+
+  // Regenerate session to avoid stale attempts
+  req.session.regenerate(async (err) => {
+    if (err) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to regenerate session.",
+      });
+    }
+
+    const newResendCount = currentResendCount + 1;
+
+    req.session.otp = {
+      flow: oldOtp.flow,
+      email: oldOtp.email,
+      payload: oldOtp.payload,
+      code: hashedOtp,
+      expiresAt: Date.now() + OTP_TTL_MS,
+      attempts: 0,
+      resendCount: newResendCount,
+      verified: false,
+    };
+
+    await sendEmailVerificationOtp(oldOtp.email, otp);
+
+    res.json({
+      success: true,
+      message: "New verification code sent.",
+      resendsRemaining: MAX_RESEND_COUNT - newResendCount,
+    });
+  });
+}
+
+export async function verifyOtp(req, res) {
+  const { otp } = req.body;
+  const otpSession = req.session.otp;
+
+  if (!otpSession) {
+    return res.status(401).json({
+      success: false,
+      message: "Verification session expired.",
+    });
+  }
+
+  if (Date.now() > otpSession.expiresAt) {
+    req.session.destroy(() => {});
+    return res.status(410).json({
+      success: false,
+      message: "OTP expired. Please request a new one.",
+    });
+  }
+
+  if (otpSession.attempts >= MAX_VERIFY_ATTEMPTS) {
+    return res.status(429).json({
+      success: false,
+      message: "Too many attempts. Please request a new code.",
+      attemptsRemaining: 0,
+    });
+  }
+
+  const isValid = await bcrypt.compare(otp, otpSession.code);
+
+  if (!isValid) {
+    otpSession.attempts += 1;
+    const remaining = MAX_VERIFY_ATTEMPTS - otpSession.attempts;
+    return res.status(400).json({
+      success: false,
+      message: `Invalid verification code. ${remaining} attempt${
+        remaining !== 1 ? "s" : ""
+      } remaining.`,
+      attemptsRemaining: remaining,
+    });
+  }
+
+  // SUCCESS
+  otpSession.verified = true;
+
+  if (otpSession.flow === "signup") {
+    const p = otpSession.payload;
+
+    await db.query(
+      `
+      INSERT INTO users (email, username, name, password, country)
+      VALUES ($1,$2,$3,$4,$5)
+      `,
+      [p.email, p.username, p.name, p.password, p.country]
+    );
+
+    req.session.destroy(() => {});
+  }
+
+  res.json({
+    success: true,
+    message: "OTP verified successfully.",
+    next: otpSession.flow === "reset-password" ? "/reset-password" : "/login",
   });
 }
 
@@ -85,86 +253,6 @@ export async function login(req, res) {
       message: "Something went wrong. Please try again later.",
     });
   }
-}
-
-export async function resendOtp(req, res) {
-  try {
-    const otpSession = req.session.otp;
-
-    if (!otpSession) {
-      return res.status(401).json({
-        success: false,
-        message: "Session expired. Please login again.",
-      });
-    }
-
-    const otp = crypto.randomInt(100000, 1000000).toString();
-
-    otpSession.code = otp;
-    otpSession.expiresAt = Date.now() + 5 * 60 * 1000;
-    otpSession.verified = false;
-
-    await sendEmailVerificationOtp(otpSession.email, otp);
-
-    return res.status(200).json({
-      success: true,
-      message: "New verification code sent.",
-    });
-  } catch (err) {
-    console.error("Resend OTP error:", err);
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to resend code. Please try again.",
-    });
-  }
-}
-
-export async function verifyOtp(req, res) {
-  const { otp } = req.body;
-  const sessionOtp = req.session.otp;
-
-  if (!sessionOtp) {
-    return res.status(401).json({
-      success: false,
-      message: "Verification session expired. Please request a new code.",
-    });
-  }
-
-  if (Date.now() > sessionOtp.expiresAt) {
-    req.session.destroy(() => {});
-    return res.status(410).json({
-      success: false,
-      message: "OTP expired.",
-    });
-  }
-
-  if (sessionOtp.code !== otp) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid verification code.",
-    });
-  }
-
-  // mark verified
-  sessionOtp.verified = true;
-
-  // SIGNUP FINALIZATION
-  if (sessionOtp.flow === "signup") {
-    const p = sessionOtp.payload;
-
-    await db.query(
-      "INSERT INTO users (email, username, name, password, country) VALUES ($1,$2,$3,$4,$5)",
-      [p.email, p.username, p.name, p.password, p.country]
-    );
-
-    req.session.destroy(() => {});
-  }
-
-  res.status(200).json({
-    success: true,
-    next: sessionOtp.flow === "reset-password" ? "/reset-password" : "/login",
-  });
 }
 
 export async function checkEmailAvailability(req, res) {
@@ -229,38 +317,6 @@ export async function checkUsernameAvailability(req, res) {
       message: "Unable to check username availability. Please try again.",
     });
   }
-}
-
-export async function forgetPassword(req, res) {
-  const { email } = req.body;
-
-  const { rowCount } = await db.query("SELECT 1 FROM users WHERE email = $1", [
-    email,
-  ]);
-
-  if (!rowCount) {
-    return res.status(404).json({
-      success: false,
-      message: "No account found with this email.",
-    });
-  }
-
-  const otp = crypto.randomInt(100000, 1000000).toString();
-
-  req.session.otp = {
-    flow: "reset-password",
-    email,
-    code: otp,
-    expiresAt: Date.now() + 5 * 60 * 1000,
-    verified: false,
-  };
-
-  await sendEmailVerificationOtp(email, otp);
-
-  res.status(200).json({
-    success: true,
-    message: "Verification code sent to your email.",
-  });
 }
 
 export async function resetPassword(req, res) {
@@ -331,5 +387,5 @@ export async function completeGoogleSignup(req, res) {
   // destroy temp oauth data
   delete req.session.oauth;
 
-  res.redirect(`${process.env.CLIENT_BASE_URL}/dashboard`);
+  res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
 }

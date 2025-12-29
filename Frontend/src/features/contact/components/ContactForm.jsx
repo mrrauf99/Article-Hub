@@ -1,13 +1,22 @@
 import { useFetcher } from "react-router-dom";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useContactForm } from "../hooks/useContactForm";
 
-import { Send, User, Mail, MessageSquare } from "lucide-react";
+import {
+  Send,
+  CheckCircle,
+  User,
+  XCircle,
+  Mail,
+  MessageSquare,
+} from "lucide-react";
 import InputField from "@/components/InputField";
 
 export default function ContactForm() {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
+
+  const [feedback, setFeedback] = useState(null);
 
   const { values, errors, handleChange, handleBlur, validate, reset } =
     useContactForm({
@@ -25,10 +34,14 @@ export default function ContactForm() {
   };
 
   useEffect(() => {
-    if (fetcher.data?.success) {
+    if (fetcher.state === "idle" && fetcher.data?.success) {
+      setFeedback(fetcher.data);
       reset();
+
+      const t = setTimeout(() => setFeedback(null), 5000);
+      return () => clearTimeout(t);
     }
-  }, [fetcher.data, reset]);
+  }, [fetcher.state]);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-8 w-full">
@@ -101,26 +114,47 @@ export default function ContactForm() {
           )}
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
+        {!feedback && (
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
         disabled:bg-blue-400 disabled:cursor-not-allowed
           font-semibold flex items-center justify-center gap-2 
-          transition-colors duration-200"
-        >
-          {isSubmitting ? (
-            <>
-              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-              Sending message…
-            </>
-          ) : (
-            <>
-              <Send className="h-4 w-4" />
-              Send Message
-            </>
-          )}
-        </button>
+          transition-colors duration-200 focus:outline-none focus-visible:ring-2
+         focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+          >
+            {isSubmitting ? (
+              <>
+                <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                Sending message…
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4" />
+                Send Message
+              </>
+            )}
+          </button>
+        )}
+
+        {/* FEEDBACK */}
+        {feedback && (
+          <div
+            className={`flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
+              feedback.success
+                ? "border-green-200 bg-green-50 text-green-800"
+                : "border-red-200 bg-red-50 text-red-800"
+            }`}
+          >
+            {feedback.success ? (
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            ) : (
+              <XCircle className="h-5 w-5 text-red-600" />
+            )}
+            <span>{feedback.message}</span>
+          </div>
+        )}
       </fetcher.Form>
     </div>
   );

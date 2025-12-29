@@ -36,13 +36,13 @@ export default function HomePage() {
     }
 
     params.set("page", "1");
-    setSearchParams(params);
+    setSearchParams(params, { preventScrollReset: true });
   }
 
   function handlePageChange(page) {
     const params = new URLSearchParams(searchParams);
     params.set("page", String(page));
-    setSearchParams(params);
+    setSearchParams(params, { preventScrollReset: true });
   }
 
   return (
