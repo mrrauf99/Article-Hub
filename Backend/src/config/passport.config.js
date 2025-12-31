@@ -19,13 +19,13 @@ export default function setupPassport() {
           const avatar = profile.photos?.[0]?.value || null;
 
           const { rows } = await db.query(
-            "SELECT id FROM users WHERE email = $1",
+            "SELECT id, role FROM users WHERE email = $1",
             [email]
           );
 
           // Existing user → login directly
           if (rows.length > 0) {
-            return done(null, { id: rows[0].id });
+            return done(null, { id: rows[0].id, role: rows[0].role });
           }
 
           // New user → TEMP session data

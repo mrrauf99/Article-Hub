@@ -1,7 +1,159 @@
 import db from "../config/db.config.js";
 
-// GET all pending articles
+// GET dashboard stats
+export const getDashboardStats = async (req, res) => {
+  try {
+    const statsQuery = await db.query(`
+      SELECT
+        (SELECT COUNT(*) FROM users WHERE role = 'user') AS total_users,
+        (SELECT COUNT(*) FROM users WHERE role = 'admin') AS total_admins,
+        (SELECT COUNT(*) FROM articles) AS total_articles,
+        (SELECT COUNT(*) FROM articles WHERE status = 'approved') AS approved_articles,
+        (SELECT COUNT(*) FROM articles WHERE status = 'pending') AS pending_articles,
+        (SELECT COUNT(*) FROM articles WHERE status = 'rejected') AS rejected_articles,
+        (SELECT COALESCE(SUM(views), 0) FROM articles) AS total_views
+    `);
 
+    const recentArticles = await db.query(`
+      SELECT
+        a.article_id,
+        a.title,
+        a.status,
+        a.created_at,
+        u.name AS author_name,
+        u.avatar AS author_avatar
+      FROM articles a
+      JOIN users u ON u.id = a.author_id
+      ORDER BY a.created_at DESC
+      LIMIT 5
+    `);
+
+    const recentUsers = await db.query(`
+      SELECT id, name, email, avatar, role, joined_at
+      FROM users
+      ORDER BY joined_at DESC
+      LIMIT 5
+    `);
+
+    res.json({
+      success: true,
+      data: {
+        stats: statsQuery.rows[0],
+        recentArticles: recentArticles.rows,
+        recentUsers: recentUsers.rows,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch dashboard stats" });
+  }
+};
+
+// GET all articles with filters and pagination
+export const getAllArticles = async (req, res) => {
+  try {
+    const { status = "all", search = "", page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    let whereClause = "WHERE 1=1";
+    const params = [];
+    let paramIndex = 1;
+
+    if (status && status !== "all") {
+      whereClause += ` AND a.status = $${paramIndex}`;
+      params.push(status);
+      paramIndex++;
+    }
+
+    if (search) {
+      whereClause += ` AND (a.title ILIKE $${paramIndex} OR u.name ILIKE $${paramIndex})`;
+      params.push(`%${search}%`);
+      paramIndex++;
+    }
+
+    const countQuery = await db.query(
+      `SELECT COUNT(*) FROM articles a JOIN users u ON u.id = a.author_id ${whereClause}`,
+      params
+    );
+    const totalCount = parseInt(countQuery.rows[0].count);
+
+    const articlesQuery = await db.query(
+      `SELECT
+        a.article_id,
+        a.title,
+        a.summary,
+        a.category,
+        a.status,
+        a.views,
+        a.image_url,
+        a.created_at,
+        a.published_at,
+        u.id AS author_id,
+        u.name AS author_name,
+        u.avatar AS author_avatar
+       FROM articles a
+       JOIN users u ON u.id = a.author_id
+       ${whereClause}
+       ORDER BY a.created_at DESC
+       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+      [...params, limit, offset]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        articles: articlesQuery.rows,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch articles" });
+  }
+};
+
+// GET single article details
+export const getArticleDetails = async (req, res) => {
+  const { articleId } = req.params;
+  try {
+    const { rows } = await db.query(
+      `SELECT
+        a.*,
+        u.id AS author_id,
+        u.name AS author_name,
+        u.email AS author_email,
+        u.avatar AS author_avatar
+       FROM articles a
+       JOIN users u ON u.id = a.author_id
+       WHERE a.article_id = $1`,
+      [articleId]
+    );
+
+    if (!rows.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Article not found" });
+    }
+
+    res.json({ success: true, data: rows[0] });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch article details" });
+  }
+};
+
+// GET all pending articles (legacy, kept for compatibility)
 export const getPendingArticles = async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -78,5 +230,208 @@ export const rejectArticle = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Rejection failed" });
+  }
+};
+
+// DELETE article
+export const deleteArticle = async (req, res) => {
+  const { articleId } = req.params;
+
+  try {
+    const { rowCount } = await db.query(
+      `DELETE FROM articles WHERE article_id = $1`,
+      [articleId]
+    );
+
+    if (!rowCount) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found",
+      });
+    }
+
+    res.json({ success: true, message: "Article deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete article" });
+  }
+};
+
+// ============= USER MANAGEMENT =============
+
+// GET all users with filters and pagination
+export const getAllUsers = async (req, res) => {
+  try {
+    const { role = "all", search = "", page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    let whereClause = "WHERE 1=1";
+    const params = [];
+    let paramIndex = 1;
+
+    if (role && role !== "all") {
+      whereClause += ` AND role = $${paramIndex}`;
+      params.push(role);
+      paramIndex++;
+    }
+
+    if (search) {
+      whereClause += ` AND (name ILIKE $${paramIndex} OR email ILIKE $${paramIndex})`;
+      params.push(`%${search}%`);
+      paramIndex++;
+    }
+
+    const countQuery = await db.query(
+      `SELECT COUNT(*) FROM users ${whereClause}`,
+      params
+    );
+    const totalCount = parseInt(countQuery.rows[0].count);
+
+    const usersQuery = await db.query(
+      `SELECT
+        id,
+        name,
+        email,
+        avatar,
+        role,
+        bio,
+        joined_at,
+        (SELECT COUNT(*) FROM articles WHERE author_id = users.id) AS article_count
+       FROM users
+       ${whereClause}
+       ORDER BY joined_at DESC
+       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+      [...params, limit, offset]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        users: usersQuery.rows,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to fetch users" });
+  }
+};
+
+// GET single user details
+export const getUserDetails = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const userQuery = await db.query(
+      `SELECT id, name, email, avatar, role, bio, joined_at
+       FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    if (!userQuery.rows.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const articlesQuery = await db.query(
+      `SELECT article_id, title, status, created_at, views
+       FROM articles WHERE author_id = $1
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        user: userQuery.rows[0],
+        articles: articlesQuery.rows,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch user details" });
+  }
+};
+
+// UPDATE user role
+export const updateUserRole = async (req, res) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+  const adminId = req.session.userId;
+
+  if (!["user", "admin"].includes(role)) {
+    return res.status(400).json({ success: false, message: "Invalid role" });
+  }
+
+  // Prevent admin from changing their own role
+  if (parseInt(userId) === adminId) {
+    return res.status(400).json({
+      success: false,
+      message: "Cannot change your own role",
+    });
+  }
+
+  try {
+    const { rowCount } = await db.query(
+      `UPDATE users SET role = $1 WHERE id = $2`,
+      [role, userId]
+    );
+
+    if (!rowCount) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, message: `User role updated to ${role}` });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update user role" });
+  }
+};
+
+// DELETE user
+export const deleteUser = async (req, res) => {
+  const { userId } = req.params;
+  const adminId = req.session.userId;
+
+  // Prevent admin from deleting themselves
+  if (parseInt(userId) === adminId) {
+    return res.status(400).json({
+      success: false,
+      message: "Cannot delete your own account",
+    });
+  }
+
+  try {
+    // First delete user's articles
+    await db.query(`DELETE FROM articles WHERE author_id = $1`, [userId]);
+
+    // Then delete user
+    const { rowCount } = await db.query(`DELETE FROM users WHERE id = $1`, [
+      userId,
+    ]);
+
+    if (!rowCount) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to delete user" });
   }
 };

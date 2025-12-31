@@ -6,6 +6,7 @@ import {
   updateUserProfile,
 } from "../controllers/user.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
+import { uploadImage } from "../middlewares/uploadImage.middleware.js";
 
 const userRoutes = Router();
 
@@ -13,6 +14,11 @@ userRoutes.get("/profile", requireAuth, getProfile);
 
 userRoutes.get("/stats", requireAuth, getUserStats);
 
-userRoutes.patch("/profile", requireAuth, updateUserProfile);
+userRoutes.patch(
+  "/profile",
+  requireAuth,
+  uploadImage.single("avatar"),
+  updateUserProfile
+);
 
 export default userRoutes;
