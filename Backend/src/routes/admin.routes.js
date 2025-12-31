@@ -1,8 +1,16 @@
 import { Router } from "express";
 import {
+  getDashboardStats,
+  getAllArticles,
+  getArticleDetails,
   getPendingArticles,
   approveArticle,
   rejectArticle,
+  deleteArticle,
+  getAllUsers,
+  getUserDetails,
+  updateUserRole,
+  deleteUser,
 } from "../controllers/admin.controller.js";
 
 import { requireAuth } from "../middlewares/auth.middleware.js";
@@ -10,25 +18,24 @@ import { requireAdmin } from "../middlewares/admin.middleware.js";
 
 const adminRoutes = Router();
 
-adminRoutes.get(
-  "/articles/pending",
-  requireAuth,
-  requireAdmin,
-  getPendingArticles
-);
+// All admin routes require authentication and admin role
+adminRoutes.use(requireAuth, requireAdmin);
 
-adminRoutes.patch(
-  "/articles/:articleId/approve",
-  requireAuth,
-  requireAdmin,
-  approveArticle
-);
+// Dashboard
+adminRoutes.get("/dashboard/stats", getDashboardStats);
 
-adminRoutes.patch(
-  "/articles/:articleId/reject",
-  requireAuth,
-  requireAdmin,
-  rejectArticle
-);
+// Articles
+adminRoutes.get("/articles", getAllArticles);
+adminRoutes.get("/articles/pending", getPendingArticles);
+adminRoutes.get("/articles/:articleId", getArticleDetails);
+adminRoutes.patch("/articles/:articleId/approve", approveArticle);
+adminRoutes.patch("/articles/:articleId/reject", rejectArticle);
+adminRoutes.delete("/articles/:articleId", deleteArticle);
+
+// Users
+adminRoutes.get("/users", getAllUsers);
+adminRoutes.get("/users/:userId", getUserDetails);
+adminRoutes.patch("/users/:userId/role", updateUserRole);
+adminRoutes.delete("/users/:userId", deleteUser);
 
 export default adminRoutes;

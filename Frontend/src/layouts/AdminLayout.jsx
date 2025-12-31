@@ -7,7 +7,7 @@ import Navbar from "../components/navbar/Navbar.jsx";
 import Footer from "../components/Footer";
 import ConfirmDialog from "../components/ConfirmDialog";
 
-export default function UserLayout() {
+export default function AdminLayout() {
   const { user } = useLoaderData();
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -20,7 +20,6 @@ export default function UserLayout() {
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout failed:", error);
-      // Still navigate to login even if logout API fails
       navigate("/login", { replace: true });
     } finally {
       setIsLoggingOut(false);

@@ -12,9 +12,13 @@ function normalizeUser(user) {
     bio: user?.bio ?? "",
 
     x_link: user?.x_link ?? "",
-    linkedin_url: user?.linkedin_url ?? "",
-    facebook_url: user?.facebook_url ?? "",
-    instagram_url: user?.instagram_url ?? "",
+    linkedin_link: user?.linkedin_link ?? "",
+    facebook_link: user?.facebook_link ?? "",
+    instagram_link: user?.instagram_link ?? "",
+
+    // Avatar fields
+    avatarPreview: null,
+    avatarFile: null,
   };
 }
 
@@ -39,6 +43,10 @@ export function useProfileForm(user) {
   }
 
   function resetForm() {
+    // Clean up blob URL if exists
+    if (formData.avatarPreview) {
+      URL.revokeObjectURL(formData.avatarPreview);
+    }
     if (initialRef.current) {
       setFormData(initialRef.current);
     }
