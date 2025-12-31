@@ -1,8 +1,5 @@
 import { adminApi } from "../../api/adminApi.js";
-import {
-  handleLoaderError,
-  getQueryParams,
-} from "../utils/loaderHelpers.js";
+import { handleLoaderError, getQueryParams } from "../utils/loaderHelpers.js";
 
 export default async function adminArticlesLoader({ request }) {
   const params = getQueryParams(request, {
