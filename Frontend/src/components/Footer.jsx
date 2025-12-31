@@ -1,5 +1,5 @@
 import styles from "@/styles/Footer.module.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Facebook, Instagram, X, Linkedin, Youtube, Send } from "lucide-react";
 
 const SOCIAL_LINKS = [
@@ -12,6 +12,26 @@ const SOCIAL_LINKS = [
 ];
 
 export default function Footer() {
+  const location = useLocation();
+
+  // Determine base path based on current context
+  const getContextPath = () => {
+    if (location.pathname.startsWith("/admin")) return "/admin";
+    if (location.pathname.startsWith("/user")) return "/user";
+    return "";
+  };
+
+  const basePath = getContextPath();
+  const isLoggedIn = basePath !== "";
+
+  // Get appropriate home/articles links based on context
+  const homeLink = isLoggedIn ? `${basePath}/dashboard` : "/";
+  const articlesLink = isLoggedIn
+    ? basePath === "/admin"
+      ? `${basePath}/articles`
+      : `${basePath}/articles`
+    : "/";
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -44,10 +64,10 @@ export default function Footer() {
         {/* RESOURCES */}
         <div className={styles.linksCol}>
           <span className={styles.heading}>Resources</span>
-          <Link to="/" className={styles.link}>
-            Home
+          <Link to={homeLink} className={styles.link}>
+            {isLoggedIn ? "Dashboard" : "Home"}
           </Link>
-          <Link to="/" className={styles.link}>
+          <Link to={articlesLink} className={styles.link}>
             Articles
           </Link>
           <a

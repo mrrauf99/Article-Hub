@@ -74,7 +74,10 @@ authRoutes.get(
     // Existing user → login directly
     if (user.id) {
       req.session.userId = user.id;
-      return res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
+      // Redirect based on role
+      const dashboardPath =
+        user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
+      return res.redirect(`${process.env.CLIENT_BASE_URL}${dashboardPath}`);
     }
 
     // New OAuth user → store temporary session

@@ -7,6 +7,7 @@ import {
   getMyArticles,
   getArticleById,
   uploadImageToCloudinary,
+  incrementArticleViews,
 } from "../controllers/article.controller.js";
 
 import { uploadImage } from "../middlewares/uploadImage.middleware.js";
@@ -19,6 +20,9 @@ articleRoutes.get("/", getApprovedArticles);
 articleRoutes.get("/me", requireAuth, getMyArticles);
 
 articleRoutes.get("/:id", getArticleById);
+
+// Increment views - no auth required (guest can view), but admin views don't count
+articleRoutes.post("/:id/view", incrementArticleViews);
 
 articleRoutes.post("/", requireAuth, createArticle);
 

@@ -36,7 +36,7 @@ const ConfirmModal = forwardRef(({ title, description, onConfirm }, ref) => {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
     >
       <div className="w-full max-w-sm sm:max-w-md bg-white rounded-xl shadow-2xl p-5 sm:p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
@@ -65,7 +65,7 @@ const ConfirmModal = forwardRef(({ title, description, onConfirm }, ref) => {
         </div>
       </div>
     </div>,
-    document.body
+    document.getElementById("modal-root")
   );
 });
 

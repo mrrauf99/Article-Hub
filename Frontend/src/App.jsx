@@ -28,6 +28,7 @@ import TermsPage from "./pages/Terms.jsx";
 
 import submitContactAction from "./features/contact/actions/submitContact.js";
 import publicArticlesLoader from "./features/articles/loaders/publicArticles.js";
+import publicLayoutLoader from "./loaders/publicLayout.js";
 
 // User
 import UserDashBoardPage from "./features/user/pages/UserDashBoardPage.jsx";
@@ -37,14 +38,28 @@ import UserProfilePage from "./features/user/pages/UserProfilePage.jsx";
 import editArticleLoader from "./features/user/loaders/editArticle.js";
 import myArticlesLoader from "./features/user/loaders/myArticles.js";
 import userProfileLoader from "./features/user/loaders/userProfile.js";
-import userStatsLoader from "./features/user/loaders/userStats.js";
+
+import profileStatsLoader from "./loaders/profileStats.js";
 
 import createArticleAction from "./features/user/actions/createArticle.js";
 import updateProfileAction from "./features/user/actions/updateProfile.js";
 
+// Admin
+import AdminDashboardPage from "./features/admin/pages/AdminDashboardPage.jsx";
+import AdminArticlesPage from "./features/admin/pages/AdminArticlesPage.jsx";
+import AdminUsersPage from "./features/admin/pages/AdminUsersPage.jsx";
+
+import adminProfileLoader from "./features/admin/loaders/adminProfile.js";
+import adminDashboardLoader from "./features/admin/loaders/adminDashboard.js";
+import adminArticlesLoader from "./features/admin/loaders/adminArticles.js";
+import adminUsersLoader from "./features/admin/loaders/adminUsers.js";
+import { adminArticlesAction } from "./features/admin/actions/adminArticles.js";
+import { adminUsersAction } from "./features/admin/actions/adminUsers.js";
+
 // Layouts
 import PublicLayout from "./layouts/PublicLayout.jsx";
 import UserLayout from "./layouts/UserLayout.jsx";
+import AdminLayout from "./layouts/AdminLayout.jsx";
 
 // (Admin, User and Public)
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
@@ -92,6 +107,7 @@ export default function App() {
     /* ---------- PUBLIC ---------- */
     {
       element: <PublicLayout />,
+      loader: publicLayoutLoader,
       children: [
         {
           index: true, // "/"
@@ -106,6 +122,11 @@ export default function App() {
         },
         { path: "privacy", element: <PrivacyPage /> },
         { path: "terms", element: <TermsPage /> },
+        {
+          path: "articles/:id",
+          element: <ArticleDetailPage />,
+          loader: articleDetailLoader,
+        },
       ],
     },
 
@@ -149,7 +170,40 @@ export default function App() {
         {
           path: "profile",
           element: <UserProfilePage />,
-          loader: userStatsLoader,
+          loader: profileStatsLoader,
+          action: updateProfileAction,
+        },
+      ],
+    },
+
+    /* ---------- ADMIN ---------- */
+    {
+      id: "admin-layout",
+      path: "/admin",
+      element: <AdminLayout />,
+      loader: adminProfileLoader,
+      children: [
+        {
+          path: "dashboard",
+          element: <AdminDashboardPage />,
+          loader: adminDashboardLoader,
+        },
+        {
+          path: "articles",
+          element: <AdminArticlesPage />,
+          loader: adminArticlesLoader,
+          action: adminArticlesAction,
+        },
+        {
+          path: "users",
+          element: <AdminUsersPage />,
+          loader: adminUsersLoader,
+          action: adminUsersAction,
+        },
+        {
+          path: "profile",
+          element: <UserProfilePage />,
+          loader: profileStatsLoader,
           action: updateProfileAction,
         },
       ],

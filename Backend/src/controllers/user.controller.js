@@ -1,4 +1,5 @@
 import db from "../config/db.config.js";
+import cloudinary from "../config/cloudinary.config.js";
 
 export async function getProfile(req, res) {
   try {
@@ -6,7 +7,7 @@ export async function getProfile(req, res) {
 
     const { rows } = await db.query(
       `
-      SELECT username, name, email, expertise,  
+      SELECT username, name, email, expertise, avatar,  
       joined_at, bio, portfolio_link, x_link, linkedin_link, 
       instagram_link, facebook_link, role FROM users WHERE id = $1
       `,
@@ -77,22 +78,55 @@ export async function updateUserProfile(req, res) {
       instagram_link,
     } = req.body;
 
-    const { rowCount, rows } = await db.query(
-      `
-      UPDATE users SET
-        name = $1,
-        expertise = $2,
-        bio = $3,
-        portfolio_link = $4,
-        x_link = $5,
-        linkedin_link = $6,
-        facebook_link = $7,
-        instagram_link = $8
-      WHERE id = $9
-      RETURNING
-        id,
-        username,
-        email,
+    // Handle avatar upload if file is provided
+    let avatarUrl = null;
+    if (req.file) {
+      try {
+        // Upload to Cloudinary
+        const result = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              folder: "article-hub/avatars",
+              transformation: [
+                { width: 200, height: 200, crop: "fill", gravity: "face" },
+              ],
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+          uploadStream.end(req.file.buffer);
+        });
+        avatarUrl = result.secure_url;
+      } catch (uploadErr) {
+        console.error("Avatar upload error:", uploadErr);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to upload avatar image.",
+        });
+      }
+    }
+
+    // Build dynamic query based on whether avatar is being updated
+    let query, params;
+
+    if (avatarUrl) {
+      query = `
+        UPDATE users SET
+          name = $1,
+          expertise = $2,
+          bio = $3,
+          portfolio_link = $4,
+          x_link = $5,
+          linkedin_link = $6,
+          facebook_link = $7,
+          instagram_link = $8,
+          avatar = $9
+        WHERE id = $10
+        RETURNING id
+      `;
+      params = [
         name,
         expertise,
         bio,
@@ -100,9 +134,25 @@ export async function updateUserProfile(req, res) {
         x_link,
         linkedin_link,
         facebook_link,
-        instagram_link
-      `,
-      [
+        instagram_link,
+        avatarUrl,
+        userId,
+      ];
+    } else {
+      query = `
+        UPDATE users SET
+          name = $1,
+          expertise = $2,
+          bio = $3,
+          portfolio_link = $4,
+          x_link = $5,
+          linkedin_link = $6,
+          facebook_link = $7,
+          instagram_link = $8
+        WHERE id = $9
+        RETURNING id
+      `;
+      params = [
         name,
         expertise,
         bio,
@@ -112,8 +162,10 @@ export async function updateUserProfile(req, res) {
         facebook_link,
         instagram_link,
         userId,
-      ]
-    );
+      ];
+    }
+
+    const { rowCount } = await db.query(query, params);
 
     if (rowCount === 0) {
       return res

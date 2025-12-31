@@ -1,17 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import {
-  useRouteLoaderData,
   useLoaderData,
-  Form,
   useNavigation,
   useActionData,
+  useSubmit,
 } from "react-router-dom";
 
 import { CheckCircle, XCircle } from "lucide-react";
 
 import { useProfileForm } from "../hooks/useProfileForm";
 import ProfileHeader from "../components/profile/ProfileHeader";
-import ProfileStats from "../components/profile/ProfileStats";
 import AuthorInfo from "../components/profile/AuthorInfo";
 import SocialLinks from "../components/profile/SocialLinks";
 import ProfileActions from "../components/profile/ProfileActions";
@@ -19,9 +17,9 @@ import ProfileActions from "../components/profile/ProfileActions";
 import ProfileProvider from "../context/ProfileContext";
 
 export default function UserProfilePage() {
-  const { user } = useRouteLoaderData("user-layout");
-  const { stats } = useLoaderData();
+  const { user, stats } = useLoaderData();
   const actionData = useActionData();
+  const submit = useSubmit();
 
   const [feedback, setFeedback] = useState(null);
   const { formData, handleChange, resetForm } = useProfileForm(user);
@@ -38,6 +36,32 @@ export default function UserProfilePage() {
 
     resetForm(); // restore original data
     setIsEditing(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const submitData = new FormData();
+
+    // Add text fields
+    submitData.append("name", formData.name);
+    submitData.append("expertise", formData.expertise);
+    submitData.append("bio", formData.bio);
+    submitData.append("portfolio_link", formData.portfolio_link);
+    submitData.append("x_link", formData.x_link);
+    submitData.append("linkedin_link", formData.linkedin_link);
+    submitData.append("facebook_link", formData.facebook_link);
+    submitData.append("instagram_link", formData.instagram_link);
+
+    // Add avatar file if selected
+    if (formData.avatarFile) {
+      submitData.append("avatar", formData.avatarFile);
+    }
+
+    submit(submitData, {
+      method: "patch",
+      encType: "multipart/form-data",
+    });
   };
 
   useEffect(() => {
@@ -72,8 +96,6 @@ export default function UserProfilePage() {
             onEdit={handleEdit}
           />
 
-          <ProfileStats stats={stats} />
-
           {/* FEEDBACK */}
           {feedback && (
             <div
@@ -92,7 +114,7 @@ export default function UserProfilePage() {
             </div>
           )}
 
-          <Form method="patch">
+          <form onSubmit={handleSubmit}>
             <AuthorInfo />
             <SocialLinks />
             <ProfileActions
@@ -100,7 +122,7 @@ export default function UserProfilePage() {
               isSaving={isSaving}
               onCancel={handleCancel}
             />
-          </Form>
+          </form>
         </div>
       </div>
     </ProfileProvider>

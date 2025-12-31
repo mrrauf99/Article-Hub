@@ -276,3 +276,48 @@ export const uploadImageToCloudinary = async (req, res) => {
     });
   }
 };
+
+/**
+ * INCREMENT article views
+ * Called when guest or user views an article
+ * Admin views should NOT increment (handled on frontend by not calling this)
+ */
+export const incrementArticleViews = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Check if the viewer is admin - if so, don't increment
+    if (req.session?.userRole === "admin") {
+      return res.status(200).json({
+        success: true,
+        message: "View not counted for admin",
+      });
+    }
+
+    // Increment views by 1
+    const { rowCount } = await db.query(
+      `UPDATE articles 
+       SET views = COALESCE(views, 0) + 1 
+       WHERE article_id = $1 AND status = 'approved'`,
+      [id]
+    );
+
+    if (!rowCount) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "View counted",
+    });
+  } catch (err) {
+    console.error("incrementArticleViews error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to increment views",
+    });
+  }
+};
