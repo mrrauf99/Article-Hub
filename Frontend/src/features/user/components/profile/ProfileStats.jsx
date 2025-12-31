@@ -1,4 +1,4 @@
-import { FileText, Eye, Users, Heart } from "lucide-react";
+import { FileText, Eye, Heart } from "lucide-react";
 
 const STAT_ITEMS = [
   {
@@ -18,14 +18,6 @@ const STAT_ITEMS = [
     iconColor: "text-green-600",
   },
   {
-    key: "followers",
-    label: "Followers",
-    icon: Users,
-    gradient: "from-purple-50 to-purple-100",
-    border: "border-purple-500",
-    iconColor: "text-purple-600",
-  },
-  {
     key: "likes",
     label: "Likes",
     icon: Heart,
@@ -35,9 +27,14 @@ const STAT_ITEMS = [
   },
 ];
 
-export default function ProfileStats({ stats }) {
+export default function ProfileStats({ stats, isAdmin = false }) {
+  // Admin doesn't have articles/views stats - they don't write articles
+  if (isAdmin) {
+    return null;
+  }
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-6 border-b border-gray-200">
+    <div className="grid grid-cols-3 gap-4 p-6 border-b border-gray-200">
       {STAT_ITEMS.map(
         ({ key, label, icon: Icon, gradient, border, iconColor }) => (
           <div

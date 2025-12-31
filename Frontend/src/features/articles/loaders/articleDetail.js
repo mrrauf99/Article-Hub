@@ -1,6 +1,6 @@
 import { apiClient } from "../../api/apiClient";
 
-export default async function articleDetailLoader({ params }) {
+export default async function articleDetailLoader({ params, request }) {
   const { id } = params;
 
   try {
@@ -11,6 +11,12 @@ export default async function articleDetailLoader({ params }) {
         article: null,
       };
     }
+
+    // Increment view count in background (don't await - fire and forget)
+    // The backend will check if user is admin and skip incrementing
+    apiClient.post(`/api/articles/${id}/view`).catch(() => {
+      // Silent fail - view count is not critical
+    });
 
     return { article: data.data };
   } catch (error) {

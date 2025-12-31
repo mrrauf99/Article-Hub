@@ -2,7 +2,7 @@ import { apiClient } from "../../api/apiClient";
 
 export default async function userStatsLoader() {
   try {
-    const { data } = await apiClient.get("api/user/stats");
+    const { data } = await apiClient.get("/api/user/stats");
 
     return {
       stats: data.data,
