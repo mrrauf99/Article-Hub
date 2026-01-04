@@ -1,3 +1,4 @@
+import CategoryFilter from "@/components/CategoryFilter";
 import styles from "../../styles/ArticleForm.module.css";
 
 export default function Category({
@@ -9,9 +10,23 @@ export default function Category({
   onBlur,
   error,
   options,
-  placeholder = "Select an option",
+  placeholder = "Select a category",
   required,
 }) {
+  // Add empty option to beginning of categories
+  const categoriesWithEmpty = ["", ...options];
+
+  const handleCategoryChange = (selectedCategory) => {
+    // Create a synthetic event to match the expected onChange format
+    const syntheticEvent = {
+      target: {
+        name: name,
+        value: selectedCategory,
+      },
+    };
+    onChange(syntheticEvent);
+  };
+
   return (
     <div className={styles.group}>
       {label && (
@@ -22,23 +37,16 @@ export default function Category({
         </label>
       )}
 
-      <select
-        id={id}
-        name={name}
-        value={value}
-        onChange={onChange}
+      <CategoryFilter
+        categories={categoriesWithEmpty}
+        activeCategory={value || ""}
+        onChange={handleCategoryChange}
         onBlur={onBlur}
-        className={`${styles.control} ${styles.select} ${
-          error ? styles.errorControl : ""
-        }`}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+        name={name}
+        variant="light"
+        placeholder={placeholder}
+        error={error}
+      />
 
       {error && <p className={styles.errorMsg}>{error}</p>}
     </div>

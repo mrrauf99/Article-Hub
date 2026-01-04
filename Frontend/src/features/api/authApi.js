@@ -9,7 +9,7 @@ export const authApi = {
 
   checkUsername: (data) => apiClient.post("/api/auth/check-username", data),
 
-  logout: () => apiClient.post("/api/auth/logout"),
+  logout: () => apiClient.get("/api/auth/logout"),
 
   verifyOTP: (data) => apiClient.post("/api/auth/verify-otp", data),
 

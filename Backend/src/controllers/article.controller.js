@@ -1,10 +1,6 @@
 import db from "../config/db.config.js";
 import cloudinary from "../config/cloudinary.config.js";
 
-/**
- * GET all approved articles (public)
- * Optional query param: ?category=Technology
- */
 export const getApprovedArticles = async (req, res) => {
   try {
     const { category } = req.query;
@@ -27,7 +23,6 @@ export const getApprovedArticles = async (req, res) => {
 
     const values = [];
 
-    // Optional category filter
     if (category) {
       query += ` AND a.category = $1`;
       values.push(category);
@@ -50,8 +45,6 @@ export const getApprovedArticles = async (req, res) => {
   }
 };
 
-//  GET articles of logged-in user
-
 export const getMyArticles = async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -70,8 +63,6 @@ export const getMyArticles = async (req, res) => {
       .json({ success: false, message: "Failed to fetch your articles" });
   }
 };
-
-// GET single approved article by ID (public)
 
 export const getArticleById = async (req, res) => {
   const { id } = req.params;
@@ -123,13 +114,28 @@ export const getArticleById = async (req, res) => {
   }
 };
 
-// CREATE article
-
 export const createArticle = async (req, res) => {
-  const { title, introduction, content, summary, category, imageUrl } =
-    req.body;
+  const { title, introduction, content, summary, category } = req.body;
 
   try {
+    let imageUrl = null;
+
+    if (req.file) {
+      const base64 = req.file.buffer.toString("base64");
+      const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "article_hub/articles",
+        resource_type: "image",
+        transformation: [
+          { width: 1200, height: 630, crop: "limit" },
+          { quality: "auto", fetch_format: "auto" },
+        ],
+      });
+
+      imageUrl = result.secure_url;
+    }
+
     const { rows } = await db.query(
       `
       INSERT INTO articles
@@ -162,14 +168,30 @@ export const createArticle = async (req, res) => {
   }
 };
 
-//  UPDATE article (owner only → resets status)
-
 export const updateArticle = async (req, res) => {
-  const { articleId } = req.params;
-  const { title, introduction, content, summary, category, imageUrl } =
+  const { id } = req.params;
+  const { title, introduction, content, summary, category, existingImageUrl } =
     req.body;
 
   try {
+    let imageUrl = existingImageUrl || null;
+
+    if (req.file) {
+      const base64 = req.file.buffer.toString("base64");
+      const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "article_hub/articles",
+        resource_type: "image",
+        transformation: [
+          { width: 1200, height: 630, crop: "limit" },
+          { quality: "auto", fetch_format: "auto" },
+        ],
+      });
+
+      imageUrl = result.secure_url;
+    }
+
     const { rowCount } = await db.query(
       `
       UPDATE articles
@@ -192,7 +214,7 @@ export const updateArticle = async (req, res) => {
         summary,
         category,
         imageUrl,
-        articleId,
+        id,
         req.session.userId,
       ]
     );
@@ -217,16 +239,14 @@ export const updateArticle = async (req, res) => {
   }
 };
 
-// DELETE article (owner only)
-
 export const deleteArticle = async (req, res) => {
-  const { articleId } = req.params;
+  const { id } = req.params;
 
   try {
     const { rowCount } = await db.query(
       `DELETE FROM articles
        WHERE article_id = $1 AND author_id = $2`,
-      [articleId, req.session.userId]
+      [id, req.session.userId]
     );
 
     if (!rowCount) {
@@ -256,7 +276,7 @@ export const uploadImageToCloudinary = async (req, res) => {
     const dataUri = `data:${req.file.mimetype};base64,${base64}`;
 
     const result = await cloudinary.uploader.upload(dataUri, {
-      folder: "article-hub",
+      folder: "article_hub/articles",
       resource_type: "image",
       transformation: [
         { width: 1200, height: 630, crop: "limit" },
@@ -277,16 +297,10 @@ export const uploadImageToCloudinary = async (req, res) => {
   }
 };
 
-/**
- * INCREMENT article views
- * Called when guest or user views an article
- * Admin views should NOT increment (handled on frontend by not calling this)
- */
 export const incrementArticleViews = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Check if the viewer is admin - if so, don't increment
     if (req.session?.userRole === "admin") {
       return res.status(200).json({
         success: true,
@@ -294,7 +308,6 @@ export const incrementArticleViews = async (req, res) => {
       });
     }
 
-    // Increment views by 1
     const { rowCount } = await db.query(
       `UPDATE articles 
        SET views = COALESCE(views, 0) + 1 

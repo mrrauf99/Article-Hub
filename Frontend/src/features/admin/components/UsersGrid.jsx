@@ -74,7 +74,7 @@ export default function UsersGrid({ users, onChangeRole, onDelete }) {
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-600">
               <Calendar className="w-4 h-4" />
-              <span>{formatDate(user.created_at)}</span>
+              <span>{formatDate(user.joined_at)}</span>
             </div>
           </div>
 

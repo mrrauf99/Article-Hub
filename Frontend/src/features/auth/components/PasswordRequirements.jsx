@@ -32,12 +32,12 @@ export default function PasswordRequirements({
   ];
 
   return (
-    <div className="password-requirements">
-      <h2 className="text-base font-semibold text-[#333] pl-0.5">
+    <div className="password-requirements mt-4">
+      <h2 className="text-sm font-semibold text-slate-700 mb-3">
         Password Requirements
       </h2>
 
-      <ul className="text-sm space-y-1 py-2 pl-1">
+      <ul className="text-sm space-y-2 pl-1">
         {requirements.map((rule, index) => {
           const showIcons = rule.show;
 
@@ -47,13 +47,15 @@ export default function PasswordRequirements({
               className={
                 showIcons
                   ? `flex items-center gap-2 ${
-                      rule.valid ? "text-green-600" : "text-red-600"
+                      rule.valid ? "text-emerald-600" : "text-red-600"
                     }`
-                  : "text-gray-600 list-disc ml-4"
+                  : "text-slate-600 list-disc ml-4"
               }
             >
               {showIcons && (
-                <span className="font-bold">{rule.valid ? "✓" : "✕"}</span>
+                <span className="font-bold text-base">
+                  {rule.valid ? "✓" : "✕"}
+                </span>
               )}
               {rule.text}
             </li>

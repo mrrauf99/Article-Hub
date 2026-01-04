@@ -28,7 +28,7 @@ export default function InputField({
   const showSuccessIcon = Boolean(success) && hasValue && !loading;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       {label && (
         <label className="block text-sm font-semibold text-slate-700">
           {label}
@@ -37,7 +37,7 @@ export default function InputField({
 
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+          <Icon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
         )}
 
         <input
@@ -49,19 +49,22 @@ export default function InputField({
           disabled={disabled || loading}
           placeholder={placeholder}
           className={`
-            w-full rounded-lg border px-4 py-3 outline-none transition-all
-            ${Icon ? "pl-11" : ""}
-            ${isPassword || loading || error || success ? "pr-11" : ""}
+            w-full rounded-xl border px-4 py-3.5 outline-none transition-all
+            bg-white text-slate-900 placeholder-slate-400
+            ${Icon ? "pl-12" : ""}
+            ${isPassword || loading || error || success ? "pr-12" : ""}
             ${
               error
-                ? "border-red-500 focus:border-red-500"
-                : "border-slate-300 focus:border-blue-600"
+                ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             }
-            disabled:bg-slate-100 disabled:cursor-not-allowed
+            disabled:bg-slate-50 disabled:cursor-not-allowed
+            hover:border-slate-400
+            shadow-sm
           `}
         />
 
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
           {loading && (
             <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
           )}
@@ -77,7 +80,7 @@ export default function InputField({
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               tabIndex={-1}
-              className="text-slate-400 hover:text-slate-600"
+              className="text-slate-400 hover:text-slate-600 transition-colors"
             >
               {showPassword ? (
                 <Eye className="h-5 w-5" />
@@ -89,7 +92,7 @@ export default function InputField({
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 mt-1.5">{error}</p>}
     </div>
   );
 }

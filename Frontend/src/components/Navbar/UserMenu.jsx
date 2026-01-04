@@ -121,14 +121,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
         {/* Menu items */}
         <div className={styles.dropdownBody}>
           <Link
-            to={dashboardPath}
-            className={styles.dropdownItem}
-            onClick={() => setOpen(false)}
-          >
-            <LayoutDashboard className={styles.dropdownItemIcon} />
-            Dashboard
-          </Link>
-          <Link
             to={profilePath}
             className={styles.dropdownItem}
             onClick={() => setOpen(false)}

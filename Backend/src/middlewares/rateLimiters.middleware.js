@@ -1,6 +1,5 @@
 import rateLimit from "express-rate-limit";
 
-/* ===================== HELPERS ===================== */
 function getRetryAfterSeconds(req) {
   return Math.max(
     0,
@@ -8,7 +7,6 @@ function getRetryAfterSeconds(req) {
   );
 }
 
-/* ===================== LOGIN ===================== */
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -23,11 +21,3 @@ export const loginLimiter = rateLimit({
     });
   },
 });
-
-/* ===================== OTP RESEND ===================== */
-// No rate limit on resend - users can request new OTP anytime
-// The session-based OTP system handles security by invalidating old OTPs
-
-/* ===================== OTP VERIFY ===================== */
-// Rate limiting removed - attempts are tracked per OTP in session (5 attempts per OTP)
-// This allows fresh 5 attempts after each resend

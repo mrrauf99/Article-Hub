@@ -34,6 +34,16 @@ export function useNewArticleForm(article) {
     }
   };
 
+  /* ---------------- BLUR HANDLER ---------------- */
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+
+    // Only validate if field is empty
+    if (!value || !value.trim()) {
+      setErrors((prev) => ({ ...prev, [name]: "Please fill out this field." }));
+    }
+  };
+
   /* ---------------- IMAGE HANDLER ---------------- */
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -104,6 +114,7 @@ export function useNewArticleForm(article) {
     categories,
     setFormData,
     handleChange,
+    handleBlur,
     handleImageChange,
     validateForm,
   };
