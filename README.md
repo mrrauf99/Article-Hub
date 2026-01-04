@@ -1,16 +1,18 @@
-# 📚 Article Hub
-
 <div align="center">
 
-![Article Hub Banner](https://dummyimage.com/1200x400/0ea5e9/ffffff\&text=Article+Hub)
+<h1>Article Hub</h1>
 
-### ✨ A modern, full‑stack platform for publishing and discovering thoughtful articles
+<p>
+A modern full-stack platform for publishing and discovering thoughtful articles.
+</p>
 
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat-square\&logo=node.js\&logoColor=white)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square\&logo=react\&logoColor=black)](https://reactjs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-4169E1?style=flat-square\&logo=postgresql\&logoColor=white)](https://www.postgresql.org/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-06B6D4?style=flat-square\&logo=tailwindcss\&logoColor=white)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+<p>
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=black" />
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=flat&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-15+-4169E1?style=flat&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/TailwindCSS-3.4-06B6D4?style=flat&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat" />
+</p>
 
 </div>
 
@@ -18,69 +20,53 @@
 
 ## 🌟 Overview
 
-**Article Hub** is a modern, full-stack article publishing platform designed to deliver a clean writing experience, structured content discovery, and a responsive user interface. It focuses on performance, usability, and scalable architecture while supporting rich content creation and category-based exploration.
+**Article Hub** is a full-stack article publishing platform focused on clean writing experiences, structured content discovery, and scalable system design. It follows a role-based architecture with separate modules for public users, registered writers, and administrators.
 
 ---
 
 ## ✨ Features
 
-### 🌍 Public / Guest Module
+### 🌍 Public / Guest
 
-* Browse and read published articles
-* Explore content across multiple categories
-* Clean, distraction-free reading experience
-* Responsive layout for all devices
+- Browse and read published articles
+- Explore content by categories
+- Clean, distraction-free reading experience
+- Fully responsive UI
 
-### 👤 User Module
+### 👤 User
 
-* User registration and authentication
-* Create, edit, and publish articles with images
-* Manage personal articles and drafts
-* View personal dashboard and content stats
-* Update profile information
+- Authentication and profile management
+- Create, edit, and publish articles with images
+- Manage drafts and published content
+- Personal dashboard and content insights
 
-### 🛡️ Admin Module
+### 🛡️ Admin
 
-* Moderate user-generated content
-* Approve, reject, or remove articles
-* Manage users and platform activity
-* Maintain content quality and platform integrity
+- Moderate user-generated content
+- Approve, reject, or remove articles
+- Manage users and platform activity
+- Ensure content quality and platform integrity
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
+**Frontend:**  
+React 19 • React Router 7 • Tailwind CSS 3.4 • Vite 7
 
-* ⚛️ **React 18**
-* 🧭 **React Router 6**
-* 🎨 **Tailwind CSS**
-* ⚡ **Vite**
-
-### Backend
-
-* 🟢 **Node.js**
-* 🚂 **Express.js**
-* 🐘 **PostgreSQL**
-* 🔑 **Passport.js** (Local & Google OAuth)
-* ☁️ **Cloudinary** (Image storage & optimization)
-
-### Supporting Tools
-
-* 📧 **Nodemailer** (Email verification)
-* 🔒 **bcrypt** (Password hashing)
-* 🍪 **express-session** (Session management)
+**Backend:**  
+Node.js • Express 5 • PostgreSQL • Passport.js • Cloudinary
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are **welcome and encouraged** 🚀
+Contributions are welcome and encouraged.
 
 1. Fork the repository
-2. Create a new branch (`feature/awesome-feature`)
+2. Create a feature branch
 3. Commit your changes
-4. Push and open a Pull Request
+4. Open a Pull Request
 
 ---
 
@@ -96,10 +82,12 @@ This project is licensed under the **MIT License**.
 
 **Made with ❤️ by Abdul Rauf**
 
-[GitHub](https://github.com/itxrauf) • [LinkedIn](https://linkedin.com/in/itxrauf) • [Email](mailto:itxrauf99@gmail.com)
+[GitHub](https://github.com/itxrauf) •
+[LinkedIn](https://linkedin.com/in/itxrauf) •
+[Email](mailto:itxrauf99@gmail.com)
 
 </div>
 
 ---
 
-⭐ *If you like this project, don’t forget to star the repo!*
+⭐ If you like this project, consider giving it a star.
