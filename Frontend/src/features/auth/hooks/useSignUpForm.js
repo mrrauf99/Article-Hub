@@ -37,6 +37,18 @@ export function useSignUpForm() {
         }
         return null;
 
+      case "password":
+        if (Object.values(passwordErrors).includes(false)) {
+          return "Password does not meet requirements.";
+        }
+        return null;
+
+      case "confirmPassword":
+        if (value !== values.password) {
+          return "Passwords do not match.";
+        }
+        return null;
+
       default:
         return null;
     }
@@ -74,7 +86,11 @@ export function useSignUpForm() {
       if (error) newErrors[key] = error;
     });
 
-    if (Object.values(passwordErrors).includes(false)) {
+    // Only check password requirements if password is not empty
+    if (
+      !isEmpty(values.password) &&
+      Object.values(passwordErrors).includes(false)
+    ) {
       newErrors.password = "Invalid password.";
     }
 

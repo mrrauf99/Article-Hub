@@ -1,3 +1,5 @@
+import { SITE_CONFIG } from "@/config/site.config";
+
 export const TERMS_SECTIONS = [
   {
     heading: "Acceptance of Terms",
@@ -71,7 +73,6 @@ export const TERMS_SECTIONS = [
 
   {
     heading: "Contact",
-    content:
-      "If you have questions regarding these terms, contact us at itxrauf99@gmail.com.",
+    content: `If you have questions regarding these terms, contact us at ${SITE_CONFIG.email.support}.`,
   },
 ];

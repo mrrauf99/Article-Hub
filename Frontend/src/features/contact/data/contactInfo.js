@@ -1,11 +1,12 @@
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { SITE_CONFIG } from "@/config/site.config";
 
 export const CONTACT_INFO = [
   {
     icon: Mail,
     title: "Email",
-    content: "support@articlehub.me",
-    link: "mailto:support@articlehub.me",
+    content: SITE_CONFIG.email.support,
+    link: `mailto:${SITE_CONFIG.email.support}`,
   },
   {
     icon: Phone,
