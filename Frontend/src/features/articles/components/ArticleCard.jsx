@@ -1,5 +1,5 @@
 import { useState, useRef, memo } from "react";
-import { Eye, Trash2, Edit } from "lucide-react";
+import { Eye, Trash2, Edit, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import ConfirmModal from "../ui/ConfirmModal";
@@ -32,7 +32,7 @@ function ArticleCard({ article, mode }) {
     <>
       <article
         onClick={openArticle}
-        className="relative bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-xl transition cursor-pointer group overflow-hidden"
+        className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden hover:-translate-y-1"
       >
         {/* status */}
         {mode !== "guest" && (
@@ -42,7 +42,7 @@ function ArticleCard({ article, mode }) {
         )}
 
         {mode !== "guest" && (
-          <div className="absolute top-3 right-3 z-10 flex gap-2">
+          <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <ActionButton title="Edit" onClick={handleEdit}>
               <Edit className="w-4 h-4 text-indigo-600" />
             </ActionButton>
@@ -54,48 +54,59 @@ function ArticleCard({ article, mode }) {
         )}
 
         {/* image */}
-
         {article.image_url && (
-          <div className="h-48 relative overflow-hidden bg-gray-200">
+          <div className="h-48 relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
             {!imgLoaded && (
-              <div className="absolute inset-0 animate-pulse bg-gray-300" />
+              <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200" />
             )}
 
             <img
               src={article.image_url}
               alt={article.title}
               onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full object-cover transition-opacity duration-300
+              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105
         ${imgLoaded ? "opacity-100" : "opacity-0"}`}
             />
+
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         )}
 
         {/* content */}
         <div className="p-5">
-          <div className="flex justify-between mb-3">
-            <span className="bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">
+          <div className="flex justify-between items-center mb-3">
+            <span className="bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-indigo-100">
               {article.category}
             </span>
 
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <Eye className="w-5 h-5" />
-              <span>{article.views}</span>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full">
+              <Eye className="w-3.5 h-3.5" />
+              <span className="font-medium">{article.views}</span>
             </div>
           </div>
 
-          <h3 className="text-lg font-bold line-clamp-2">{article.title}</h3>
+          <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-indigo-600 transition-colors duration-200">
+            {article.title}
+          </h3>
 
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+          <p className="text-sm text-slate-600 line-clamp-2 mt-2 mb-4 leading-relaxed">
             {article.summary}
           </p>
 
-          <div className="flex justify-between text-xs text-gray-500">
-            <span className="font-medium">{article.author_name}</span>
-            <span>
+          <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+            <span className="text-sm font-semibold text-slate-700">
+              {article.author_name}
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-slate-500">
+              <Calendar className="w-3.5 h-3.5" />
               {article.published_at
-                ? new Date(article.published_at).toLocaleDateString()
-                : "Not published"}
+                ? new Date(article.published_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : "Draft"}
             </span>
           </div>
         </div>
@@ -118,7 +129,7 @@ function ActionButton({ children, onClick, title }) {
     <button
       onClick={onClick}
       title={title}
-      className="p-1.5 rounded-full bg-white/80 hover:bg-gray-100 transition"
+      className="p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110"
     >
       {children}
     </button>

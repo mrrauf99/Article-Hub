@@ -1,6 +1,5 @@
 import db from "../config/db.config.js";
 
-// GET dashboard stats
 export const getDashboardStats = async (req, res) => {
   try {
     const statsQuery = await db.query(`
@@ -51,7 +50,6 @@ export const getDashboardStats = async (req, res) => {
   }
 };
 
-// GET all articles with filters and pagination
 export const getAllArticles = async (req, res) => {
   try {
     const { status = "all", search = "", page = 1, limit = 10 } = req.query;
@@ -121,7 +119,6 @@ export const getAllArticles = async (req, res) => {
   }
 };
 
-// GET single article details
 export const getArticleDetails = async (req, res) => {
   const { articleId } = req.params;
   try {
@@ -153,7 +150,6 @@ export const getArticleDetails = async (req, res) => {
   }
 };
 
-// GET all pending articles (legacy, kept for compatibility)
 export const getPendingArticles = async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -176,8 +172,6 @@ export const getPendingArticles = async (req, res) => {
       .json({ success: false, message: "Failed to fetch pending articles" });
   }
 };
-
-// APPROVE article
 
 export const approveArticle = async (req, res) => {
   const { articleId } = req.params;
@@ -205,8 +199,6 @@ export const approveArticle = async (req, res) => {
   }
 };
 
-// REJECT article
-
 export const rejectArticle = async (req, res) => {
   const { articleId } = req.params;
 
@@ -233,7 +225,6 @@ export const rejectArticle = async (req, res) => {
   }
 };
 
-// DELETE article
 export const deleteArticle = async (req, res) => {
   const { articleId } = req.params;
 
@@ -259,9 +250,6 @@ export const deleteArticle = async (req, res) => {
   }
 };
 
-// ============= USER MANAGEMENT =============
-
-// GET all users with filters and pagination
 export const getAllUsers = async (req, res) => {
   try {
     const { role = "all", search = "", page = 1, limit = 10 } = req.query;
@@ -324,7 +312,6 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// GET single user details
 export const getUserDetails = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -362,7 +349,6 @@ export const getUserDetails = async (req, res) => {
   }
 };
 
-// UPDATE user role
 export const updateUserRole = async (req, res) => {
   const { userId } = req.params;
   const { role } = req.body;
@@ -401,7 +387,6 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
-// DELETE user
 export const deleteUser = async (req, res) => {
   const { userId } = req.params;
   const adminId = req.session.userId;

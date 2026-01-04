@@ -84,19 +84,19 @@ export default function Login() {
           error={form.errors.password}
         />
 
+        <div className="text-right">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors font-medium"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         <Button disabled={isSubmitting} isLoading={isSubmitting}>
           {isSubmitting ? "Signing In..." : "Sign In"}
         </Button>
       </Form>
-
-      <div className="text-right mt-2">
-        <Link
-          to="/forgot-password"
-          className="inline-block text-indigo-600 hover:underline px-1"
-        >
-          Forgot password?
-        </Link>
-      </div>
 
       <OrDivider />
       <GoogleAuthButton>Sign in with Google</GoogleAuthButton>

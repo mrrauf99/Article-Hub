@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import {
   X,
   User,
@@ -8,6 +9,7 @@ import {
   Clock,
   XCircle,
   Tag,
+  ExternalLink,
 } from "lucide-react";
 
 function formatDate(dateString) {
@@ -24,6 +26,7 @@ export default function ArticleDetailModal({
   onApprove,
   onReject,
 }) {
+  const navigate = useNavigate();
   if (!article) return null;
 
   const statusConfig = {
@@ -126,37 +129,47 @@ export default function ArticleDetailModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-t border-slate-200 flex flex-wrap items-center justify-end gap-3">
-          {article.status !== "approved" && (
-            <button
-              onClick={() => {
-                onApprove(article.article_id);
-                onClose();
-              }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              Approve
-            </button>
-          )}
-          {article.status !== "rejected" && (
-            <button
-              onClick={() => {
-                onReject(article.article_id);
-                onClose();
-              }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:from-rose-600 hover:to-pink-600 shadow-lg shadow-rose-500/25 transition-all hover:shadow-rose-500/40"
-            >
-              <XCircle className="w-4 h-4" />
-              Reject
-            </button>
-          )}
+        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
           <button
-            onClick={onClose}
-            className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all"
+            onClick={() => navigate(`/articles/${article.article_id}`)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 shadow-lg shadow-indigo-500/25 transition-all hover:shadow-indigo-500/40"
           >
-            Close
+            <ExternalLink className="w-4 h-4" />
+            View Article
           </button>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {article.status !== "approved" && (
+              <button
+                onClick={() => {
+                  onApprove(article.article_id);
+                  onClose();
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Approve
+              </button>
+            )}
+            {article.status !== "rejected" && (
+              <button
+                onClick={() => {
+                  onReject(article.article_id);
+                  onClose();
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:from-rose-600 hover:to-pink-600 shadow-lg shadow-rose-500/25 transition-all hover:shadow-rose-500/40"
+              >
+                <XCircle className="w-4 h-4" />
+                Reject
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>,

@@ -1,5 +1,19 @@
 import { Form, useNavigation, useLoaderData } from "react-router-dom";
 import { useNewArticleForm } from "../hooks/useNewArticleForm.js";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import {
+  Feather,
+  Type,
+  FolderOpen,
+  FileText,
+  ListChecks,
+  ImagePlus,
+  Sparkles,
+  Send,
+  Loader2,
+  PenLine,
+  AlignLeft,
+} from "lucide-react";
 
 import TextArea from "../components/new-article/TextArea.jsx";
 import Category from "../components/new-article/Category.jsx";
@@ -16,12 +30,14 @@ export default function CreateArticlePage() {
     errors,
     categories,
     handleChange,
+    handleBlur,
     handleImageChange,
     validateForm,
   } = useNewArticleForm(data?.article);
 
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const isEditing = !!data?.article;
 
   const handleSubmit = (e) => {
     const isValid = validateForm();
@@ -31,89 +47,202 @@ export default function CreateArticlePage() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.formWrapper}>
-        <div className={styles.formHeader}>
-          <h1>Submit Your Article</h1>
-          <p>Share your knowledge with the Article Hub community</p>
-        </div>
-
-        <Form
-          className={styles.articleForm}
-          method="post"
-          onSubmit={handleSubmit}
-        >
-          <Input
-            label="Article Title"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            error={errors.title}
-            placeholder="Enter your article title"
-          />
-
-          <Category
-            label="Category"
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            error={errors.category}
-            options={categories}
-            placeholder="Select a category"
-          />
-
-          <TextArea
-            label="Introduction"
-            id="introduction"
-            name="introduction"
-            value={formData.introduction}
-            onChange={handleChange}
-            error={errors.introduction}
-            placeholder="Write the introduction of your article..."
-            maxLength={500}
-            charCount={charCounts.introduction}
-          />
-
-          <TextArea
-            label="Main Content"
-            id="content"
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            error={errors.content}
-            placeholder="Write the main content of your article..."
-            rows={12}
-          />
-
-          <TextArea
-            label="Summary"
-            id="summary"
-            name="summary"
-            value={formData.summary}
-            onChange={handleChange}
-            error={errors.summary}
-            placeholder="Write a brief summary to wrap up your article..."
-            maxLength={300}
-            charCount={charCounts.summary}
-          />
-
-          <ImageUpload
-            label="Featured Image"
-            id="image"
-            name="image"
-            onChange={handleImageChange}
-            error={errors.image}
-            imageFile={formData.imageFile}
-            imageUrl={formData.imageUrl}
-          />
-
-          <button className={styles.submitBtn} disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Publish Article"}
-          </button>
-        </Form>
+    <div className={styles.pageContainer}>
+      {/* Background decorations */}
+      <div className={styles.bgDecoration}>
+        <div className={styles.bgCircle1} />
+        <div className={styles.bgCircle2} />
       </div>
+
+      <ScrollReveal animation="fade-up" duration={600}>
+        <div className={styles.container}>
+          {/* Header Section - Inline like navbar */}
+          <div className={styles.headerSection}>
+            <div className={styles.headerRow}>
+              <div className={styles.headerIcon}>
+                <Feather className="w-5 h-5" strokeWidth={2.5} />
+              </div>
+              <h1 className={styles.headerTitle}>
+                {isEditing ? "Edit Article" : "Create Article"}
+              </h1>
+              <Sparkles className={styles.sparkleIcon} />
+            </div>
+            <p className={styles.headerSubtitle}>
+              {isEditing
+                ? "Update your article and share your thoughts"
+                : "Share your knowledge with the community"}
+            </p>
+          </div>
+
+          {/* Form Card */}
+          <div className={styles.formCard}>
+            <Form
+              className={styles.articleForm}
+              method="post"
+              onSubmit={handleSubmit}
+            >
+              {/* Section: Basic Info */}
+              <div className={styles.formSection}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionIcon}>
+                    <Type className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className={styles.sectionTitle}>Basic Information</h3>
+                    <p className={styles.sectionDesc}>
+                      Give your article a compelling title and category
+                    </p>
+                  </div>
+                </div>
+
+                <div className={styles.fieldsGrid}>
+                  <Input
+                    label="Article Title"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.title}
+                    placeholder="Enter a captivating title..."
+                    icon={<Type className="w-4 h-4" />}
+                  />
+
+                  <Category
+                    label="Category"
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.category}
+                    options={categories}
+                    placeholder="Select a category"
+                    icon={<FolderOpen className="w-4 h-4" />}
+                  />
+                </div>
+              </div>
+
+              {/* Section: Content */}
+              <div className={styles.formSection}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionIcon}>
+                    <PenLine className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className={styles.sectionTitle}>Article Content</h3>
+                    <p className={styles.sectionDesc}>
+                      Write your introduction, main content, and summary
+                    </p>
+                  </div>
+                </div>
+
+                <TextArea
+                  label="Introduction"
+                  id="introduction"
+                  name="introduction"
+                  value={formData.introduction}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={errors.introduction}
+                  placeholder="Hook your readers with an engaging introduction..."
+                  maxLength={500}
+                  charCount={charCounts.introduction}
+                  rows={4}
+                  icon={<AlignLeft className="w-4 h-4" />}
+                />
+
+                <TextArea
+                  label="Main Content"
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={errors.content}
+                  placeholder="Share your insights, ideas, and knowledge..."
+                  rows={10}
+                  icon={<PenLine className="w-4 h-4" />}
+                />
+
+                <TextArea
+                  label="Summary"
+                  id="summary"
+                  name="summary"
+                  value={formData.summary}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={errors.summary}
+                  placeholder="Wrap up with key takeaways..."
+                  maxLength={300}
+                  charCount={charCounts.summary}
+                  rows={3}
+                  icon={<ListChecks className="w-4 h-4" />}
+                />
+              </div>
+
+              {/* Section: Media */}
+              <div className={styles.formSection}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionIcon}>
+                    <ImagePlus className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className={styles.sectionTitle}>Featured Image</h3>
+                    <p className={styles.sectionDesc}>
+                      Add a cover image to make your article stand out
+                    </p>
+                  </div>
+                </div>
+
+                <ImageUpload
+                  id="image"
+                  name="image"
+                  onChange={handleImageChange}
+                  error={errors.image}
+                  imageFile={formData.imageFile}
+                  imageUrl={formData.imageUrl}
+                />
+
+                {/* Hidden field to preserve existing image URL during edit */}
+                {isEditing && formData.imageUrl && !formData.imageFile && (
+                  <input
+                    type="hidden"
+                    name="existingImageUrl"
+                    value={formData.imageUrl}
+                  />
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <div className={styles.submitSection}>
+                <button
+                  type="submit"
+                  className={styles.submitBtn}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Publishing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      <span>
+                        {isEditing ? "Update Article" : "Publish Article"}
+                      </span>
+                    </>
+                  )}
+                </button>
+                <p className={styles.submitHint}>
+                  Your article will be reviewed before publishing
+                </p>
+              </div>
+            </Form>
+          </div>
+        </div>
+      </ScrollReveal>
     </div>
   );
 }

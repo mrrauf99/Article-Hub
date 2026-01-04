@@ -23,7 +23,7 @@ export default async function loginAction({ request }) {
   } catch (err) {
     // RATE LIMIT ERROR
     if (err.response?.status === 429) {
-      const { message, retryAfterSeconds } = err.response.data;
+      const { retryAfterSeconds } = err.response.data;
 
       return {
         success: false,

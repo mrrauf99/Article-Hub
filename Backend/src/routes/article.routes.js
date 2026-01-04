@@ -24,11 +24,21 @@ articleRoutes.get("/:id", getArticleById);
 // Increment views - no auth required (guest can view), but admin views don't count
 articleRoutes.post("/:id/view", incrementArticleViews);
 
-articleRoutes.post("/", requireAuth, createArticle);
+articleRoutes.post(
+  "/",
+  requireAuth,
+  uploadImage.single("image"),
+  createArticle
+);
 
-articleRoutes.patch("/:id", requireAuth, updateArticle);
+articleRoutes.patch(
+  "/:articleId",
+  requireAuth,
+  uploadImage.single("image"),
+  updateArticle
+);
 
-articleRoutes.delete("/:id", requireAuth, deleteArticle);
+articleRoutes.delete("/:articleId", requireAuth, deleteArticle);
 
 articleRoutes.post(
   "/upload-image",

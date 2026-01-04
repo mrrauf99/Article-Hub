@@ -3,7 +3,6 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { sendEmailVerificationOtp } from "../services/email.service.js";
 
-/* ===================== CONSTANTS ===================== */
 const OTP_TTL_MS = 5 * 60 * 1000;
 const OTP_HASH_ROUNDS = 10;
 const MAX_VERIFY_ATTEMPTS = 5;
