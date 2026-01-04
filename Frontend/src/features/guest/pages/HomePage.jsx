@@ -1,9 +1,13 @@
 import { useMemo } from "react";
 import { useLoaderData, useSearchParams } from "react-router-dom";
 
-import Layout from "../components/Layout";
-import Sidebar from "../components/Sidebar";
-import ArticlesSection from "@/features/articles/components/ArticlesSection";
+import HeroSection from "../components/HeroSection";
+import FeaturedArticles from "../components/FeaturedArticles";
+import CategoriesSection from "../components/CategoriesSection";
+import FeaturesSection from "../components/FeaturesSection";
+import CTASection from "../components/CTASection";
+import ArticlesGrid from "../components/ArticlesGrid";
+import NewsletterSection from "../components/NewsletterSection";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 
 export default function HomePage() {
@@ -26,6 +30,21 @@ export default function HomePage() {
     return articles.filter((a) => a.category === activeCategory);
   }, [articles, activeCategory]);
 
+  // Calculate article counts per category
+  const articleCounts = useMemo(() => {
+    const counts = {};
+    articles.forEach((article) => {
+      counts[article.category] = (counts[article.category] || 0) + 1;
+    });
+    return counts;
+  }, [articles]);
+
+  // Get unique authors count
+  const authorCount = useMemo(() => {
+    const authors = new Set(articles.map((a) => a.author_name));
+    return authors.size;
+  }, [articles]);
+
   function handleCategorySelect(category) {
     const params = new URLSearchParams(searchParams);
 
@@ -46,27 +65,38 @@ export default function HomePage() {
   }
 
   return (
-    <Layout
-      sidebar={
-        <Sidebar
-          categories={categories}
-          active={activeCategory}
-          onSelect={handleCategorySelect}
-        />
-      }
-    >
-      <ArticlesSection
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <HeroSection articleCount={articles.length} authorCount={authorCount} />
+
+      {/* Featured Articles */}
+      <FeaturedArticles articles={articles} />
+
+      {/* Categories Section */}
+      <CategoriesSection
+        categories={categories}
+        onSelect={handleCategorySelect}
+        articleCounts={articleCounts}
+      />
+
+      {/* Features Section */}
+      <FeaturesSection />
+
+      {/* All Articles Grid */}
+      <ArticlesGrid
         articles={filteredArticles}
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategorySelect={handleCategorySelect}
         page={pageParam}
         onPageChange={handlePageChange}
-        showCreateButton={false}
-        mode="guest"
-        title={
-          activeCategory === "All"
-            ? "All Articles"
-            : `${activeCategory} Articles`
-        }
       />
-    </Layout>
+
+      {/* Newsletter Section */}
+      <NewsletterSection />
+
+      {/* CTA Section */}
+      <CTASection />
+    </div>
   );
 }

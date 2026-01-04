@@ -13,6 +13,7 @@ import ProfileHeader from "../components/profile/ProfileHeader";
 import AuthorInfo from "../components/profile/AuthorInfo";
 import SocialLinks from "../components/profile/SocialLinks";
 import ProfileActions from "../components/profile/ProfileActions";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 import ProfileProvider from "../context/ProfileContext";
 
@@ -88,43 +89,45 @@ export default function UserProfilePage() {
 
   return (
     <ProfileProvider value={profileValue}>
-      <div className="max-w-6xl mx-auto py-8">
-        <div className="bg-white rounded-xl shadow overflow-hidden">
-          <ProfileHeader
-            user={user}
-            isEditing={isEditing}
-            onEdit={handleEdit}
-          />
-
-          {/* FEEDBACK */}
-          {feedback && (
-            <div
-              className={`mx-6 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
-                feedback.success
-                  ? "border-green-200 bg-green-50 text-green-800"
-                  : "border-red-200 bg-red-50 text-red-800"
-              }`}
-            >
-              {feedback.success ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              ) : (
-                <XCircle className="h-5 w-5 text-red-600" />
-              )}
-              <span>{feedback.message}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <AuthorInfo />
-            <SocialLinks />
-            <ProfileActions
+      <ScrollReveal animation="fade-up" duration={600}>
+        <div className="max-w-6xl mx-auto py-8">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
+            <ProfileHeader
+              user={user}
               isEditing={isEditing}
-              isSaving={isSaving}
-              onCancel={handleCancel}
+              onEdit={handleEdit}
             />
-          </form>
+
+            {/* FEEDBACK */}
+            {feedback && (
+              <div
+                className={`mx-6 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
+                  feedback.success
+                    ? "border-green-200 bg-green-50 text-green-800"
+                    : "border-red-200 bg-red-50 text-red-800"
+                }`}
+              >
+                {feedback.success ? (
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                ) : (
+                  <XCircle className="h-5 w-5 text-red-600" />
+                )}
+                <span>{feedback.message}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <AuthorInfo />
+              <SocialLinks />
+              <ProfileActions
+                isEditing={isEditing}
+                isSaving={isSaving}
+                onCancel={handleCancel}
+              />
+            </form>
+          </div>
         </div>
-      </div>
+      </ScrollReveal>
     </ProfileProvider>
   );
 }

@@ -1,10 +1,10 @@
-import { FileText, BarChart, Users, LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Compass, Users, FileText } from "lucide-react";
 
 export function getNavItemsForRole(role) {
   if (role === "user") {
     return [
-      { label: "My Articles", href: "/user/dashboard", icon: FileText },
-      { label: "All Articles", href: "/user/articles", icon: BarChart },
+      { label: "Dashboard", href: "/user/dashboard", icon: LayoutDashboard },
+      { label: "Explore", href: "/user/articles", icon: Compass },
     ];
   }
 

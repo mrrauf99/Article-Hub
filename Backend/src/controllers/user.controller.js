@@ -86,9 +86,10 @@ export async function updateUserProfile(req, res) {
         const result = await new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              folder: "article-hub/avatars",
+              folder: "article_hub/avatars",
               transformation: [
                 { width: 200, height: 200, crop: "fill", gravity: "face" },
+                { quality: "auto", fetch_format: "auto" },
               ],
             },
             (error, result) => {

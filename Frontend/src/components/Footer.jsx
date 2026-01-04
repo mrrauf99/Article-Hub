@@ -1,6 +1,6 @@
 import styles from "@/styles/Footer.module.css";
 import { Link, useLocation } from "react-router-dom";
-import { Facebook, Instagram, X, Linkedin, Youtube, Send } from "lucide-react";
+import { Facebook, Instagram, X, Linkedin, Youtube, Send, BookOpen } from "lucide-react";
 
 const SOCIAL_LINKS = [
   { Icon: Facebook, label: "Facebook", href: "#", brand: "facebook" },
@@ -37,7 +37,12 @@ export default function Footer() {
       <div className={styles.container}>
         {/* BRAND */}
         <div className={styles.left}>
-          <h2 className={styles.title}>Article Hub</h2>
+          <div className={styles.brandWrapper}>
+            <div className={styles.logoIcon}>
+              <BookOpen size={20} />
+            </div>
+            <h2 className={styles.title}>Article Hub</h2>
+          </div>
 
           <p className={styles.description}>
             A modern platform for publishing thoughtful articles on technology,

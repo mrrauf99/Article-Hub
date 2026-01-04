@@ -1,3 +1,5 @@
+import { SITE_CONFIG } from "@/config/site.config";
+
 export const PRIVACY_SECTIONS = [
   {
     heading: "Our Privacy Commitment",
@@ -74,7 +76,6 @@ export const PRIVACY_SECTIONS = [
 
   {
     heading: "Contact Us",
-    content:
-      "If you have questions or concerns regarding privacy or data handling, contact us at itxrauf99@gmail.com.",
+    content: `If you have questions or concerns regarding privacy or data handling, contact us at ${SITE_CONFIG.email.support}.`,
   },
 ];

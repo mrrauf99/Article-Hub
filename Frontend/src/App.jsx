@@ -34,6 +34,7 @@ import publicLayoutLoader from "./loaders/publicLayout.js";
 import UserDashBoardPage from "./features/user/pages/UserDashBoardPage.jsx";
 import CreateArticlePage from "./features/user/pages/CreateArticlePage.jsx";
 import UserProfilePage from "./features/user/pages/UserProfilePage.jsx";
+import ExploreArticlesPage from "./features/user/pages/ExploreArticlesPage.jsx";
 
 import editArticleLoader from "./features/user/loaders/editArticle.js";
 import myArticlesLoader from "./features/user/loaders/myArticles.js";
@@ -60,6 +61,7 @@ import { adminUsersAction } from "./features/admin/actions/adminUsers.js";
 import PublicLayout from "./layouts/PublicLayout.jsx";
 import UserLayout from "./layouts/UserLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
+import AuthLayout from "./layouts/AuthLayout.jsx";
 
 // (Admin, User and Public)
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
@@ -71,37 +73,42 @@ export default function App() {
   const router = createBrowserRouter([
     /* ---------- AUTH ---------- */
     {
-      path: "/login",
-      element: <LoginPage />,
-      action: loginAction,
-    },
-    {
-      path: "/register",
-      element: <SignUpPage />,
-      action: signUpAction,
-    },
-    {
-      path: "/verify-otp",
-      element: <OTPVerificationFormPage />,
-      action: otpAction,
-      loader: verifyOtpPageLoader,
-    },
-    {
-      path: "/forgot-password",
-      element: <ForgotPasswordPage />,
-      action: forgotPasswordAction,
-    },
-    {
-      path: "/reset-password",
-      element: <ResetPasswordPage />,
-      action: resetPasswordAction,
-      loader: resetPasswordLoader,
-    },
-    {
-      path: "/complete-profile",
-      element: <CompleteProfile />,
-      action: completeProfileAction,
-      loader: completeProfileLoader,
+      element: <AuthLayout />,
+      children: [
+        {
+          path: "/login",
+          element: <LoginPage />,
+          action: loginAction,
+        },
+        {
+          path: "/register",
+          element: <SignUpPage />,
+          action: signUpAction,
+        },
+        {
+          path: "/verify-otp",
+          element: <OTPVerificationFormPage />,
+          action: otpAction,
+          loader: verifyOtpPageLoader,
+        },
+        {
+          path: "/forgot-password",
+          element: <ForgotPasswordPage />,
+          action: forgotPasswordAction,
+        },
+        {
+          path: "/reset-password",
+          element: <ResetPasswordPage />,
+          action: resetPasswordAction,
+          loader: resetPasswordLoader,
+        },
+        {
+          path: "/complete-profile",
+          element: <CompleteProfile />,
+          action: completeProfileAction,
+          loader: completeProfileLoader,
+        },
+      ],
     },
 
     /* ---------- PUBLIC ---------- */
@@ -147,7 +154,7 @@ export default function App() {
           children: [
             {
               index: true,
-              element: <HomePage />,
+              element: <ExploreArticlesPage />,
               loader: publicArticlesLoader,
             },
             {
@@ -159,6 +166,7 @@ export default function App() {
               path: ":id/edit",
               element: <CreateArticlePage />,
               loader: editArticleLoader,
+              action: createArticleAction,
             },
             {
               path: ":id",

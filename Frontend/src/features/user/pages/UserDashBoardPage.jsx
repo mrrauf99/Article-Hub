@@ -4,7 +4,7 @@ import DashboardStats from "../components/DashboardStats";
 import ArticlesSection from "@/features/articles/components/ArticlesSection";
 
 export default function UserDashBoardPage() {
-  const { articles } = useLoaderData();
+  const { articles, stats } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pageParam = Number(searchParams.get("page")) || 1;
@@ -29,7 +29,7 @@ export default function UserDashBoardPage() {
 
   return (
     <>
-      <DashboardStats articles={articles} />
+      <DashboardStats articles={articles} stats={stats} />
 
       <ArticlesSection
         articles={articles}

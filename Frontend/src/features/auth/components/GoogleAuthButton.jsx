@@ -6,17 +6,17 @@ export default function GoogleAuthButton({ children }) {
   return (
     <button
       className="
-        w-full mt-2.5 py-3 px-4
+        w-full mt-3 py-3.5 px-4
         bg-white
         rounded-xl
-        text-black text-base font-medium
+        text-slate-700 text-base font-medium
         flex items-center justify-center gap-3
-        hover:bg-gray-50
+        hover:bg-slate-50
         transition-all
-        shadow-sm hover:shadow
-        active:scale-[0.99]
-        border border-gray-300
-        focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
+        shadow-sm hover:shadow-md
+        active:scale-[0.98]
+        border border-slate-300
+        focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2
       "
       onClick={handleGoogleLogin}
       type="button"

@@ -1,3 +1,5 @@
+import { BookOpen } from "lucide-react";
+
 export default function AuthLayout({
   title,
   subtitle,
@@ -5,24 +7,37 @@ export default function AuthLayout({
   subtitleStyle,
 }) {
   return (
-    <div
-      className="min-h-screen flex justify-center items-center bg-gradient-to-br
-     from-indigo-50 via-indigo-100 to-purple-50"
-    >
-      <div className="w-full max-w-xl p-5">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-10 max-[480px]:p-5">
-          <h1 className="text-[1.875rem] text-center font-bold  text-indigo-600 max-[480px]:text-[1.375rem]">
-            {title}
-          </h1>
+    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-sky-50 via-white to-slate-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-sky-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-100/20 rounded-full blur-3xl"></div>
+      </div>
 
-          <h2
-            style={subtitleStyle}
-            className="text-2xl mt-2 mb-4 text-[#333] text-center max-[480px]:text-[1.125rem]"
-          >
-            {subtitle}
-          </h2>
+      <div className="w-full max-w-lg p-5 relative z-10">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/50 p-8 sm:p-10">
+          {/* Logo/Brand */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl mb-4 shadow-lg shadow-sky-500/25">
+              <BookOpen className="w-8 h-8 text-white" strokeWidth={2.5} />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">{title}</h1>
+            <h2 style={subtitleStyle} className="text-slate-600 text-base">
+              {subtitle}
+            </h2>
+          </div>
+
           {children}
         </div>
+
+        {/* Footer text */}
+        <p className="text-center text-slate-500 text-sm mt-6">
+          © 2025 Article Hub. All rights reserved.
+        </p>
       </div>
     </div>
   );

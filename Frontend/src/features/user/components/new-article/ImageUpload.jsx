@@ -1,3 +1,4 @@
+import { ImagePlus } from "lucide-react";
 import styles from "../../styles/ArticleForm.module.css";
 
 export default function ImageUpload({
@@ -12,12 +13,6 @@ export default function ImageUpload({
 }) {
   return (
     <div className={styles.imageUploadGroup}>
-      {label && (
-        <label htmlFor={id} className={styles.label}>
-          {label} {required && <span className={styles.required}>*</span>}
-        </label>
-      )}
-
       <div className={styles.imageUploadWrapper}>
         <input
           type="file"
@@ -28,18 +23,27 @@ export default function ImageUpload({
           className={styles.fileInput}
         />
 
-        <label htmlFor={id} className={styles.fileLabel}>
-          <span className={styles.uploadIcon}>📁</span>
+        <label
+          htmlFor={id}
+          className={`${styles.fileLabel} ${
+            error ? styles.fileLabelError : ""
+          }`}
+        >
+          <div className={styles.uploadIconWrapper}>
+            <ImagePlus className="w-6 h-6" />
+          </div>
 
           <span className={styles.uploadText}>
             {imageFile
               ? imageFile.name
               : imageUrl
-              ? "Current image selected"
-              : "Choose an image file"}
+              ? "Click to change image"
+              : "Click to upload an image"}
           </span>
 
-          <span className={styles.uploadHint}>JPG, PNG, GIF (Max 5MB)</span>
+          <span className={styles.uploadHint}>
+            Drag and drop or click to browse • JPG, PNG, GIF (Max 5MB)
+          </span>
         </label>
       </div>
 

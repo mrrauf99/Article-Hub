@@ -28,8 +28,6 @@ app.use(sessionMiddleware);
 setupPassport();
 app.use(passport.initialize());
 
-/* ---------------- Routes ---------------- */
-
 app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
