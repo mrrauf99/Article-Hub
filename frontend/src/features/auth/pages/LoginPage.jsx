@@ -1,5 +1,5 @@
 import { Link, Form, useActionData, useNavigation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, startTransition } from "react";
 
 import { User, Lock } from "lucide-react";
 import AlertMessageBox from "../components/AlertMessageBox";
@@ -19,9 +19,11 @@ export default function Login() {
   const isSubmitting = navigation.state === "submitting";
 
   const [alertMessage, setAlertMessage] = useState("");
+  const lastActionDataRef = useRef(null);
 
   useEffect(() => {
-    if (actionData?.success === false) {
+    if (actionData?.success === false && actionData !== lastActionDataRef.current) {
+      lastActionDataRef.current = actionData;
       let msg = actionData.message || "Too many login attempts.";
       const seconds = actionData.retryAfterSeconds;
 
@@ -38,10 +40,12 @@ export default function Login() {
         }
       }
 
-      setAlertMessage(msg);
+      startTransition(() => {
+        setAlertMessage(msg);
+      });
       form.handlePasswordReset();
     }
-  }, [actionData]);
+  }, [actionData, form]);
 
   function handleSubmit(e) {
     if (!form.validate()) {

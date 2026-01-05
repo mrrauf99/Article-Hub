@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Mail, Award, Edit2, Pencil } from "lucide-react";
-import { useProfile } from "../../context/ProfileContext";
+import { useProfile } from "../../hooks/useProfile";
 
 export default function ProfileHeader({ user, isEditing, onEdit }) {
   const { formData, handleChange } = useProfile();

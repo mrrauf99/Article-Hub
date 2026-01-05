@@ -1,5 +1,5 @@
 import { authApi } from "../../api/authApi";
-import { data, redirect } from "react-router-dom";
+import { redirect } from "react-router-dom";
 
 export default async function verifyOtpPageLoader() {
   try {

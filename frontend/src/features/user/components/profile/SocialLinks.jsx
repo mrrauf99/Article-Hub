@@ -2,7 +2,7 @@ import { Linkedin, Facebook, Instagram } from "lucide-react";
 import SocialLinkField from "./SocialLinkField";
 import XIcon from "./XIcon";
 
-import { useProfile } from "../../context/ProfileContext";
+import { useProfile } from "../../hooks/useProfile";
 
 export default function SocialLinks() {
   const { formData, isEditing, handleChange } = useProfile();

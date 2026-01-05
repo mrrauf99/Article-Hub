@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, startTransition } from "react";
 import { Form, useActionData, useNavigation } from "react-router-dom";
 
 import { Lock } from "lucide-react";
@@ -18,10 +18,14 @@ export default function ResetPassword() {
   const isSubmitting = navigation.state === "submitting";
 
   const [alertMessage, setAlertMessage] = useState("");
+  const lastActionDataRef = useRef(null);
 
   useEffect(() => {
-    if (actionData?.success === false) {
-      setAlertMessage(actionData.message);
+    if (actionData?.success === false && actionData !== lastActionDataRef.current) {
+      lastActionDataRef.current = actionData;
+      startTransition(() => {
+        setAlertMessage(actionData.message);
+      });
     }
   }, [actionData]);
 

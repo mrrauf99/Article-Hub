@@ -7,7 +7,7 @@ import {
   useLoaderData,
 } from "react-router-dom";
 import { ArrowLeft, CheckCircle } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, startTransition } from "react";
 
 import { useOTPForm } from "../hooks/useOTPForm";
 import OTPHeader from "../components/OTPHeader";
@@ -44,16 +44,22 @@ export default function OTPVerificationForm() {
       actionData !== lastActionDataRef.current
     ) {
       lastActionDataRef.current = actionData;
-      setMessage({ success: actionData.success, message: actionData.message });
+      startTransition(() => {
+        setMessage({ success: actionData.success, message: actionData.message });
+      });
     }
   }, [actionData, mode]);
 
+  const lastResendDataRef = useRef(null);
   // Handle resend fetcher response
   useEffect(() => {
-    if (mode === "resend" && resendFetcher.data) {
-      setMessage({
-        success: resendFetcher.data.success,
-        message: resendFetcher.data.message,
+    if (mode === "resend" && resendFetcher.data && resendFetcher.data !== lastResendDataRef.current) {
+      lastResendDataRef.current = resendFetcher.data;
+      startTransition(() => {
+        setMessage({
+          success: resendFetcher.data.success,
+          message: resendFetcher.data.message,
+        });
       });
     }
   }, [resendFetcher.data, mode]);
@@ -61,14 +67,18 @@ export default function OTPVerificationForm() {
   // Clear message when user starts typing (mode becomes idle)
   useEffect(() => {
     if (mode === "idle") {
-      setMessage(null);
+      startTransition(() => {
+        setMessage(null);
+      });
     }
   }, [mode]);
 
   // Clear message when submitting
   useEffect(() => {
     if (isVerifying || isResending) {
-      setMessage(null);
+      startTransition(() => {
+        setMessage(null);
+      });
     }
   }, [isVerifying, isResending]);
 
