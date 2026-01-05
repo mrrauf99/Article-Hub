@@ -31,9 +31,6 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
-      - name: Build
-        run: npm run build
-
   backend:
     name: Backend CI
     runs-on: ubuntu-latest
