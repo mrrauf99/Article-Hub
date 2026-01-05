@@ -1,6 +1,6 @@
 import { apiClient } from "../../api/apiClient";
 
-export default async function articleDetailLoader({ params, request }) {
+export default async function articleDetailLoader({ params }) {
   // Accept both 'id' and 'article_id' as parameter names
   const { id, article_id } = params;
   const articleId = id || article_id;

@@ -1,6 +1,6 @@
 import { User, Mail, BookOpen, Globe, Calendar, FileText } from "lucide-react";
 import ProfileField from "./ProfileField";
-import { useProfile } from "../../context/ProfileContext";
+import { useProfile } from "../../hooks/useProfile";
 
 export default function AuthorInfo() {
   const { formData, isEditing, handleChange } = useProfile();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, startTransition } from "react";
 import { Form, useActionData, useNavigation } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 
@@ -17,10 +17,14 @@ export default function ForgotPassword() {
   const isSubmitting = navigation.state === "submitting";
 
   const [alertMessage, setAlertMessage] = useState("");
+  const lastActionDataRef = useRef(null);
 
   useEffect(() => {
-    if (actionData?.message) {
-      setAlertMessage(actionData.message);
+    if (actionData?.message && actionData !== lastActionDataRef.current) {
+      lastActionDataRef.current = actionData;
+      startTransition(() => {
+        setAlertMessage(actionData.message);
+      });
     }
   }, [actionData]);
 

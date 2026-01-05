@@ -1,5 +1,5 @@
 import { useFetcher } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, startTransition } from "react";
 import { useContactForm } from "../hooks/useContactForm";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
@@ -18,6 +18,7 @@ export default function ContactForm() {
   const isSubmitting = fetcher.state === "submitting";
 
   const [feedback, setFeedback] = useState(null);
+  const lastFetcherDataRef = useRef(null);
 
   const { values, errors, handleChange, handleBlur, validate, reset } =
     useContactForm({
@@ -35,14 +36,18 @@ export default function ContactForm() {
   };
 
   useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.success) {
-      setFeedback(fetcher.data);
-      reset();
+    if (fetcher.state === "idle" && fetcher.data?.success && fetcher.data !== lastFetcherDataRef.current) {
+      lastFetcherDataRef.current = fetcher.data;
+      const data = fetcher.data;
+      startTransition(() => {
+        setFeedback(data);
+        reset();
 
-      const t = setTimeout(() => setFeedback(null), 5000);
-      return () => clearTimeout(t);
+        const t = setTimeout(() => setFeedback(null), 5000);
+        return () => clearTimeout(t);
+      });
     }
-  }, [fetcher.state]);
+  }, [fetcher.state, fetcher.data, reset]);
 
   return (
     <ScrollReveal animation="fade-right" duration={600}>

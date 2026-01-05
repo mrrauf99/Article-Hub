@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, startTransition } from "react";
 import { authApi } from "../../api/authApi";
 
 export function useAvailability(value, hasError, type) {
@@ -6,18 +6,32 @@ export function useAvailability(value, hasError, type) {
     status: "idle",
     message: "",
   });
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (!value || hasError) {
-      setState({ status: "idle", message: "" });
-      return;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (!value || hasError) {
+        return;
+      }
+    } else {
+      if (!value || hasError) {
+        startTransition(() => {
+          setState((prev) => ({ ...prev, status: "idle", message: "" }));
+        });
+        return;
+      }
     }
 
     let isCancelled = false;
     let timeoutId;
 
     const checkAvailability = async () => {
-      setState({ status: "checking", message: "Checking..." });
+      setState((prev) => ({
+        ...prev,
+        status: "checking",
+        message: "Checking...",
+      }));
 
       try {
         const endpoint =
@@ -29,10 +43,11 @@ export function useAvailability(value, hasError, type) {
 
         if (!isCancelled) {
           const { available, message } = res.data;
-          setState({
+          setState((prev) => ({
+            ...prev,
             status: available ? "available" : "unavailable",
             message,
-          });
+          }));
         }
       } catch (err) {
         if (isCancelled) return;
@@ -43,14 +58,14 @@ export function useAvailability(value, hasError, type) {
             ? "Network error. Please check your connection."
             : "Something went wrong. Please try again.");
 
-        setState({
+        setState((prev) => ({
+          ...prev,
           status: "error",
           message: errorMessage,
-        });
+        }));
       }
     };
 
-    // Debounce: wait 500ms after user stops typing
     timeoutId = setTimeout(() => {
       checkAvailability();
     }, 500);

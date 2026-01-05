@@ -2,14 +2,12 @@ import { ImagePlus } from "lucide-react";
 import styles from "../../styles/ArticleForm.module.css";
 
 export default function ImageUpload({
-  label,
   id,
   name,
   onChange,
   error,
   imageFile,
   imageUrl,
-  required,
 }) {
   return (
     <div className={styles.imageUploadGroup}>
