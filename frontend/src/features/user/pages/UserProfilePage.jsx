@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, startTransition } from "react";
 import {
   useLoaderData,
   useNavigation,
@@ -18,12 +18,13 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import ProfileProvider from "../context/ProfileContext";
 
 export default function UserProfilePage() {
-  const { user, stats } = useLoaderData();
+  const { user } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
 
   const [feedback, setFeedback] = useState(null);
   const { formData, handleChange, resetForm } = useProfileForm(user);
+  const lastActionDataRef = useRef(null);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -32,12 +33,12 @@ export default function UserProfilePage() {
 
   const handleEdit = () => setIsEditing(true);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     if (isSaving) return;
 
     resetForm(); // restore original data
     setIsEditing(false);
-  };
+  }, [isSaving, resetForm]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -66,13 +67,16 @@ export default function UserProfilePage() {
   };
 
   useEffect(() => {
-    if (!actionData) return;
+    if (!actionData || actionData === lastActionDataRef.current) return;
 
-    setFeedback(actionData);
-    if (actionData.success) setIsEditing(false);
+    lastActionDataRef.current = actionData;
+    startTransition(() => {
+      setFeedback(actionData);
+      if (actionData.success) setIsEditing(false);
 
-    const t = setTimeout(() => setFeedback(null), 5000);
-    return () => clearTimeout(t);
+      const t = setTimeout(() => setFeedback(null), 5000);
+      return () => clearTimeout(t);
+    });
   }, [actionData]);
 
   const profileValue = useMemo(
@@ -84,7 +88,7 @@ export default function UserProfilePage() {
       handleChange,
       handleCancel,
     }),
-    [user, formData, isEditing, isSaving]
+    [user, formData, isEditing, isSaving, handleChange, handleCancel]
   );
 
   return (

@@ -1,6 +1,14 @@
-import styles from "@/styles/Footer.module.css";
+import styles from "@/styles/footer.module.css";
 import { Link, useLocation } from "react-router-dom";
-import { Facebook, Instagram, X, Linkedin, Youtube, Send, BookOpen } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  X,
+  Linkedin,
+  Youtube,
+  Send,
+  BookOpen,
+} from "lucide-react";
 
 const SOCIAL_LINKS = [
   { Icon: Facebook, label: "Facebook", href: "#", brand: "facebook" },

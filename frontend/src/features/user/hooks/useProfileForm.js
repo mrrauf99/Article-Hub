@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, startTransition } from "react";
 
 function normalizeUser(user) {
   return {
@@ -24,14 +24,20 @@ function normalizeUser(user) {
 
 export function useProfileForm(user) {
   const initialRef = useRef(() => normalizeUser(user));
+  const lastUserRef = useRef(user);
 
   const [formData, setFormData] = useState(() => normalizeUser(user));
 
   // sync when backend user changes (loader revalidation)
   useEffect(() => {
-    const snapshot = normalizeUser(user);
-    initialRef.current = snapshot;
-    setFormData(snapshot);
+    if (user !== lastUserRef.current) {
+      lastUserRef.current = user;
+      const snapshot = normalizeUser(user);
+      initialRef.current = snapshot;
+      startTransition(() => {
+        setFormData(snapshot);
+      });
+    }
   }, [user]);
 
   function handleChange(e) {

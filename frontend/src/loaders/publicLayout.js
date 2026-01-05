@@ -14,7 +14,7 @@ export default async function publicLayoutLoader() {
     }
 
     return { user: null };
-  } catch (err) {
+  } catch {
     // Not authenticated - that's fine for public pages
     return { user: null };
   }

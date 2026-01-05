@@ -14,7 +14,7 @@ export default async function editArticleLoader({ params }) {
     return {
       article: data.data,
     };
-  } catch (err) {
+  } catch {
     // Article not found OR not owned by user
     throw redirect("/user/dashboard");
   }

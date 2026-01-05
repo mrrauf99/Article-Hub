@@ -147,7 +147,7 @@ export default function CategoryFilter({
   const isMoreButton = triggerLabel !== null;
 
   // Error styling classes
-  const errorClasses = error ? "border-red-300 bg-red-50" : "";
+  // ...existing code...
 
   return (
     <div

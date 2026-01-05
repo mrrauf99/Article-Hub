@@ -8,7 +8,7 @@ export default async function userProfileLoader() {
     return {
       user: data.data,
     };
-  } catch (err) {
+  } catch {
     throw redirect("/login");
   }
 }

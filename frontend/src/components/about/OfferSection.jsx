@@ -60,7 +60,7 @@ export default function OfferSection() {
             </h3>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              {FEATURES.map((feature, index) => (
+              {FEATURES.map((feature) => (
                 <div key={feature} className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
                   <span className="text-slate-700">{feature}</span>
