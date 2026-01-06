@@ -16,10 +16,6 @@ const app = express();
 
 app.set("trust proxy", 1); // Trust Heroku proxy for HTTPS
 
-if (!process.env.CLIENT_BASE_URL) {
-  throw new Error("CLIENT_BASE_URL is not defined in environment variables");
-}
-
 app.use(
   cors({
     origin: process.env.CLIENT_BASE_URL,
