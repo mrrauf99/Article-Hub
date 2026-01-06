@@ -39,14 +39,16 @@ export default function HomePage() {
 
   // Build category list sorted by popularity and excluding empty ones
   const categories = useMemo(() => {
-    const entries = Object.entries(articleCounts)
+    const ranked = Object.entries(articleCounts)
       .filter(([, count]) => count > 0)
       .sort((a, b) => b[1] - a[1])
       .map(([name]) => name);
 
-    // Fallback to all configured categories if we have no data yet
-    const base = entries.length > 0 ? entries : ARTICLE_CATEGORIES;
-    return ["All", ...base];
+    const remaining = ARTICLE_CATEGORIES.filter(
+      (category) => !ranked.includes(category)
+    );
+
+    return ["All", ...ranked, ...remaining];
   }, [articleCounts]);
 
   // Get unique authors count

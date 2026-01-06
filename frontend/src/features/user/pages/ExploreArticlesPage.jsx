@@ -25,6 +25,11 @@ export default function ExploreArticlesPage() {
   }, [rawCategory]);
 
   const categories = useMemo(() => ["All", ...ARTICLE_CATEGORIES], []);
+  const overflowCategories = useMemo(
+    () => categories.slice(10),
+    [categories]
+  );
+  const overflowActive = overflowCategories.includes(activeCategory);
 
   // Filter by category and search
   const filteredArticles = useMemo(() => {
@@ -177,13 +182,18 @@ export default function ExploreArticlesPage() {
                 {category}
               </button>
             ))}
-            {categories.length > 10 && (
+            {overflowCategories.length > 0 && (
               <CategoryFilter
-                categories={categories.slice(10)}
+                categories={overflowCategories}
                 activeCategory={activeCategory}
                 onChange={handleCategoryChange}
                 variant="dark"
-                triggerLabel={`+${categories.length - 10} more`}
+                triggerLabel={
+                  overflowActive
+                    ? activeCategory
+                    : `+${overflowCategories.length} more`
+                }
+                moreButtonActive={overflowActive}
               />
             )}
           </div>

@@ -23,6 +23,16 @@ export default function ArticlesGrid({
     return articles.slice(start, start + PER_PAGE);
   }, [articles, safePage]);
 
+  const primaryCategories = useMemo(
+    () => categories.slice(0, 10),
+    [categories]
+  );
+  const overflowCategories = useMemo(
+    () => categories.slice(10),
+    [categories]
+  );
+  const overflowActive = overflowCategories.includes(activeCategory);
+
   return (
     <section id="articles" className="py-16 lg:py-24 bg-slate-50 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,7 +63,7 @@ export default function ArticlesGrid({
 
         {/* Category Pills (Desktop) */}
         <div className="hidden lg:flex flex-wrap gap-2 mb-10">
-          {categories.slice(0, 12).map((cat) => (
+          {primaryCategories.map((cat) => (
             <button
               key={cat}
               onClick={() => onCategorySelect(cat)}
@@ -66,13 +76,19 @@ export default function ArticlesGrid({
               {cat}
             </button>
           ))}
-          {categories.length > 12 && (
-            <button
-              onClick={() => onCategorySelect("All")}
-              className="px-4 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 focus:outline-none"
-            >
-              +{categories.length - 12} more
-            </button>
+          {overflowCategories.length > 0 && (
+            <CategoryFilter
+              categories={overflowCategories}
+              activeCategory={activeCategory}
+              onChange={onCategorySelect}
+              variant="light"
+              triggerLabel={
+                overflowActive
+                  ? activeCategory
+                  : `+${overflowCategories.length} more`
+              }
+              moreButtonActive={overflowActive}
+            />
           )}
         </div>
 
