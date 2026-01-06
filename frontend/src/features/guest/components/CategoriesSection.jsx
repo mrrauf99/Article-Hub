@@ -99,7 +99,8 @@ export default function CategoriesSection({
   onSelect,
   articleCounts = {},
 }) {
-  // Show first 8 categories
+  // Show top 8 categories (excluding the synthetic "All" entry)
+  // Categories are already ranked in HomePage, so we just take the first 8.
   const displayCategories = categories.filter((c) => c !== "All").slice(0, 8);
 
   return (
@@ -183,7 +184,7 @@ export default function CategoriesSection({
               }}
               className="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 font-semibold transition-colors"
             >
-              View all 21 categories
+              View all categories
               <svg
                 className="w-4 h-4 translate-y-px"
                 fill="none"
