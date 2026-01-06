@@ -14,17 +14,20 @@ import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 
-app.set("trust proxy", 1);
+app.set("trust proxy", 1); // Trust Heroku proxy for HTTPS
 
-app.use(express.json());
+if (!process.env.CLIENT_BASE_URL) {
+  throw new Error("CLIENT_BASE_URL is not defined in environment variables");
+}
 
 app.use(
   cors({
     origin: process.env.CLIENT_BASE_URL,
-    credentials: true,
+    credentials: true, // Send cookies to client
   })
 );
 
+app.use(express.json());
 app.use(sessionMiddleware);
 
 setupPassport();
