@@ -5,8 +5,8 @@ export default async function profileStatsLoader() {
   try {
     // Fetch both user profile and stats
     const [profileRes, statsRes] = await Promise.all([
-      apiClient.get("/api/user/profile"),
-      apiClient.get("/api/user/stats"),
+      apiClient.get("user/profile"),
+      apiClient.get("user/stats"),
     ]);
 
     return {

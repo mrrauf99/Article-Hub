@@ -6,7 +6,7 @@ export default async function articleDetailLoader({ params }) {
   const articleId = id || article_id;
 
   try {
-    const { data } = await apiClient.get(`/api/articles/${articleId}`);
+    const { data } = await apiClient.get(`articles/${articleId}`);
 
     if (!data.success) {
       return {
@@ -22,7 +22,7 @@ export default async function articleDetailLoader({ params }) {
 
     // Increment view count in background (don't await - fire and forget)
     // The backend will check if user is admin and skip incrementing
-    apiClient.post(`/api/articles/${articleId}/view`).catch(() => {
+    apiClient.post(`articles/${articleId}/view`).catch(() => {
       // Silent fail - view count is not critical
     });
 
