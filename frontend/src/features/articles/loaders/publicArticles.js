@@ -5,7 +5,7 @@ export default async function publicArticlesLoader({ request }) {
   const category = url.searchParams.get("category");
 
   try {
-    const res = await apiClient.get("/api/articles", {
+    const res = await apiClient.get("articles", {
       params: category && category !== "All" ? { category } : {},
     });
 

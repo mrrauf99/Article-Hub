@@ -5,8 +5,8 @@ export default async function myArticlesLoader() {
   try {
     // Fetch both articles and stats in parallel
     const [articlesRes, statsRes] = await Promise.all([
-      apiClient.get("/api/articles/me"),
-      apiClient.get("/api/user/stats"),
+      apiClient.get("articles/me"),
+      apiClient.get("user/stats"),
     ]);
 
     return {

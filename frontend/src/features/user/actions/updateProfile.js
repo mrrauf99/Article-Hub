@@ -27,7 +27,7 @@ export default async function updateProfileAction({ request }) {
     );
 
     try {
-      const res = await apiClient.patch("/api/user/profile", multipartData, {
+      const res = await apiClient.patch("user/profile", multipartData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -58,7 +58,7 @@ export default async function updateProfileAction({ request }) {
   };
 
   try {
-    const res = await apiClient.patch("/api/user/profile", payload);
+    const res = await apiClient.patch("user/profile", payload);
 
     return {
       success: true,
