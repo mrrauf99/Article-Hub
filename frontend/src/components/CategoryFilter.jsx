@@ -12,6 +12,7 @@ import { createPortal } from "react-dom";
  * @param {string} props.className - Additional classes
  * @param {string} props.triggerLabel - Custom label for trigger button (e.g., '+10 more')
  * @param {string} props.placeholder - Placeholder text when no category selected
+ * @param {boolean} props.moreButtonActive - Highlight the trigger when active category is in overflow
  */
 export default function CategoryFilter({
   categories,
@@ -24,6 +25,7 @@ export default function CategoryFilter({
   placeholder = "Select category",
   name = "",
   error = false,
+  moreButtonActive = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({
@@ -146,6 +148,14 @@ export default function CategoryFilter({
   // Check if using custom trigger label (like '+10 more')
   const isMoreButton = triggerLabel !== null;
 
+  const moreButtonBaseClasses = isDark
+    ? "bg-slate-700/80 text-slate-300 hover:bg-slate-600 hover:text-white border border-slate-600"
+    : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-300";
+
+  const moreButtonActiveClasses = isDark
+    ? "border-sky-400 text-sky-200 bg-slate-700/70 shadow-[0_0_0_2px_rgba(56,189,248,0.35)]"
+    : "border-sky-300 text-sky-700 bg-sky-50 shadow-[0_0_0_2px_rgba(56,189,248,0.25)]";
+
   // Error styling classes
   // ...existing code...
 
@@ -162,11 +172,9 @@ export default function CategoryFilter({
         onClick={() => setIsOpen(!isOpen)}
         className={
           isMoreButton
-            ? `flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${
-                isDark
-                  ? "bg-slate-700/80 text-slate-300 hover:bg-slate-600 hover:text-white border border-slate-600"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-300"
-              }`
+          ? `flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${moreButtonBaseClasses} ${
+              moreButtonActive ? moreButtonActiveClasses : ""
+            }`
             : `flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-[0.9375rem] font-normal transition-all duration-200 w-full shadow-sm ${
                 isDark
                   ? "bg-slate-800/80 border border-slate-700 text-white hover:bg-slate-700"
