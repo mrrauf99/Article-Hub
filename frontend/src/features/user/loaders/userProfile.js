@@ -3,7 +3,7 @@ import { apiClient } from "../../api/apiClient";
 
 export default async function userProfileLoader() {
   try {
-    const { data } = await apiClient.get("/api/user/profile");
+    const { data } = await apiClient.get("user/profile");
 
     return {
       user: data.data,

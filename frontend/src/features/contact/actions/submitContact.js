@@ -11,7 +11,7 @@ export default async function submitContactAction({ request }) {
       message: formData.get("message"),
     };
 
-    await apiClient.post("/api/contact", payload);
+    await apiClient.post("contact", payload);
 
     return {
       success: true,

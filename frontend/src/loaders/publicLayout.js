@@ -7,7 +7,7 @@ import { apiClient } from "../features/api/apiClient";
  */
 export default async function publicLayoutLoader() {
   try {
-    const { data } = await apiClient.get("/api/user/profile");
+    const { data } = await apiClient.get("user/profile");
 
     if (data.success) {
       return { user: data.data };

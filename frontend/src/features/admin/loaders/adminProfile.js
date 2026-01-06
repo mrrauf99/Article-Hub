@@ -3,7 +3,7 @@ import { apiClient } from "../../api/apiClient.js";
 
 export default async function adminProfileLoader() {
   try {
-    const response = await apiClient.get("/api/user/profile");
+    const response = await apiClient.get("user/profile");
     const user = response.data.data;
 
     // Redirect non-admin users

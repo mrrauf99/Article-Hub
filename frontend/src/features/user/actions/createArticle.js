@@ -8,10 +8,10 @@ export default async function createArticleAction({ request, params }) {
 
     if (isEditing) {
       // Update existing article
-      await apiClient.patch(`/api/articles/${params.id}`, formData);
+      await apiClient.patch(`articles/${params.id}`, formData);
     } else {
       // Create new article
-      await apiClient.post("/api/articles", formData);
+      await apiClient.post("articles", formData);
     }
 
     return redirect("/dashboard/articles");
