@@ -66,6 +66,7 @@ import AuthLayout from "./layouts/AuthLayout.jsx";
 // (Admin, User and Public)
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 import "./index.css";
 
@@ -215,6 +216,12 @@ export default function App() {
           action: updateProfileAction,
         },
       ],
+    },
+
+    /* ---------- 404 ---------- */
+    {
+      path: "*",
+      element: <NotFoundPage />,
     },
   ]);
 
