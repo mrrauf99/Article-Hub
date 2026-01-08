@@ -14,12 +14,12 @@ import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 
-app.set("trust proxy", 1); // Trust Heroku proxy for HTTPS
+app.set("trust proxy", 1);
 
 app.use(
   cors({
     origin: process.env.CLIENT_BASE_URL,
-    credentials: true, // Send cookies to client
+    credentials: true,
   })
 );
 
