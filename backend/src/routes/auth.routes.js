@@ -66,7 +66,7 @@ authRoutes.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "/login",
+    failureRedirect: `${process.env.CLIENT_BASE_URL}/login`,
   }),
   (req, res) => {
     const user = req.user;
