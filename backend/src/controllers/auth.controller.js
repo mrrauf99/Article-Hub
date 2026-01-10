@@ -185,15 +185,39 @@ export async function verifyOtp(req, res) {
   if (otpSession.flow === "signup") {
     const p = otpSession.payload;
 
-    await db.query(
-      `
-      INSERT INTO users (email, username, name, password, country)
-      VALUES ($1,$2,$3,$4,$5)
-      `,
-      [p.email, p.username, p.name, p.password, p.country]
-    );
+    try {
+      await db.query(
+        `
+        INSERT INTO users (email, username, name, password, country)
+        VALUES ($1, $2, $3, $4, $5)
+        `,
+        [p.email, p.username, p.name, p.password, p.country]
+      );
 
-    req.session.destroy(() => {});
+      req.session.destroy(() => {});
+    } catch (insertErr) {
+      console.error("Error inserting user during signup:", insertErr);
+      
+      // Handle specific database errors
+      if (insertErr.code === '42703') {
+        return res.status(500).json({
+          success: false,
+          message: "Database column error. Please check users table schema.",
+        });
+      }
+      
+      if (insertErr.code === '23505') {
+        return res.status(400).json({
+          success: false,
+          message: "Email or username already exists.",
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create account. Please try again.",
+      });
+    }
   }
 
   res.json({
@@ -373,18 +397,42 @@ export async function completeGoogleSignup(req, res) {
     });
   }
 
-  const { rows } = await db.query(
-    `INSERT INTO users (email, name, username, avatar)
-     VALUES ($1,$2,$3,$4) returning id`,
-    [oauth.email, oauth.name, username, oauth.avatar]
-  );
+  try {
+    const { rows } = await db.query(
+      `INSERT INTO users (email, name, username, avatar_url)
+       VALUES ($1, $2, $3, $4) RETURNING id`,
+      [oauth.email, oauth.name, username, oauth.avatar]
+    );
 
-  oauth.completed = true;
+    oauth.completed = true;
 
-  req.session.userId = rows[0].id;
+    req.session.userId = rows[0].id;
 
-  // destroy temp oauth data
-  delete req.session.oauth;
+    // destroy temp oauth data
+    delete req.session.oauth;
 
-  res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
+    res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
+  } catch (insertErr) {
+    console.error("Error inserting user during Google signup:", insertErr);
+    
+    // Handle specific database errors
+    if (insertErr.code === '42703') {
+      return res.status(500).json({
+        success: false,
+        message: "Database column error. Please check users table schema.",
+      });
+    }
+    
+    if (insertErr.code === '23505') {
+      return res.status(400).json({
+        success: false,
+        message: "Username already taken. Please choose a different username.",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to complete signup. Please try again.",
+    });
+  }
 }

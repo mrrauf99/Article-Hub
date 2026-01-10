@@ -19,8 +19,9 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="py-16 bg-white border-y border-slate-100">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <section className="py-12 sm:py-16 bg-white border-y border-slate-100 w-full">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+        <div className="w-full max-w-4xl mx-auto">
         <ScrollReveal animation="scale" duration={500}>
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-sky-100 text-sky-600 mb-6">
             <Mail className="w-7 h-7" />
@@ -78,6 +79,7 @@ export default function NewsletterSection() {
             anytime.
           </p>
         </ScrollReveal>
+        </div>
       </div>
     </section>
   );

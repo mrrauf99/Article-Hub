@@ -16,8 +16,9 @@ export default function HeroSection({ articleCount, authorCount }) {
         />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-        <div className="text-center max-w-4xl mx-auto">
+      <div className="relative w-full px-3 sm:px-4 md:px-6 lg:px-8 py-16 sm:py-20 lg:py-32">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="text-center max-w-4xl mx-auto">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500/10 to-purple-500/10 border border-sky-500/20 px-4 py-2 mb-8">
             <Sparkles className="w-4 h-4 text-sky-400" />
@@ -102,6 +103,7 @@ export default function HeroSection({ articleCount, authorCount }) {
               value="Fast"
               label="& Clean"
             />
+          </div>
           </div>
         </div>
       </div>

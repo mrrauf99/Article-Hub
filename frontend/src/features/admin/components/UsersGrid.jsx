@@ -26,27 +26,28 @@ export default function UsersGrid({ users, onChangeRole, onDelete }) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
       {users.map((user) => (
         <div
           key={user.id}
-          className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+          className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
         >
           {/* Card Header with Avatar */}
-          <div className="relative p-6 pb-4">
+          <div className="relative p-4 sm:p-6 pb-3 sm:pb-4">
             {/* Role Badge */}
             <span
-              className={`absolute top-4 right-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+              className={`absolute top-3 right-3 sm:top-4 sm:right-4 inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                 user.role === "admin"
                   ? "bg-purple-100 text-purple-700"
                   : "bg-slate-100 text-slate-700"
               }`}
             >
               {user.role === "admin" && <Shield className="w-3 h-3" />}
-              {user.role}
+              <span className="hidden sm:inline">{user.role}</span>
+              <span className="sm:hidden">{user.role === "admin" ? "A" : "U"}</span>
             </span>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 pr-16 sm:pr-20">
               <img
                 src={
                   user.avatar ||
@@ -55,43 +56,47 @@ export default function UsersGrid({ users, onChangeRole, onDelete }) {
                   )}&background=6366f1&color=fff&size=80`
                 }
                 alt={user.name}
-                className="w-16 h-16 rounded-full object-cover ring-4 ring-slate-100"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover ring-2 sm:ring-4 ring-slate-100 shrink-0"
+                loading="lazy"
               />
-              <div className="min-w-0">
-                <h3 className="font-semibold text-slate-900 truncate">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-sm sm:text-base text-slate-900 truncate">
                   {user.name}
                 </h3>
-                <p className="text-sm text-slate-500 truncate">{user.email}</p>
+                <p className="text-xs sm:text-sm text-slate-500 truncate">{user.email}</p>
               </div>
             </div>
           </div>
 
           {/* Stats */}
-          <div className="px-6 py-3 bg-slate-50 border-y border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <FileText className="w-4 h-4" />
-              <span>{user.article_count} articles</span>
+          <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-50 border-y border-slate-100 flex items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-600">
+              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+              <span className="whitespace-nowrap">{user.article_count} {user.article_count === 1 ? "article" : "articles"}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Calendar className="w-4 h-4" />
-              <span>{formatDate(user.joined_at)}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-600">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+              <span className="whitespace-nowrap">{formatDate(user.joined_at)}</span>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="p-4 flex items-center gap-2">
+          <div className="p-3 sm:p-4 flex items-center gap-2">
             <button
               onClick={() => onChangeRole(user)}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 bg-slate-100 text-slate-700 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-slate-200 transition-colors whitespace-nowrap"
             >
-              <Crown className="w-4 h-4" />
-              Change Role
+              <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Change Role</span>
+              <span className="sm:hidden">Role</span>
             </button>
             <button
               onClick={() => onDelete(user)}
-              className="inline-flex items-center justify-center w-10 h-10 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-colors"
+              className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-rose-50 text-rose-600 rounded-lg sm:rounded-xl hover:bg-rose-100 transition-colors shrink-0"
+              title="Delete user"
+              aria-label="Delete user"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>

@@ -3,8 +3,9 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function ContactHero() {
   return (
-    <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white py-16 sm:py-20 w-full">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+        <div className="w-full max-w-7xl mx-auto">
         {/* Icon */}
         <ScrollReveal animation="scale" duration={500}>
           <div className="flex justify-center mb-6">
@@ -30,6 +31,7 @@ export default function ContactHero() {
             feedback, we're here to help build a better content experience.
           </p>
         </ScrollReveal>
+        </div>
       </div>
     </div>
   );

@@ -19,8 +19,8 @@ export default function SocialLinks() {
         <SocialLinkField
           icon={XIcon}
           label="Twitter"
-          value={formData.x_link}
-          name="x_link"
+          value={formData.x_url}
+          name="x_url"
           isEditing={isEditing}
           onChange={handleChange}
           placeholder="https://x.com/yourusername"
@@ -29,8 +29,8 @@ export default function SocialLinks() {
         <SocialLinkField
           icon={Linkedin}
           label="LinkedIn"
-          value={formData.linkedin_link}
-          name="linkedin_link"
+          value={formData.linkedin_url}
+          name="linkedin_url"
           isEditing={isEditing}
           onChange={handleChange}
           placeholder="https://linkedin.com/in/yourusername"
@@ -39,8 +39,8 @@ export default function SocialLinks() {
         <SocialLinkField
           icon={Facebook}
           label="Facebook"
-          value={formData.facebook_link}
-          name="facebook_link"
+          value={formData.facebook_url}
+          name="facebook_url"
           isEditing={isEditing}
           onChange={handleChange}
           placeholder="https://facebook.com/yourusername"
@@ -49,8 +49,8 @@ export default function SocialLinks() {
         <SocialLinkField
           icon={Instagram}
           label="Instagram"
-          value={formData.instagram_link}
-          name="instagram_link"
+          value={formData.instagram_url}
+          name="instagram_url"
           isEditing={isEditing}
           onChange={handleChange}
           placeholder="https://instagram.com/yourusername"

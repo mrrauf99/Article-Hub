@@ -3,7 +3,8 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function AboutCTA() {
   return (
-    <section className="max-w-4xl mx-auto px-4 sm:px-6 py-16 lg:py-20">
+    <section className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="w-full max-w-4xl mx-auto">
       <ScrollReveal animation="scale-up" duration={700}>
         <div className="bg-gradient-to-br from-sky-500 to-indigo-600 rounded-3xl p-8 sm:p-12 text-center text-white shadow-2xl">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -38,6 +39,7 @@ export default function AboutCTA() {
           </div>
         </div>
       </ScrollReveal>
+      </div>
     </section>
   );
 }

@@ -11,20 +11,21 @@ export default async function updateProfileAction({ request }) {
   if (hasAvatar) {
     const multipartData = new FormData();
     multipartData.append("avatar", avatarFile);
-    multipartData.append("name", formData.get("name") || "");
-    multipartData.append("expertise", formData.get("expertise") || "");
-    multipartData.append("bio", formData.get("bio") || "");
-    multipartData.append(
-      "portfolio_link",
-      formData.get("portfolio_link") || ""
-    );
-    multipartData.append("x_link", formData.get("x_link") || "");
-    multipartData.append("linkedin_link", formData.get("linkedin_link") || "");
-    multipartData.append("facebook_link", formData.get("facebook_link") || "");
-    multipartData.append(
-      "instagram_link",
-      formData.get("instagram_link") || ""
-    );
+      multipartData.append("name", formData.get("name") || "");
+      multipartData.append("expertise", formData.get("expertise") || "");
+      multipartData.append("bio", formData.get("bio") || "");
+      multipartData.append("gender", formData.get("gender") || "");
+      multipartData.append(
+        "portfolio_url",
+        formData.get("portfolio_url") || ""
+      );
+      multipartData.append("x_url", formData.get("x_url") || "");
+      multipartData.append("linkedin_url", formData.get("linkedin_url") || "");
+      multipartData.append("facebook_url", formData.get("facebook_url") || "");
+      multipartData.append(
+        "instagram_url",
+        formData.get("instagram_url") || ""
+      );
 
     try {
       const res = await apiClient.patch("user/profile", multipartData, {
@@ -50,11 +51,12 @@ export default async function updateProfileAction({ request }) {
     name: formData.get("name"),
     expertise: formData.get("expertise"),
     bio: formData.get("bio"),
-    portfolio_link: formData.get("portfolio_link"),
-    x_link: formData.get("x_link"),
-    linkedin_link: formData.get("linkedin_link"),
-    facebook_link: formData.get("facebook_link"),
-    instagram_link: formData.get("instagram_link"),
+    gender: formData.get("gender") || null,
+    portfolio_url: formData.get("portfolio_url"),
+    x_url: formData.get("x_url"),
+    linkedin_url: formData.get("linkedin_url"),
+    facebook_url: formData.get("facebook_url"),
+    instagram_url: formData.get("instagram_url"),
   };
 
   try {

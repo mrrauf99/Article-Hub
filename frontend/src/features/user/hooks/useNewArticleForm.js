@@ -46,10 +46,15 @@ export function useNewArticleForm(article) {
 
   /* ---------------- IMAGE HANDLER ---------------- */
   const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    // Handle cropped image file from ImageUpload component
+    const file = e.croppedFile || e.target?.files?.[0];
+    
+    if (!file) {
+      return;
+    }
 
-    if (!file.type.startsWith("image/")) {
+    // Validation
+    if (!file.type || !file.type.startsWith("image/")) {
       setErrors((p) => ({ ...p, image: "Only image files are allowed" }));
       return;
     }
@@ -62,13 +67,20 @@ export function useNewArticleForm(article) {
       return;
     }
 
-    const previewUrl = URL.createObjectURL(file);
+    // Use provided preview URL if available (from cropper), otherwise create one
+    const previewUrl = e.croppedPreviewUrl || URL.createObjectURL(file);
 
-    setFormData((prev) => ({
-      ...prev,
-      imageFile: file,
-      imageUrl: previewUrl,
-    }));
+    setFormData((prev) => {
+      // Clean up old preview URL to prevent memory leaks
+      if (prev.imageUrl && prev.imageUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(prev.imageUrl);
+      }
+      return {
+        ...prev,
+        imageFile: file,
+        imageUrl: previewUrl,
+      };
+    });
 
     setErrors((p) => ({ ...p, image: "" }));
   };

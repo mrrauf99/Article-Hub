@@ -3,8 +3,9 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function MissionSection() {
   return (
-    <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 lg:py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+    <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-12 sm:py-16 lg:py-20 w-full">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+        <div className="w-full max-w-6xl mx-auto">
         <ScrollReveal animation="scale" duration={500}>
           <Sparkles className="h-12 w-12 text-sky-400 mx-auto mb-6" />
         </ScrollReveal>
@@ -24,6 +25,7 @@ export default function MissionSection() {
             who use it.
           </p>
         </ScrollReveal>
+        </div>
       </div>
     </section>
   );

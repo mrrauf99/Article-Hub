@@ -11,7 +11,8 @@ export default function CTASection() {
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative w-full px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+        <div className="w-full max-w-5xl mx-auto">
         {/* Heading */}
         <ScrollReveal animation="fade-up" duration={600}>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
@@ -88,6 +89,7 @@ export default function CTASection() {
             </Link>
           </p>
         </ScrollReveal>
+        </div>
       </div>
     </section>
   );

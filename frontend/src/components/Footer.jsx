@@ -1,11 +1,10 @@
 import styles from "@/styles/footer.module.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Facebook,
   Instagram,
   X,
   Linkedin,
-  Youtube,
   Send,
   BookOpen,
 } from "lucide-react";
@@ -15,31 +14,10 @@ const SOCIAL_LINKS = [
   { Icon: Instagram, label: "Instagram", href: "#", brand: "instagram" },
   { Icon: X, label: "X", href: "#", brand: "x" },
   { Icon: Linkedin, label: "LinkedIn", href: "#", brand: "linkedin" },
-  { Icon: Youtube, label: "YouTube", href: "#", brand: "youtube" },
   { Icon: Send, label: "Telegram", href: "#", brand: "telegram" },
 ];
 
 export default function Footer() {
-  const location = useLocation();
-
-  // Determine base path based on current context
-  const getContextPath = () => {
-    if (location.pathname.startsWith("/admin")) return "/admin";
-    if (location.pathname.startsWith("/user")) return "/user";
-    return "";
-  };
-
-  const basePath = getContextPath();
-  const isLoggedIn = basePath !== "";
-
-  // Get appropriate home/articles links based on context
-  const homeLink = isLoggedIn ? `${basePath}/dashboard` : "/";
-  const articlesLink = isLoggedIn
-    ? basePath === "/admin"
-      ? `${basePath}/articles`
-      : `${basePath}/articles`
-    : "/";
-
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -74,25 +52,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* RESOURCES */}
-        <div className={styles.linksCol}>
-          <span className={styles.heading}>Resources</span>
-          <Link to={homeLink} className={styles.link}>
-            {isLoggedIn ? "Dashboard" : "Home"}
-          </Link>
-          <Link to={articlesLink} className={styles.link}>
-            Articles
-          </Link>
-          <a
-            href="https://youtube.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.link}
-          >
-            YouTube Channel
-          </a>
-        </div>
-
         {/* COMPANY */}
         <div className={styles.linksCol}>
           <span className={styles.heading}>Company</span>
@@ -115,10 +74,6 @@ export default function Footer() {
       <div className={styles.bottomBar}>
         <span>
           © {new Date().getFullYear()} Article Hub. All rights reserved.
-        </span>
-        <span>
-          Crafted by{" "}
-          <strong className={styles.devName}>Abdul Rauf & Tayyab Ali</strong>
         </span>
       </div>
     </footer>

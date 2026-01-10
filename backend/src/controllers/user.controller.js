@@ -1,5 +1,7 @@
 import db from "../config/db.config.js";
 import cloudinary from "../config/cloudinary.config.js";
+import { deleteImageByUrl } from "../utils/cloudinary.utils.js";
+import { validateProfileData } from "../utils/validation.utils.js";
 
 export async function getProfile(req, res) {
   try {
@@ -7,9 +9,9 @@ export async function getProfile(req, res) {
 
     const { rows } = await db.query(
       `
-      SELECT username, name, email, expertise, avatar,  
-      joined_at, bio, portfolio_link, x_link, linkedin_link, 
-      instagram_link, facebook_link, role FROM users WHERE id = $1
+      SELECT username, name, email, expertise, avatar_url AS avatar,  
+      joined_at, bio, portfolio_url, x_url, linkedin_url, 
+      instagram_url, facebook_url, role, gender FROM users WHERE id = $1
       `,
       [userId]
     );
@@ -28,6 +30,14 @@ export async function getProfile(req, res) {
     });
   } catch (error) {
     console.error("User Profile retrieval failed:", error);
+
+    // Check if error is due to missing column
+    if (error.code === '42703') {
+      return res.status(500).json({
+        success: false,
+        message: "Database column error. Please check users table schema.",
+      });
+    }
 
     return res.status(500).json({
       success: false,
@@ -67,22 +77,56 @@ export async function updateUserProfile(req, res) {
   try {
     const userId = req.session.userId;
 
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
     const {
       name,
       expertise,
       bio,
-      portfolio_link,
-      x_link,
-      linkedin_link,
-      facebook_link,
-      instagram_link,
+      portfolio_url,
+      x_url,
+      linkedin_url,
+      facebook_url,
+      instagram_url,
     } = req.body;
+
+    // Validate profile data
+    const validationErrors = validateProfileData({
+      name,
+      expertise,
+      bio,
+      portfolio_url,
+      x_url,
+      linkedin_url,
+      facebook_url,
+      instagram_url,
+      gender,
+    });
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: validationErrors.join(", "),
+      });
+    }
 
     // Handle avatar upload if file is provided
     let avatarUrl = null;
     if (req.file) {
       try {
-        // Upload to Cloudinary
+        // First, get the current avatar URL to delete it later
+        const currentUserQuery = await db.query(
+          "SELECT avatar_url FROM users WHERE id = $1",
+          [userId]
+        );
+        const currentAvatarUrl = currentUserQuery.rows[0]?.avatar_url;
+
+        // Upload new avatar to Cloudinary
         const result = await new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
             {
@@ -99,7 +143,18 @@ export async function updateUserProfile(req, res) {
           );
           uploadStream.end(req.file.buffer);
         });
+        
         avatarUrl = result.secure_url;
+
+        // Delete old avatar from Cloudinary if it exists and is from Cloudinary
+        if (currentAvatarUrl && currentAvatarUrl.includes("cloudinary.com")) {
+          try {
+            await deleteImageByUrl(currentAvatarUrl);
+          } catch (deleteErr) {
+            // Log error but don't fail the request if deletion fails
+            console.error("Failed to delete old avatar from Cloudinary:", deleteErr);
+          }
+        }
       } catch (uploadErr) {
         console.error("Avatar upload error:", uploadErr);
         return res.status(500).json({
@@ -118,24 +173,26 @@ export async function updateUserProfile(req, res) {
           name = $1,
           expertise = $2,
           bio = $3,
-          portfolio_link = $4,
-          x_link = $5,
-          linkedin_link = $6,
-          facebook_link = $7,
-          instagram_link = $8,
-          avatar = $9
-        WHERE id = $10
+          portfolio_url = $4,
+          x_url = $5,
+          linkedin_url = $6,
+          facebook_url = $7,
+          instagram_url = $8,
+          gender = $9,
+          avatar_url = $10
+        WHERE id = $11
         RETURNING id
       `;
       params = [
         name,
         expertise,
         bio,
-        portfolio_link,
-        x_link,
-        linkedin_link,
-        facebook_link,
-        instagram_link,
+        portfolio_url,
+        x_url,
+        linkedin_url,
+        facebook_url,
+        instagram_url,
+        gender || null,
         avatarUrl,
         userId,
       ];
@@ -145,23 +202,37 @@ export async function updateUserProfile(req, res) {
           name = $1,
           expertise = $2,
           bio = $3,
-          portfolio_link = $4,
-          x_link = $5,
-          linkedin_link = $6,
-          facebook_link = $7,
-          instagram_link = $8
-        WHERE id = $9
+          portfolio_url = $4,
+          x_url = $5,
+          linkedin_url = $6,
+          facebook_url = $7,
+          instagram_url = $8,
+          gender = $9
+        WHERE id = $10
         RETURNING id
       `;
       params = [
         name,
         expertise,
         bio,
-        portfolio_link,
-        x_link,
-        linkedin_link,
-        facebook_link,
-        instagram_link,
+        portfolio_url,
+        x_url,
+        linkedin_url,
+        facebook_url,
+        instagram_url,
+        gender || null,
+        userId,
+      ];
+      params = [
+        name,
+        expertise,
+        bio,
+        portfolio_url,
+        x_url,
+        linkedin_url,
+        facebook_url,
+        instagram_url,
+        gender || null,
         userId,
       ];
     }
@@ -180,6 +251,15 @@ export async function updateUserProfile(req, res) {
     });
   } catch (err) {
     console.error("updateUserProfile error:", err);
+    
+    // Check if error is due to missing column
+    if (err.code === '42703') {
+      return res.status(500).json({
+        success: false,
+        message: "Database column error. Please check users table schema.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "An unexpected error occurred. Please try again later.",

@@ -98,9 +98,15 @@ export default function ExploreArticlesPage() {
       {/* Hero Section Header with Categories - Connected to Navbar */}
       <ScrollReveal animation="fade-up" duration={600}>
         <div
-          className="relative p-8 lg:p-10 pb-8 -mx-4 px-8 lg:px-14"
+          className="relative py-8 lg:py-10 px-4 sm:px-6 md:px-8 lg:px-10 pb-8"
           style={{
             background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
+            left: "50%",
+            right: "50%",
+            width: "100vw",
+            marginLeft: "-50vw",
+            marginRight: "-50vw",
+            boxSizing: "border-box",
           }}
         >
           {/* Decorative Elements */}

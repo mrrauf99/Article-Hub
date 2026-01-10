@@ -1,4 +1,5 @@
 import db from "../config/db.config.js";
+import { deleteImageByUrl } from "../utils/cloudinary.utils.js";
 
 export const getDashboardStats = async (req, res) => {
   try {
@@ -20,7 +21,7 @@ export const getDashboardStats = async (req, res) => {
         a.status,
         a.created_at,
         u.name AS author_name,
-        u.avatar AS author_avatar
+        u.avatar_url AS author_avatar
       FROM articles a
       JOIN users u ON u.id = a.author_id
       ORDER BY a.created_at DESC
@@ -28,7 +29,7 @@ export const getDashboardStats = async (req, res) => {
     `);
 
     const recentUsers = await db.query(`
-      SELECT id, name, email, avatar, role, joined_at
+      SELECT id, username, name, email, avatar_url AS avatar, role, joined_at
       FROM users
       ORDER BY joined_at DESC
       LIMIT 5
@@ -90,7 +91,7 @@ export const getAllArticles = async (req, res) => {
         a.published_at,
         u.id AS author_id,
         u.name AS author_name,
-        u.avatar AS author_avatar
+        u.avatar_url AS author_avatar
        FROM articles a
        JOIN users u ON u.id = a.author_id
        ${whereClause}
@@ -128,7 +129,7 @@ export const getArticleDetails = async (req, res) => {
         u.id AS author_id,
         u.name AS author_name,
         u.email AS author_email,
-        u.avatar AS author_avatar
+        u.avatar_url AS author_avatar
        FROM articles a
        JOIN users u ON u.id = a.author_id
        WHERE a.article_id = $1`,
@@ -229,6 +230,20 @@ export const deleteArticle = async (req, res) => {
   const { articleId } = req.params;
 
   try {
+    // First, get the article to fetch image URL before deletion
+    const articleQuery = await db.query(
+      `SELECT image_url FROM articles WHERE article_id = $1`,
+      [articleId]
+    );
+
+    if (articleQuery.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found",
+      });
+    }
+
+    // Delete the article from database
     const { rowCount } = await db.query(
       `DELETE FROM articles WHERE article_id = $1`,
       [articleId]
@@ -239,6 +254,17 @@ export const deleteArticle = async (req, res) => {
         success: false,
         message: "Article not found",
       });
+    }
+
+    // Delete image from Cloudinary if it exists
+    const article = articleQuery.rows[0];
+    if (article.image_url && article.image_url.includes("cloudinary.com")) {
+      try {
+        await deleteImageByUrl(article.image_url);
+      } catch (deleteErr) {
+        // Log error but don't fail the request if deletion fails
+        console.error("Failed to delete image from Cloudinary:", deleteErr);
+      }
     }
 
     res.json({ success: true, message: "Article deleted successfully" });
@@ -266,7 +292,7 @@ export const getAllUsers = async (req, res) => {
     }
 
     if (search) {
-      whereClause += ` AND (name ILIKE $${paramIndex} OR email ILIKE $${paramIndex})`;
+      whereClause += ` AND (name ILIKE $${paramIndex} OR email ILIKE $${paramIndex} OR username ILIKE $${paramIndex})`;
       params.push(`%${search}%`);
       paramIndex++;
     }
@@ -280,9 +306,10 @@ export const getAllUsers = async (req, res) => {
     const usersQuery = await db.query(
       `SELECT
         id,
+        username,
         name,
         email,
-        avatar,
+        avatar_url AS avatar,
         role,
         bio,
         joined_at,
@@ -307,7 +334,16 @@ export const getAllUsers = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
+    console.error("getAllUsers error:", err);
+    
+    // Check if error is due to missing column
+    if (err.code === '42703') {
+      return res.status(500).json({
+        success: false,
+        message: "Database column error. Please check users table schema.",
+      });
+    }
+
     res.status(500).json({ success: false, message: "Failed to fetch users" });
   }
 };
@@ -316,7 +352,7 @@ export const getUserDetails = async (req, res) => {
   const { userId } = req.params;
   try {
     const userQuery = await db.query(
-      `SELECT id, name, email, avatar, role, bio, joined_at
+      `SELECT id, username, name, email, avatar_url AS avatar, role, bio, joined_at
        FROM users WHERE id = $1`,
       [userId]
     );
@@ -342,7 +378,16 @@ export const getUserDetails = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
+    console.error("getUserDetails error:", err);
+    
+    // Check if error is due to missing column
+    if (err.code === '42703') {
+      return res.status(500).json({
+        success: false,
+        message: "Database column error. Please check users table schema.",
+      });
+    }
+
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch user details" });
@@ -400,8 +445,46 @@ export const deleteUser = async (req, res) => {
   }
 
   try {
-    // First delete user's articles
+    // First, get user's articles and avatar URL before deletion
+    const articlesQuery = await db.query(
+      `SELECT image_url FROM articles WHERE author_id = $1 AND image_url IS NOT NULL`,
+      [userId]
+    );
+
+    const userQuery = await db.query(
+      `SELECT avatar_url FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    if (userQuery.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Delete user's articles (database only, Cloudinary cleanup below)
     await db.query(`DELETE FROM articles WHERE author_id = $1`, [userId]);
+
+    // Delete article images from Cloudinary
+    for (const article of articlesQuery.rows) {
+      if (article.image_url && article.image_url.includes("cloudinary.com")) {
+        try {
+          await deleteImageByUrl(article.image_url);
+        } catch (deleteErr) {
+          console.error("Failed to delete article image from Cloudinary:", deleteErr);
+        }
+      }
+    }
+
+    // Delete user avatar from Cloudinary if it exists
+    const user = userQuery.rows[0];
+    if (user.avatar_url && user.avatar_url.includes("cloudinary.com")) {
+      try {
+        await deleteImageByUrl(user.avatar_url);
+      } catch (deleteErr) {
+        console.error("Failed to delete avatar from Cloudinary:", deleteErr);
+      }
+    }
 
     // Then delete user
     const { rowCount } = await db.query(`DELETE FROM users WHERE id = $1`, [

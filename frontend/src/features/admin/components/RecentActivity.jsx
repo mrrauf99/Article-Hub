@@ -75,42 +75,42 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
     <div className="space-y-6">
       {/* Article Status Breakdown */}
       <ScrollReveal animation="fade-up" duration={500}>
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900">
                 Article Status Overview
               </h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-xs sm:text-sm text-slate-500">
                 Distribution of articles by status
               </p>
             </div>
             <Link
               to="/admin/articles"
-              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+              className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-indigo-600 hover:text-indigo-700 self-start sm:self-auto"
             >
               View All
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             {ARTICLE_STATS.map((stat) => {
               const Icon = stat.icon;
               const value = stats[`${stat.key}_articles`];
               return (
                 <div
                   key={stat.key}
-                  className={`${stat.bg} rounded-xl p-4 flex items-center gap-4`}
+                  className={`${stat.bg} rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4`}
                 >
                   <div
-                    className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}
+                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}
                   >
-                    <Icon className={`w-6 h-6 ${stat.color}`} />
+                    <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold text-slate-900">{value}</p>
-                    <p className="text-sm text-slate-600">{stat.label}</p>
+                  <div className="min-w-0">
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900">{value}</p>
+                    <p className="text-xs sm:text-sm text-slate-600">{stat.label}</p>
                   </div>
                 </div>
               );
@@ -121,16 +121,16 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
 
       {/* Recent Activity Grid */}
       <ScrollReveal animation="fade-up" duration={500} delay={100}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Recent Articles */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-white" />
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-900">
                     Recent Articles
                   </h3>
                   <p className="text-xs text-slate-500">Latest submissions</p>
@@ -138,24 +138,24 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
               </div>
               <Link
                 to="/admin/articles"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                className="text-xs sm:text-sm font-medium text-indigo-600 hover:text-indigo-700 self-start sm:self-auto"
               >
-                View All
+                View All →
               </Link>
             </div>
 
             <div className="divide-y divide-slate-100">
               {recentArticles.length === 0 ? (
-                <div className="px-6 py-8 text-center text-slate-500">
+                <div className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs sm:text-sm text-slate-500">
                   No articles yet
                 </div>
               ) : (
                 recentArticles.map((article) => (
                   <div
                     key={article.article_id}
-                    className="px-6 py-4 hover:bg-slate-50 transition-colors"
+                    className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 sm:gap-3">
                       <img
                         src={
                           article.author_avatar ||
@@ -164,17 +164,20 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
                           )}&background=6366f1&color=fff`
                         }
                         alt={article.author_name}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0"
+                        loading="lazy"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900 truncate">
+                        <p className="text-sm sm:text-base font-medium text-slate-900 truncate">
                           {article.title}
                         </p>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-xs sm:text-sm text-slate-500 truncate">
                           by {article.author_name}
                         </p>
                       </div>
-                      <StatusBadge status={article.status} />
+                      <div className="shrink-0">
+                        <StatusBadge status={article.status} />
+                      </div>
                     </div>
                   </div>
                 ))
@@ -183,37 +186,37 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
           </div>
 
           {/* Recent Users */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Recent Users</h3>
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-900">Recent Users</h3>
                   <p className="text-xs text-slate-500">Newest registrations</p>
                 </div>
               </div>
               <Link
                 to="/admin/users"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                className="text-xs sm:text-sm font-medium text-indigo-600 hover:text-indigo-700 self-start sm:self-auto"
               >
-                View All
+                View All →
               </Link>
             </div>
 
             <div className="divide-y divide-slate-100">
               {recentUsers.length === 0 ? (
-                <div className="px-6 py-8 text-center text-slate-500">
+                <div className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs sm:text-sm text-slate-500">
                   No users yet
                 </div>
               ) : (
                 recentUsers.map((user) => (
                   <div
                     key={user.id}
-                    className="px-6 py-4 hover:bg-slate-50 transition-colors"
+                    className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <img
                         src={
                           user.avatar ||
@@ -222,17 +225,20 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
                           )}&background=6366f1&color=fff`
                         }
                         alt={user.name}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0"
+                        loading="lazy"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900">
+                        <p className="text-sm sm:text-base font-medium text-slate-900 truncate">
                           {user.name}
                         </p>
-                        <p className="text-sm text-slate-500 truncate">
+                        <p className="text-xs sm:text-sm text-slate-500 truncate">
                           {user.email}
                         </p>
                       </div>
-                      <RoleBadge role={user.role} />
+                      <div className="shrink-0">
+                        <RoleBadge role={user.role} />
+                      </div>
                     </div>
                   </div>
                 ))
