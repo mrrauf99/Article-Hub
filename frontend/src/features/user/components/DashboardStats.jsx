@@ -88,11 +88,6 @@ function StatCard({
     <div
       className={`relative overflow-hidden bg-gradient-to-br ${bgGradient} rounded-2xl p-6 border border-white/50 shadow-sm hover:shadow-lg transition-all duration-300 group`}
     >
-      {/* Background Decoration */}
-      <div
-        className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${gradient} rounded-full opacity-10 group-hover:opacity-20 transition-opacity`}
-      />
-
       <div className="relative flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-slate-600 mb-1">{label}</p>

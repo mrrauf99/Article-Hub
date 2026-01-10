@@ -1,15 +1,17 @@
 import { apiClient } from "../../api/apiClient";
 
-export default async function publicArticlesLoader({ request }) {
-  const url = new URL(request.url);
-  const category = url.searchParams.get("category");
+import { normalizeCategory } from "@/utils/categoryUtils";
 
+export default async function publicArticlesLoader() {
   try {
-    const res = await apiClient.get("articles", {
-      params: category && category !== "All" ? { category } : {},
-    });
+    const res = await apiClient.get("articles");
 
-    return { articles: res.data.data };
+    const articles = res.data.data.map((article) => ({
+      ...article,
+      category: normalizeCategory(article.category) || article.category,
+    }));
+
+    return { articles };
   } catch (error) {
     console.error("articlesLoader error:", error);
 

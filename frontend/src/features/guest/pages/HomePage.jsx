@@ -9,6 +9,7 @@ import CTASection from "../components/CTASection";
 import ArticlesGrid from "../components/ArticlesGrid";
 import NewsletterSection from "../components/NewsletterSection";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
+import { normalizeCategory, getCanonicalCategory } from "@/utils/categoryUtils";
 
 export default function HomePage() {
   const { articles } = useLoaderData();
@@ -18,21 +19,25 @@ export default function HomePage() {
   const pageParam = Number(searchParams.get("page")) || 1;
 
   const activeCategory = useMemo(() => {
-    return rawCategory && ARTICLE_CATEGORIES.includes(rawCategory)
-      ? rawCategory
-      : "All";
+    if (!rawCategory) return "All";
+    const canonical = getCanonicalCategory(rawCategory);
+    return canonical || "All";
   }, [rawCategory]);
 
   const filteredArticles = useMemo(() => {
     if (activeCategory === "All") return articles;
-    return articles.filter((a) => a.category === activeCategory);
+    return articles.filter((a) => {
+      const articleCategory = normalizeCategory(a.category);
+      return articleCategory === activeCategory;
+    });
   }, [articles, activeCategory]);
 
-  // Calculate article counts per category
+  // Calculate article counts per category (normalized)
   const articleCounts = useMemo(() => {
     const counts = {};
     articles.forEach((article) => {
-      counts[article.category] = (counts[article.category] || 0) + 1;
+      const normalized = normalizeCategory(article.category);
+      counts[normalized] = (counts[normalized] || 0) + 1;
     });
     return counts;
   }, [articles]);
@@ -42,7 +47,8 @@ export default function HomePage() {
     const ranked = Object.entries(articleCounts)
       .filter(([, count]) => count > 0)
       .sort((a, b) => b[1] - a[1])
-      .map(([name]) => name);
+      .map(([name]) => name)
+      .filter((cat) => ARTICLE_CATEGORIES.includes(cat));
 
     const remaining = ARTICLE_CATEGORIES.filter(
       (category) => !ranked.includes(category)

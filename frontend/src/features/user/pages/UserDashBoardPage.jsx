@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { useLoaderData, useSearchParams } from "react-router-dom";
 
 import DashboardStats from "../components/DashboardStats";
@@ -19,11 +19,13 @@ export default function UserDashBoardPage() {
     [articles, statusParam, pageParam]
   );
 
+  const prevPageRef = useRef(pageParam);
+  const prevStatusRef = useRef(statusParam);
+
   function handlePageChange(page) {
     const params = new URLSearchParams(searchParams);
     params.set("page", String(page));
     setSearchParams(params, { preventScrollReset: true });
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleStatusChange(status) {
@@ -36,6 +38,28 @@ export default function UserDashBoardPage() {
     params.set("page", "1");
     setSearchParams(params, { preventScrollReset: true });
   }
+
+  useEffect(() => {
+    const pageChanged = prevPageRef.current !== pageParam;
+    const statusChanged = prevStatusRef.current !== statusParam;
+
+    if (pageChanged || statusChanged) {
+      const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+
+      const timeoutId = setTimeout(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(scrollToTop);
+        });
+      }, 100);
+
+      if (pageChanged) prevPageRef.current = pageParam;
+      if (statusChanged) prevStatusRef.current = statusParam;
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [pageParam, statusParam]);
 
   return (
     <div className="space-y-6">

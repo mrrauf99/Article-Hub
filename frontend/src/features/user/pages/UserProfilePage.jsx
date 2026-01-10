@@ -74,10 +74,10 @@ export default function UserProfilePage() {
     startTransition(() => {
       setFeedback(actionData);
       if (actionData.success) setIsEditing(false);
-
-      const t = setTimeout(() => setFeedback(null), 5000);
-      return () => clearTimeout(t);
     });
+
+    const timeoutId = setTimeout(() => setFeedback(null), 5000);
+    return () => clearTimeout(timeoutId);
   }, [actionData]);
 
   const profileValue = useMemo(
