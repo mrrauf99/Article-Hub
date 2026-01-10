@@ -71,6 +71,7 @@ export default function SignUpFields({ form }) {
         name="password"
         value={form.values.password}
         onChange={form.handleChange}
+        onFocus={form.handleFocus}
         onBlur={form.handleBlur}
         error={form.errors.password}
       />

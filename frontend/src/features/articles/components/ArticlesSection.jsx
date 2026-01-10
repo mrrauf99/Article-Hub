@@ -120,7 +120,7 @@ export default function ArticlesSection({
       {/* Pagination - Outside Section */}
       {showPagination && totalPages > 1 && paginatedArticles.length > 0 && (
         <ScrollReveal animation="fade-up" duration={400}>
-          <div>
+          <div className="px-4 sm:px-6 mt-10">
             <Pagination
               current={safePage}
               total={totalPages}

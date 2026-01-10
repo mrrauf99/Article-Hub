@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { useLoaderData, useSearchParams } from "react-router-dom";
 import { Search, Sparkles, BookOpen } from "lucide-react";
 
@@ -7,6 +7,7 @@ import Pagination from "@/features/articles/components/Pagination";
 import CategoryFilter from "@/components/CategoryFilter";
 import { ScrollReveal, StaggerReveal } from "@/components/ScrollReveal";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
+import { normalizeCategory, getCanonicalCategory } from "@/utils/categoryUtils";
 
 const PER_PAGE = 9;
 
@@ -19,9 +20,9 @@ export default function ExploreArticlesPage() {
   const pageParam = Number(searchParams.get("page")) || 1;
 
   const activeCategory = useMemo(() => {
-    return rawCategory && ARTICLE_CATEGORIES.includes(rawCategory)
-      ? rawCategory
-      : "All";
+    if (!rawCategory) return "All";
+    const canonical = getCanonicalCategory(rawCategory);
+    return canonical || "All";
   }, [rawCategory]);
 
   const categories = useMemo(() => ["All", ...ARTICLE_CATEGORIES], []);
@@ -36,7 +37,10 @@ export default function ExploreArticlesPage() {
     let result = articles;
 
     if (activeCategory !== "All") {
-      result = result.filter((a) => a.category === activeCategory);
+      result = result.filter((a) => {
+        const articleCategory = normalizeCategory(a.category);
+        return articleCategory === activeCategory;
+      });
     }
 
     if (searchQuery.trim()) {
@@ -86,12 +90,39 @@ export default function ExploreArticlesPage() {
     setSearchParams(params, { preventScrollReset: true });
   }
 
+  const prevPageRef = useRef(safePage);
+  const prevCategoryRef = useRef(activeCategory);
+  const prevSearchRef = useRef(searchQuery);
+
   function handlePageChange(page) {
     const params = new URLSearchParams(searchParams);
     params.set("page", String(page));
     setSearchParams(params, { preventScrollReset: true });
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  useEffect(() => {
+    const pageChanged = prevPageRef.current !== safePage;
+    const categoryChanged = prevCategoryRef.current !== activeCategory;
+    const searchChanged = prevSearchRef.current !== searchQuery;
+
+    if (pageChanged || categoryChanged || searchChanged) {
+      const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+
+      const timeoutId = setTimeout(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(scrollToTop);
+        });
+      }, 100);
+
+      prevPageRef.current = safePage;
+      prevCategoryRef.current = activeCategory;
+      prevSearchRef.current = searchQuery;
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [safePage, activeCategory, searchQuery]);
 
   return (
     <div className="space-y-6 -mt-8">

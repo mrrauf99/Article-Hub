@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Eye, Clock } from "lucide-react";
 import Pagination from "@/features/articles/components/Pagination";
@@ -22,6 +22,42 @@ export default function ArticlesGrid({
     const start = (safePage - 1) * PER_PAGE;
     return articles.slice(start, start + PER_PAGE);
   }, [articles, safePage]);
+
+  const prevPageRef = useRef(safePage);
+  const prevCategoryRef = useRef(activeCategory);
+
+  useEffect(() => {
+    const pageChanged = prevPageRef.current !== safePage;
+    const categoryChanged = prevCategoryRef.current !== activeCategory;
+
+    if (pageChanged || categoryChanged) {
+      const scrollToArticles = () => {
+        const articlesSection = document.getElementById("articles");
+        if (articlesSection) {
+          const rect = articlesSection.getBoundingClientRect();
+          if (rect.height > 0 || categoryChanged) {
+            const offset = 20;
+            const scrollY = window.pageYOffset || window.scrollY;
+            const elementTop = rect.top + scrollY;
+            const targetY = Math.max(0, elementTop - offset);
+            window.scrollTo({ top: targetY, behavior: "smooth" });
+          }
+        }
+      };
+
+      // Wait for React Router and DOM updates before scrolling
+      const timeoutId = setTimeout(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(scrollToArticles);
+        });
+      }, 100);
+
+      prevPageRef.current = safePage;
+      prevCategoryRef.current = activeCategory;
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [safePage, activeCategory]);
 
   const primaryCategories = useMemo(
     () => categories.slice(0, 10),
@@ -125,10 +161,10 @@ export default function ArticlesGrid({
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {paginatedArticles.map((article, index) => (
                 <ScrollReveal
-                  key={article.article_id}
+                  key={`${article.article_id}-${safePage}`}
                   animation="fade-up"
-                  delay={index * 75}
-                  duration={500}
+                  delay={index * 50}
+                  duration={350}
                 >
                   <ArticleCard article={article} />
                 </ScrollReveal>
@@ -136,11 +172,13 @@ export default function ArticlesGrid({
             </div>
 
             {totalPages > 1 && (
-              <Pagination
-                current={safePage}
-                total={totalPages}
-                onChange={onPageChange}
-              />
+              <div className="mt-10">
+                <Pagination
+                  current={safePage}
+                  total={totalPages}
+                  onChange={onPageChange}
+                />
+              </div>
             )}
           </>
         )}

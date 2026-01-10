@@ -1,4 +1,4 @@
-import { useScrollReveal } from "./useScrollReveal";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 /**
  * Scroll Reveal wrapper component
@@ -16,19 +16,19 @@ export function ScrollReveal({
 
   const animations = {
     "fade-up": {
-      hidden: "opacity-0 translate-y-8",
+      hidden: "opacity-0 translate-y-4",
       visible: "opacity-100 translate-y-0",
     },
     "fade-down": {
-      hidden: "opacity-0 -translate-y-8",
+      hidden: "opacity-0 -translate-y-4",
       visible: "opacity-100 translate-y-0",
     },
     "fade-left": {
-      hidden: "opacity-0 translate-x-8",
+      hidden: "opacity-0 translate-x-4",
       visible: "opacity-100 translate-x-0",
     },
     "fade-right": {
-      hidden: "opacity-0 -translate-x-8",
+      hidden: "opacity-0 -translate-x-4",
       visible: "opacity-100 translate-x-0",
     },
     fade: {
@@ -81,19 +81,19 @@ export function StaggerReveal({
 
   const animations = {
     "fade-up": {
-      hidden: "opacity-0 translate-y-8",
+      hidden: "opacity-0 translate-y-4",
       visible: "opacity-100 translate-y-0",
     },
     "fade-down": {
-      hidden: "opacity-0 -translate-y-8",
+      hidden: "opacity-0 -translate-y-4",
       visible: "opacity-100 translate-y-0",
     },
     "fade-left": {
-      hidden: "opacity-0 translate-x-8",
+      hidden: "opacity-0 translate-x-4",
       visible: "opacity-100 translate-x-0",
     },
     "fade-right": {
-      hidden: "opacity-0 -translate-x-8",
+      hidden: "opacity-0 -translate-x-4",
       visible: "opacity-100 translate-x-0",
     },
     fade: {
