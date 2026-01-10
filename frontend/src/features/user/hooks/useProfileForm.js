@@ -16,20 +16,17 @@ function normalizeUser(user) {
     linkedin_url: user?.linkedin_url ?? "",
     facebook_url: user?.facebook_url ?? "",
     instagram_url: user?.instagram_url ?? "",
-
-    // Avatar fields
     avatarPreview: null,
     avatarFile: null,
   };
 }
 
 export function useProfileForm(user) {
-  const initialRef = useRef(() => normalizeUser(user));
+  const initialRef = useRef(normalizeUser(user));
   const lastUserRef = useRef(user);
 
   const [formData, setFormData] = useState(() => normalizeUser(user));
 
-  // sync when backend user changes (loader revalidation)
   useEffect(() => {
     if (user !== lastUserRef.current) {
       lastUserRef.current = user;
@@ -50,7 +47,6 @@ export function useProfileForm(user) {
   }
 
   function resetForm() {
-    // Clean up blob URL if exists
     if (formData.avatarPreview) {
       URL.revokeObjectURL(formData.avatarPreview);
     }

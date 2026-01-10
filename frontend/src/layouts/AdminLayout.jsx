@@ -38,7 +38,7 @@ export default function AdminLayout() {
         onLogout={() => setShowLogoutConfirm(true)}
       />
 
-      <main className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 overflow-x-hidden">
         <div className="w-full max-w-7xl mx-auto">
           <Outlet />
         </div>

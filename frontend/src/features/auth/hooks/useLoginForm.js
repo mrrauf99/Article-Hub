@@ -10,8 +10,6 @@ export function useLoginForm() {
   const [values, setValues] = useState(INITIAL_VALUES);
   const [errors, setErrors] = useState({});
 
-  /* ---------------- Field validation ---------------- */
-
   const validateField = (name, value) => {
     if (isEmpty(value)) {
       return "Please fill out this field.";
@@ -29,8 +27,6 @@ export function useLoginForm() {
     return null;
   };
 
-  /* ---------------- Form validation ---------------- */
-
   const validate = () => {
     const newErrors = {};
 
@@ -43,8 +39,6 @@ export function useLoginForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  /* ---------------- Handlers ---------------- */
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -53,7 +47,6 @@ export function useLoginForm() {
       [name]: value,
     }));
 
-    // clear error on change
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }

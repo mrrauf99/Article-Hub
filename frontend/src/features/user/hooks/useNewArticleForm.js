@@ -19,7 +19,6 @@ export function useNewArticleForm(article) {
 
   const [errors, setErrors] = useState({});
 
-  /* ---------------- TEXT HANDLER ---------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -34,44 +33,34 @@ export function useNewArticleForm(article) {
     }
   };
 
-  /* ---------------- BLUR HANDLER ---------------- */
   const handleBlur = (e) => {
     const { name, value } = e.target;
-
-    // Only validate if field is empty
     if (!value || !value.trim()) {
       setErrors((prev) => ({ ...prev, [name]: "Please fill out this field." }));
     }
   };
 
-  /* ---------------- IMAGE HANDLER ---------------- */
   const handleImageChange = (e) => {
-    // Handle cropped image file from ImageUpload component
     const file = e.croppedFile || e.target?.files?.[0];
     
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
-    // Validation
     if (!file.type || !file.type.startsWith("image/")) {
-      setErrors((p) => ({ ...p, image: "Only image files are allowed" }));
+      setErrors((prev) => ({ ...prev, image: "Only image files are allowed" }));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setErrors((p) => ({
-        ...p,
+      setErrors((prev) => ({
+        ...prev,
         image: "Image size should be less than 5MB",
       }));
       return;
     }
 
-    // Use provided preview URL if available (from cropper), otherwise create one
     const previewUrl = e.croppedPreviewUrl || URL.createObjectURL(file);
 
     setFormData((prev) => {
-      // Clean up old preview URL to prevent memory leaks
       if (prev.imageUrl && prev.imageUrl.startsWith("blob:")) {
         URL.revokeObjectURL(prev.imageUrl);
       }
@@ -82,10 +71,9 @@ export function useNewArticleForm(article) {
       };
     });
 
-    setErrors((p) => ({ ...p, image: "" }));
+    setErrors((prev) => ({ ...prev, image: "" }));
   };
 
-  /* ---------------- VALIDATION ---------------- */
   const validateForm = () => {
     const newErrors = {};
 

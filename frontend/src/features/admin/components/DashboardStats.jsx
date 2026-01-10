@@ -83,7 +83,6 @@ export default function DashboardStats({ stats }) {
                     {card.getValue(stats)}
                   </p>
                 </div>
-                <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10" />
               </div>
             );
           })}

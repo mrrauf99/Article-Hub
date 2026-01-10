@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLoaderData, useSearchParams, useFetcher } from "react-router-dom";
 import { LayoutGrid, CheckCircle2, Clock, XCircle } from "lucide-react";
 
@@ -80,12 +80,38 @@ export default function AdminArticlesPage() {
     setSearchParams(params);
   };
 
+  const prevPageRef = useRef(pagination.page);
+  const prevFiltersRef = useRef({ status: filters.status, search: filters.search });
+
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams);
-    params.set("page", page);
-    setSearchParams(params);
-    window.scrollTo({ top: 0, behavior: "instant" });
+    params.set("page", String(page));
+    setSearchParams(params, { preventScrollReset: true });
   };
+
+  useEffect(() => {
+    const pageChanged = prevPageRef.current !== pagination.page;
+    const filtersChanged = 
+      prevFiltersRef.current.status !== filters.status ||
+      prevFiltersRef.current.search !== filters.search;
+
+    if (pageChanged || filtersChanged) {
+      const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+
+      const timeoutId = setTimeout(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(scrollToTop);
+        });
+      }, 100);
+
+      prevPageRef.current = pagination.page;
+      prevFiltersRef.current = { status: filters.status, search: filters.search };
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [pagination.page, filters.status, filters.search]);
 
   const handleAction = (intent, articleId) => {
     fetcher.submit({ intent, articleId }, { method: "post" });
