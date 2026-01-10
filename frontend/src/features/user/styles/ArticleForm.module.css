@@ -1,8 +1,20 @@
-/* ================== PAGE LAYOUT ================== */
 .pageContainer {
   position: relative;
   min-height: 100vh;
-  padding: 1.5rem 1rem 3rem;
+  padding: 1rem 0.75rem 2rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .pageContainer {
+    padding: 1.5rem 1rem 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pageContainer {
+    padding: 2rem 1.5rem 3rem;
+  }
 }
 
 .bgDecoration {
@@ -15,10 +27,10 @@
 
 .bgCircle1 {
   position: absolute;
-  top: -200px;
-  right: -200px;
-  width: 500px;
-  height: 500px;
+  top: -12.5rem;
+  right: -12.5rem;
+  width: 31.25rem;
+  height: 31.25rem;
   background: radial-gradient(
     circle,
     rgba(14, 165, 233, 0.08) 0%,
@@ -29,10 +41,10 @@
 
 .bgCircle2 {
   position: absolute;
-  bottom: -150px;
-  left: -150px;
-  width: 400px;
-  height: 400px;
+  bottom: -9.375rem;
+  left: -9.375rem;
+  width: 25rem;
+  height: 25rem;
   background: radial-gradient(
     circle,
     rgba(99, 102, 241, 0.06) 0%,
@@ -44,9 +56,16 @@
 .container {
   max-width: 52rem;
   margin: 0 auto;
+  width: 100%;
+  padding: 0 0.5rem;
 }
 
-/* ================== HEADER SECTION ================== */
+@media (min-width: 640px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
 .headerSection {
   text-align: center;
   margin-bottom: 1.25rem;
@@ -63,12 +82,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   border-radius: 0.75rem;
   color: white;
-  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 0.375rem 1.25rem rgba(14, 165, 233, 0.3);
 }
 
 .headerTitle {
@@ -79,24 +98,23 @@
 }
 
 .sparkleIcon {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   color: #f59e0b;
 }
 
 .headerSubtitle {
   font-size: 0.9375rem;
   color: #64748b;
-  max-width: 380px;
+  max-width: 23.75rem;
   margin: 0 auto;
 }
 
-/* ================== FORM CARD ================== */
 .formCard {
   background: #ffffff;
   border-radius: 1.25rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 10px 20px -5px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0.25rem 0.375rem -0.0625rem rgba(0, 0, 0, 0.05),
+    0 0.625rem 1.25rem -0.3125rem rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(226, 232, 240, 0.8);
   overflow: hidden;
 }
@@ -105,7 +123,6 @@
   padding: 1.5rem;
 }
 
-/* ================== FORM SECTIONS ================== */
 .formSection {
   padding: 1rem 0;
 }
@@ -129,8 +146,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
   border-radius: 0.375rem;
   color: #0284c7;
@@ -161,7 +178,6 @@
   }
 }
 
-/* ================== FORM GROUPS ================== */
 .group {
   margin-bottom: 1rem;
 }
@@ -195,7 +211,6 @@
   margin-left: 0.125rem;
 }
 
-/* ================== CONTROLS ================== */
 .control {
   width: 100%;
   padding: 0.75rem 0.875rem;
@@ -206,7 +221,7 @@
   background-color: #ffffff;
   color: #1e293b;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05);
 }
 
 .control::placeholder {
@@ -220,7 +235,7 @@
 .control:focus {
   outline: none;
   border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 0.125rem rgba(99, 102, 241, 0.2);
 }
 
 .textarea {
@@ -249,7 +264,6 @@ select option {
   font-size: 0.9375rem;
 }
 
-/* ================== ERROR ================== */
 .errorControl {
   border-color: #fca5a5;
 }
@@ -257,7 +271,7 @@ select option {
 .errorControl:focus {
   outline: none;
   border-color: #ef4444;
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 0 0.125rem rgba(239, 68, 68, 0.2);
 }
 
 .errorMsg {
@@ -275,7 +289,6 @@ select option {
   border-radius: 999px;
 }
 
-/* ================== IMAGE UPLOAD ================== */
 .imageUploadGroup {
   margin-bottom: 1.25rem;
 }
@@ -318,8 +331,8 @@ select option {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
+  width: 3.5rem;
+  height: 3.5rem;
   background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
   border-radius: 1rem;
   color: #0284c7;
@@ -348,7 +361,7 @@ select option {
   border-radius: 1rem;
   overflow: hidden;
   border: 2px solid #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
 }
 
 .imagePreview img {
@@ -358,7 +371,6 @@ select option {
   display: block;
 }
 
-/* ================== SUBMIT SECTION ================== */
 .submitSection {
   padding-top: 1rem;
   margin-top: 0.5rem;
@@ -378,19 +390,19 @@ select option {
   cursor: pointer;
   color: #ffffff;
   background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 0.25rem 0.75rem rgba(14, 165, 233, 0.3);
   transition: all 0.2s ease;
 }
 
 .submitBtn:hover:not(:disabled) {
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
-  transform: translateY(-1px);
+  box-shadow: 0 0.375rem 1.25rem rgba(14, 165, 233, 0.4);
+  transform: translateY(-0.0625rem);
 }
 
 .submitBtn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px #ffffff, 0 0 0 5px #0ea5e9;
+  box-shadow: 0 0 0 0.1875rem #ffffff, 0 0 0 0.3125rem #0ea5e9;
 }
 
 .submitBtn:disabled {
@@ -407,10 +419,18 @@ select option {
   color: #94a3b8;
 }
 
-/* ================== RESPONSIVE ================== */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 0.75rem 0.5rem 2rem;
+    padding: 0.75rem 0 2rem;
+  }
+
+  .container {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .headerSection {
+    padding: 0 1rem;
   }
 
   .headerRow {
@@ -418,13 +438,13 @@ select option {
   }
 
   .headerIcon {
-    width: 40px;
-    height: 40px;
+    width: 2.5rem;
+    height: 2.5rem;
   }
 
   .headerIcon svg {
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .headerTitle {
@@ -432,8 +452,8 @@ select option {
   }
 
   .sparkleIcon {
-    width: 18px;
-    height: 18px;
+    width: 1.125rem;
+    height: 1.125rem;
   }
 
   .headerSubtitle {
@@ -441,11 +461,14 @@ select option {
   }
 
   .formCard {
-    border-radius: 1.25rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
   }
 
   .articleForm {
-    padding: 1.5rem 1.25rem;
+    padding: 1.5rem 1rem;
   }
 
   .sectionHeader {
@@ -453,8 +476,8 @@ select option {
   }
 
   .sectionIcon {
-    width: 28px;
-    height: 28px;
+    width: 1.75rem;
+    height: 1.75rem;
   }
 
   .sectionTitle {
@@ -479,13 +502,12 @@ select option {
   }
 }
 
-/* ================== LEGACY SUPPORT ================== */
 .formWrapper {
   max-width: 52rem;
   margin: 0 auto;
   background: #ffffff;
   border-radius: 1.5rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
 
@@ -506,14 +528,14 @@ select option {
   opacity: 0.9;
 }
 
-/* ================== RESPONSIVE ================== */
 @media (max-width: 768px) {
   .container {
-    padding: 1.25rem 0.75rem;
+    padding: 0;
+    max-width: 100%;
   }
 
   .formWrapper {
-    border-radius: 1rem;
+    border-radius: 0;
   }
 
   .formHeader {

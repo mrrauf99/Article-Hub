@@ -6,8 +6,8 @@ import {
   PageHeader,
   PillFilter,
   SearchInput,
-  SimplePagination,
 } from "../components/AdminFilters";
+import Pagination from "@/features/articles/components/Pagination";
 import ArticlesTable from "../components/ArticlesTable";
 import ArticleDetailModal from "../components/ArticleDetailModal";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
@@ -133,19 +133,23 @@ export default function AdminArticlesPage() {
       </PageHeader>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-          <PillFilter
-            options={STATUS_OPTIONS}
-            value={filters.status}
-            onChange={handleStatusChange}
-          />
-          <SearchInput
-            value={searchValue}
-            onChange={setSearchValue}
-            onSubmit={handleSearch}
-            placeholder="Search by title or author..."
-          />
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4 w-full">
+          <div className="w-full lg:w-auto overflow-x-auto scrollbar-hide -mx-3 sm:mx-0 px-3 sm:px-0">
+            <PillFilter
+              options={STATUS_OPTIONS}
+              value={filters.status}
+              onChange={handleStatusChange}
+            />
+          </div>
+          <div className="w-full lg:w-auto">
+            <SearchInput
+              value={searchValue}
+              onChange={setSearchValue}
+              onSubmit={handleSearch}
+              placeholder="Search by title or author..."
+            />
+          </div>
         </div>
       </div>
 
@@ -160,11 +164,13 @@ export default function AdminArticlesPage() {
       />
 
       {/* Pagination */}
-      <SimplePagination
-        page={pagination.page}
-        totalPages={pagination.totalPages}
-        onPageChange={handlePageChange}
-      />
+      {pagination.totalPages > 1 && (
+        <Pagination
+          current={pagination.page}
+          total={pagination.totalPages}
+          onChange={handlePageChange}
+        />
+      )}
 
       {/* Article Detail Modal */}
       {selectedArticle && (

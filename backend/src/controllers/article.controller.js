@@ -1,9 +1,11 @@
 import db from "../config/db.config.js";
 import cloudinary from "../config/cloudinary.config.js";
+import { deleteImageByUrl } from "../utils/cloudinary.utils.js";
+import { validateArticleData } from "../utils/validation.utils.js";
 
 export const getApprovedArticles = async (req, res) => {
   try {
-    const { category } = req.query;
+    const { category } = req.query || {};
 
     let query = `
       SELECT
@@ -65,10 +67,16 @@ export const getMyArticles = async (req, res) => {
 };
 
 export const getArticleById = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.session?.userId ?? null;
-
   try {
+    const { id } = req.params;
+    const userId = req.session?.userId ?? null;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Article ID is required",
+      });
+    }
     const { rows } = await db.query(
       `
       SELECT
@@ -115,25 +123,57 @@ export const getArticleById = async (req, res) => {
 };
 
 export const createArticle = async (req, res) => {
-  const { title, introduction, content, summary, category } = req.body;
-
   try {
+    const { title, introduction, content, summary, category } = req.body;
+
+    // Validate article data
+    const validationErrors = validateArticleData({
+      title,
+      introduction,
+      content,
+      summary,
+      category,
+    });
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: validationErrors.join(", "),
+      });
+    }
+
     let imageUrl = null;
 
     if (req.file) {
-      const base64 = req.file.buffer.toString("base64");
-      const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+      try {
+        // Validate file type
+        if (!req.file.mimetype.startsWith("image/")) {
+          return res.status(400).json({
+            success: false,
+            message: "Only image files are allowed",
+          });
+        }
 
-      const result = await cloudinary.uploader.upload(dataUri, {
-        folder: "article_hub/articles",
-        resource_type: "image",
-        transformation: [
-          { width: 1200, height: 630, crop: "limit" },
-          { quality: "auto", fetch_format: "auto" },
-        ],
-      });
+        const base64 = req.file.buffer.toString("base64");
+        const dataUri = `data:${req.file.mimetype};base64,${base64}`;
 
-      imageUrl = result.secure_url;
+        const result = await cloudinary.uploader.upload(dataUri, {
+          folder: "article_hub/articles",
+          resource_type: "image",
+          transformation: [
+            { width: 1200, height: 630, crop: "limit" },
+            { quality: "auto", fetch_format: "auto" },
+          ],
+        });
+
+        imageUrl = result.secure_url;
+      } catch (uploadErr) {
+        console.error("Image upload error:", uploadErr);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to upload image. Please try again.",
+        });
+      }
     }
 
     const { rows } = await db.query(
@@ -161,35 +201,131 @@ export const createArticle = async (req, res) => {
     });
   } catch (err) {
     console.error("createArticle error:", err);
+    
+    // Handle database errors
+    if (err.code === "23505") {
+      // Unique constraint violation
+      return res.status(400).json({
+        success: false,
+        message: "Article with this title already exists",
+      });
+    }
+    
+    if (err.code === "23503") {
+      // Foreign key constraint violation
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data provided",
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: "Article creation failed",
+      message: "Article creation failed. Please try again.",
     });
   }
 };
 
 export const updateArticle = async (req, res) => {
-  const { id } = req.params;
-  const { title, introduction, content, summary, category, existingImageUrl } =
-    req.body;
-
   try {
-    let imageUrl = existingImageUrl || null;
+    const { articleId: id } = req.params;
+    const { title, introduction, content, summary, category, existingImageUrl } =
+      req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Article ID is required",
+      });
+    }
+
+    // Validate article data
+    const validationErrors = validateArticleData({
+      title,
+      introduction,
+      content,
+      summary,
+      category,
+    });
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: validationErrors.join(", "),
+      });
+    }
+    // First, get the current article to check existing image
+    const currentArticleQuery = await db.query(
+      `SELECT image_url, author_id FROM articles WHERE article_id = $1`,
+      [id]
+    );
+
+    if (currentArticleQuery.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found.",
+      });
+    }
+
+    const currentArticle = currentArticleQuery.rows[0];
+
+    // Check if user is the author
+    if (currentArticle.author_id !== req.session.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to update this article.",
+      });
+    }
+
+    let imageUrl = existingImageUrl || currentArticle.image_url || null;
+    const oldImageUrl = currentArticle.image_url;
 
     if (req.file) {
-      const base64 = req.file.buffer.toString("base64");
-      const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+      try {
+        const base64 = req.file.buffer.toString("base64");
+        const dataUri = `data:${req.file.mimetype};base64,${base64}`;
 
-      const result = await cloudinary.uploader.upload(dataUri, {
-        folder: "article_hub/articles",
-        resource_type: "image",
-        transformation: [
-          { width: 1200, height: 630, crop: "limit" },
-          { quality: "auto", fetch_format: "auto" },
-        ],
-      });
+        const result = await cloudinary.uploader.upload(dataUri, {
+          folder: "article_hub/articles",
+          resource_type: "image",
+          transformation: [
+            { width: 1200, height: 630, crop: "limit" },
+            { quality: "auto", fetch_format: "auto" },
+          ],
+        });
 
-      imageUrl = result.secure_url;
+        imageUrl = result.secure_url;
+
+        // Delete old image from Cloudinary if it exists and is different from new one
+        if (
+          oldImageUrl &&
+          oldImageUrl !== imageUrl &&
+          oldImageUrl.includes("cloudinary.com")
+        ) {
+          try {
+            await deleteImageByUrl(oldImageUrl);
+          } catch (deleteErr) {
+            // Log error but don't fail the request if deletion fails
+            console.error("Failed to delete old image from Cloudinary:", deleteErr);
+          }
+        }
+      } catch (uploadErr) {
+        console.error("Image upload error:", uploadErr);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to upload image.",
+        });
+      }
+    } else if (existingImageUrl === null || existingImageUrl === "") {
+      // If no new file and existingImageUrl is explicitly null/empty, delete old image
+      if (oldImageUrl && oldImageUrl.includes("cloudinary.com")) {
+        try {
+          await deleteImageByUrl(oldImageUrl);
+        } catch (deleteErr) {
+          console.error("Failed to delete old image from Cloudinary:", deleteErr);
+        }
+      }
+      imageUrl = null;
     }
 
     const { rowCount } = await db.query(
@@ -222,7 +358,7 @@ export const updateArticle = async (req, res) => {
     if (!rowCount) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized or article not found.",
+        message: "Failed to update article.",
       });
     }
 
@@ -240,9 +376,33 @@ export const updateArticle = async (req, res) => {
 };
 
 export const deleteArticle = async (req, res) => {
-  const { id } = req.params;
+  const { articleId: id } = req.params;
 
   try {
+    // First, get the article to check if it exists and get the image URL
+    const articleQuery = await db.query(
+      `SELECT image_url, author_id FROM articles WHERE article_id = $1`,
+      [id]
+    );
+
+    if (articleQuery.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found",
+      });
+    }
+
+    const article = articleQuery.rows[0];
+
+    // Check authorization
+    if (article.author_id !== req.session.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to delete this article",
+      });
+    }
+
+    // Delete the article from database
     const { rowCount } = await db.query(
       `DELETE FROM articles
        WHERE article_id = $1 AND author_id = $2`,
@@ -252,13 +412,23 @@ export const deleteArticle = async (req, res) => {
     if (!rowCount) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized or article not found",
+        message: "Failed to delete article",
       });
+    }
+
+    // Delete image from Cloudinary if it exists
+    if (article.image_url && article.image_url.includes("cloudinary.com")) {
+      try {
+        await deleteImageByUrl(article.image_url);
+      } catch (deleteErr) {
+        // Log error but don't fail the request if deletion fails
+        console.error("Failed to delete image from Cloudinary:", deleteErr);
+      }
     }
 
     res.json({ success: true, message: "Article deleted" });
   } catch (err) {
-    console.error(err);
+    console.error("Delete article error:", err);
     res.status(500).json({ success: false, message: "Delete failed" });
   }
 };

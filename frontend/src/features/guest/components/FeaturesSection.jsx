@@ -114,29 +114,30 @@ const COLOR_CLASSES = {
 
 export default function FeaturesSection() {
   return (
-    <section className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <ScrollReveal animation="fade-up" duration={600}>
-          <div className="text-center mb-16">
-            <span className="inline-block text-sky-600 font-semibold text-sm tracking-wider uppercase mb-4">
-              Why Choose Us
-            </span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
-              Everything You Need to{" "}
-              <span className="bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-transparent">
-                Read & Write
+    <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white w-full">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto">
+          {/* Section Header */}
+          <ScrollReveal animation="fade-up" duration={600}>
+            <div className="text-center mb-10 sm:mb-16 px-4">
+              <span className="inline-block text-sky-600 font-semibold text-xs sm:text-sm tracking-wider uppercase mb-3 sm:mb-4">
+                Why Choose Us
               </span>
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Article Hub is designed with both readers and writers in mind.
-              Here's what makes us different.
-            </p>
-          </div>
-        </ScrollReveal>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">
+                Everything You Need to{" "}
+                <span className="bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-transparent">
+                  Read & Write
+                </span>
+              </h2>
+              <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+                Article Hub is designed with both readers and writers in mind.
+                Here's what makes us different.
+              </p>
+            </div>
+          </ScrollReveal>
 
-        {/* Features Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          {/* Features Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {FEATURES.map((feature, index) => {
             const colors = COLOR_CLASSES[feature.color];
             return (
@@ -164,6 +165,7 @@ export default function FeaturesSection() {
               </ScrollReveal>
             );
           })}
+          </div>
         </div>
       </div>
     </section>

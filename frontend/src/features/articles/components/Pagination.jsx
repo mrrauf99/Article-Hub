@@ -14,7 +14,7 @@ export default function Pagination({ current, total, onChange }) {
   }
 
   return (
-    <div className="mt-14 flex justify-center items-center gap-1.5">
+    <div className="flex justify-center items-center gap-1.5">
       {/* Prev */}
       <button
         disabled={current === 1}

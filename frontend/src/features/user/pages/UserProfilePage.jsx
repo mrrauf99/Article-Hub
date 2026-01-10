@@ -49,11 +49,12 @@ export default function UserProfilePage() {
     submitData.append("name", formData.name);
     submitData.append("expertise", formData.expertise);
     submitData.append("bio", formData.bio);
-    submitData.append("portfolio_link", formData.portfolio_link);
-    submitData.append("x_link", formData.x_link);
-    submitData.append("linkedin_link", formData.linkedin_link);
-    submitData.append("facebook_link", formData.facebook_link);
-    submitData.append("instagram_link", formData.instagram_link);
+    submitData.append("gender", formData.gender || "");
+    submitData.append("portfolio_url", formData.portfolio_url);
+    submitData.append("x_url", formData.x_url);
+    submitData.append("linkedin_url", formData.linkedin_url);
+    submitData.append("facebook_url", formData.facebook_url);
+    submitData.append("instagram_url", formData.instagram_url);
 
     // Add avatar file if selected
     if (formData.avatarFile) {
@@ -94,8 +95,9 @@ export default function UserProfilePage() {
   return (
     <ProfileProvider value={profileValue}>
       <ScrollReveal animation="fade-up" duration={600}>
-        <div className="max-w-6xl mx-auto py-8">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
+        <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="w-full max-w-6xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
             <ProfileHeader
               user={user}
               isEditing={isEditing}
@@ -129,6 +131,7 @@ export default function UserProfilePage() {
                 onCancel={handleCancel}
               />
             </form>
+            </div>
           </div>
         </div>
       </ScrollReveal>

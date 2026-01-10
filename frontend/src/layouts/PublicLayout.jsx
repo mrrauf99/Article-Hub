@@ -38,7 +38,7 @@ export default function PublicLayout() {
         avatar={user?.avatar}
         onLogout={user ? () => setShowLogoutConfirm(true) : undefined}
       />
-      <main>
+      <main className="w-full min-h-screen">
         <Outlet />
       </main>
       <Footer />

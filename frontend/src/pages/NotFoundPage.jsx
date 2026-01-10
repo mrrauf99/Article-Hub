@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 
 export default function NotFoundPage() {
   return (
-    <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl">
+    <main className="min-h-screen bg-slate-950 flex items-center justify-center w-full px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="w-full max-w-4xl mx-auto">
         {/* Background glow */}
         <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 via-sky-500/10 to-emerald-500/10 blur-3xl" />
 

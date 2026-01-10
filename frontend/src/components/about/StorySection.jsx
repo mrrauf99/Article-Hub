@@ -2,7 +2,8 @@ import { BookOpen } from "lucide-react";
 
 export default function StorySection() {
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 lg:py-20">
+    <section className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="w-full max-w-6xl mx-auto">
       <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6 flex items-center gap-3">
         <BookOpen className="h-8 w-8 text-sky-600" />
         Our Story
@@ -35,6 +36,7 @@ export default function StorySection() {
           we're building in public, learning from our community, and staying
           true to our core values every step of the way.
         </p>
+      </div>
       </div>
     </section>
   );

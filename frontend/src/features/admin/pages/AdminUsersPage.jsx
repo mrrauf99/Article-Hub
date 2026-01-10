@@ -6,8 +6,8 @@ import {
   PageHeader,
   PillFilter,
   SearchInput,
-  SimplePagination,
 } from "../components/AdminFilters";
+import Pagination from "@/features/articles/components/Pagination";
 import UsersGrid from "../components/UsersGrid";
 import RoleChangeModal from "../components/RoleChangeModal";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
@@ -110,19 +110,23 @@ export default function AdminUsersPage() {
       </PageHeader>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-          <PillFilter
-            options={ROLE_OPTIONS}
-            value={filters.role}
-            onChange={handleRoleFilter}
-          />
-          <SearchInput
-            value={searchValue}
-            onChange={setSearchValue}
-            onSubmit={handleSearch}
-            placeholder="Search by name or email..."
-          />
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4 w-full">
+          <div className="w-full lg:w-auto overflow-x-auto scrollbar-hide -mx-3 sm:mx-0 px-3 sm:px-0">
+            <PillFilter
+              options={ROLE_OPTIONS}
+              value={filters.role}
+              onChange={handleRoleFilter}
+            />
+          </div>
+          <div className="w-full lg:w-auto">
+            <SearchInput
+              value={searchValue}
+              onChange={setSearchValue}
+              onSubmit={handleSearch}
+              placeholder="Search by name or email..."
+            />
+          </div>
         </div>
       </div>
 
@@ -134,11 +138,13 @@ export default function AdminUsersPage() {
       />
 
       {/* Pagination */}
-      <SimplePagination
-        page={pagination.page}
-        totalPages={pagination.totalPages}
-        onPageChange={handlePageChange}
-      />
+      {pagination.totalPages > 1 && (
+        <Pagination
+          current={pagination.page}
+          total={pagination.totalPages}
+          onChange={handlePageChange}
+        />
+      )}
 
       {/* Role Change Modal */}
       {confirmRoleChange && (
