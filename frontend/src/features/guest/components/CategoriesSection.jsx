@@ -104,23 +104,24 @@ export default function CategoriesSection({
   const displayCategories = categories.filter((c) => c !== "All").slice(0, 8);
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <ScrollReveal animation="fade-up" duration={600}>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
-              Explore by Category
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Dive into articles across 21 different topics, from programming to
-              AI, career advice to startup insights.
-            </p>
-          </div>
-        </ScrollReveal>
+    <section className="py-12 sm:py-16 lg:py-24 bg-white w-full">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto">
+          {/* Section Header */}
+          <ScrollReveal animation="fade-up" duration={600}>
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 sm:mb-4 px-4">
+                Explore by Category
+              </h2>
+              <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto px-4">
+                Dive into articles across 21 different topics, from programming to
+                AI, career advice to startup insights.
+              </p>
+            </div>
+          </ScrollReveal>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+          {/* Categories Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 px-2 sm:px-0">
           {displayCategories.map((category, index) => {
             const Icon = CATEGORY_ICONS[category] || MoreHorizontal;
             const gradient =
@@ -170,37 +171,38 @@ export default function CategoriesSection({
           })}
         </div>
 
-        {/* View All Categories */}
-        <ScrollReveal animation="fade-up" delay={300}>
-          <div className="mt-10 text-center">
-            <button
-              onClick={() => {
-                onSelect("All");
-                setTimeout(() => {
-                  document
-                    .getElementById("articles")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }, 100);
-              }}
-              className="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 font-semibold transition-colors"
-            >
-              View all categories
-              <svg
-                className="w-4 h-4 translate-y-px"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          {/* View All Categories */}
+          <ScrollReveal animation="fade-up" delay={300}>
+            <div className="mt-8 sm:mt-10 text-center">
+              <button
+                onClick={() => {
+                  onSelect("All");
+                  setTimeout(() => {
+                    document
+                      .getElementById("articles")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }}
+                className="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 font-semibold transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </button>
-          </div>
-        </ScrollReveal>
+                View all categories
+                <svg
+                  className="w-4 h-4 translate-y-px"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </button>
+            </div>
+          </ScrollReveal>
+        </div>
       </div>
     </section>
   );

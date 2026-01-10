@@ -38,6 +38,7 @@ export default function MobileNavMenu({
                   src={avatar}
                   alt={userName}
                   className={styles.mobileAvatar}
+                  loading="lazy"
                 />
               ) : (
                 <span className={styles.mobileAvatarFallback}>{initials}</span>

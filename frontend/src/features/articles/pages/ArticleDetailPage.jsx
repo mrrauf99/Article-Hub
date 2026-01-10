@@ -45,8 +45,9 @@ export default function ArticleDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-4xl mx-auto px-6 py-10">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white w-full">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="w-full max-w-4xl mx-auto">
         {/* ================= HEADER ================= */}
         <div className="mb-10">
           {/* Category */}
@@ -139,6 +140,7 @@ export default function ArticleDetailPage() {
             {article.summary}
           </p>
         )}
+        </div>
       </div>
     </div>
   );

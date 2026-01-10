@@ -8,13 +8,14 @@ function normalizeUser(user) {
 
     name: user?.name ?? "",
     expertise: user?.expertise ?? "",
-    portfolio_link: user?.portfolio_link ?? "",
+    portfolio_url: user?.portfolio_url ?? "",
     bio: user?.bio ?? "",
+    gender: user?.gender ?? "",
 
-    x_link: user?.x_link ?? "",
-    linkedin_link: user?.linkedin_link ?? "",
-    facebook_link: user?.facebook_link ?? "",
-    instagram_link: user?.instagram_link ?? "",
+    x_url: user?.x_url ?? "",
+    linkedin_url: user?.linkedin_url ?? "",
+    facebook_url: user?.facebook_url ?? "",
+    instagram_url: user?.instagram_url ?? "",
 
     // Avatar fields
     avatarPreview: null,

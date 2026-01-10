@@ -7,14 +7,13 @@
 }
 
 .inner {
-  height: 64px;
+  height: 4rem;
   padding: 0 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* Desktop nav links */
 .desktopNav {
   display: none;
   align-items: center;
@@ -35,8 +34,8 @@
 }
 
 .navLinkIcon {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .navLink:hover {
@@ -44,7 +43,6 @@
   color: #f9fafb;
 }
 
-/* Desktop user area */
 .desktopUser {
   display: none;
   align-items: center;
@@ -83,18 +81,17 @@
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 0.25rem 0.875rem rgba(37, 99, 235, 0.35);
   transition: all 0.2s ease;
 }
 
 .signupBtn:hover,
 .active:hover {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
-  transform: translateY(-1px);
+  box-shadow: 0 0.375rem 1.25rem rgba(37, 99, 235, 0.45);
+  transform: translateY(-0.0625rem);
 }
 
-/* Profile button */
 .profileButton {
   display: inline-flex;
   align-items: center;
@@ -121,11 +118,10 @@
   border-color: rgba(100, 116, 139, 0.7);
 }
 
-/* Avatar */
 .avatarContainer {
   position: relative;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   overflow: visible;
 }
@@ -152,25 +148,25 @@
 
 .adminDot {
   position: absolute;
-  bottom: -1px;
-  right: -1px;
-  width: 10px;
-  height: 10px;
+  bottom: -0.0625rem;
+  right: -0.0625rem;
+  width: 0.625rem;
+  height: 0.625rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border: 2px solid #0f172a;
 }
 
 .userName {
-  max-width: 100px;
+  max-width: 6.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .chevronIcon {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   color: #94a3b8;
   transition: transform 0.2s ease;
 }
@@ -179,22 +175,21 @@
   transform: rotate(180deg);
 }
 
-/* Dropdown menu */
 .dropdownMenu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 0.5rem);
   right: 0;
-  width: 240px;
+  width: 15rem;
   max-width: calc(100vw - 2rem);
   background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
   border-radius: 1rem;
   border: 1px solid rgba(71, 85, 105, 0.5);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   padding: 0;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px) scale(0.96);
+  transform: translateY(-0.5rem) scale(0.96);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 100;
   overflow: hidden;
@@ -206,7 +201,6 @@
   transform: translateY(0) scale(1);
 }
 
-/* Dropdown header */
 .dropdownHeader {
   display: flex;
   align-items: center;
@@ -216,8 +210,8 @@
 }
 
 .dropdownAvatarLarge {
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 50%;
   flex-shrink: 0;
   overflow: hidden;
@@ -261,12 +255,11 @@
 }
 
 .roleIcon {
-  width: 12px;
-  height: 12px;
+  width: 0.75rem;
+  height: 0.75rem;
   color: #22c55e;
 }
 
-/* Dropdown divider */
 .dropdownDivider {
   height: 1px;
   background: linear-gradient(
@@ -278,7 +271,6 @@
   margin: 0;
 }
 
-/* Dropdown body */
 .dropdownBody {
   padding: 0.5rem;
 }
@@ -307,8 +299,8 @@
 }
 
 .dropdownItemIcon {
-  width: 18px;
-  height: 18px;
+  width: 1.125rem;
+  height: 1.125rem;
   color: #64748b;
   transition: color 0.15s ease;
 }
@@ -317,7 +309,6 @@
   color: #94a3b8;
 }
 
-/* Dropdown footer */
 .dropdownFooter {
   padding: 0.5rem;
 }
@@ -348,7 +339,6 @@
   color: #f87171;
 }
 
-/* Mobile toggle */
 .mobileToggle {
   display: inline-flex;
   align-items: center;
@@ -364,15 +354,14 @@
 
 .mobileToggle:hover {
   background: rgba(15, 23, 42, 0.9);
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
 }
 
 .mobileToggleIcon {
-  width: 22px;
-  height: 22px;
+  width: 1.375rem;
+  height: 1.375rem;
 }
 
-/* Mobile menu */
 .mobileMenu {
   background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
   border-top: 1px solid rgba(71, 85, 105, 0.3);
@@ -383,9 +372,25 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
 }
 
-/* Mobile user header */
+.mobileMenuInner::-webkit-scrollbar {
+  width: 0.375rem;
+}
+
+.mobileMenuInner::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mobileMenuInner::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.5);
+  border-radius: 0.1875rem;
+}
+
 .mobileUserHeader {
   display: flex;
   align-items: center;
@@ -398,8 +403,8 @@
 }
 
 .mobileAvatarContainer {
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 50%;
   flex-shrink: 0;
   overflow: hidden;
@@ -448,12 +453,11 @@
 }
 
 .mobileRoleIcon {
-  width: 12px;
-  height: 12px;
+  width: 0.75rem;
+  height: 0.75rem;
   color: #22c55e;
 }
 
-/* Mobile nav sections */
 .mobileNavSection {
   display: flex;
   flex-direction: column;
@@ -485,8 +489,8 @@
 }
 
 .mobileLinkIcon {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   color: #64748b;
 }
 
@@ -501,7 +505,6 @@
   color: #94a3b8;
 }
 
-/* Mobile guest actions */
 .mobileGuestActions {
   display: flex;
   flex-direction: column;
@@ -541,7 +544,7 @@
   text-decoration: none;
   font-size: 0.9375rem;
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 0.25rem 0.875rem rgba(37, 99, 235, 0.35);
   transition: all 0.15s ease;
 }
 
@@ -549,7 +552,6 @@
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 }
 
-/* Mobile logout section */
 .mobileLogoutSection {
   padding-top: 0.5rem;
   border-top: 1px solid rgba(71, 85, 105, 0.3);
@@ -582,7 +584,6 @@
   color: #f87171;
 }
 
-/* Layout breakpoints */
 @media (min-width: 768px) {
   .desktopNav {
     display: flex;
@@ -601,11 +602,10 @@
   }
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-0.25rem);
   }
   to {
     opacity: 1;

@@ -2,8 +2,9 @@ import { Info } from "lucide-react";
 
 export default function AboutHero() {
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 lg:py-24">
-      <div className="max-w-4xl">
+    <section className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="max-w-4xl">
         <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-4 py-1.5 text-sm font-medium text-sky-700 border border-sky-200 mb-6 shadow-sm">
           <Info className="h-4 w-4" />
           About Article Hub
@@ -38,6 +39,7 @@ export default function AboutHero() {
             you see. No dark patterns pushing you toward endless scrolling. Just
             clean, thoughtful design that respects your time and intelligence.
           </p>
+        </div>
         </div>
       </div>
     </section>

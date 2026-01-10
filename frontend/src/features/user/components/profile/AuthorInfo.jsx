@@ -1,5 +1,6 @@
-import { User, Mail, BookOpen, Globe, Calendar, FileText } from "lucide-react";
+import { User, Mail, BookOpen, Globe, Calendar, FileText, Users } from "lucide-react";
 import ProfileField from "./ProfileField";
+import ProfileRadioField from "./ProfileRadioField";
 import { useProfile } from "../../hooks/useProfile";
 
 export default function AuthorInfo() {
@@ -57,11 +58,26 @@ export default function AuthorInfo() {
           onChange={handleChange}
         />
 
+        <ProfileRadioField
+          icon={Users}
+          label="Gender"
+          value={formData.gender}
+          name="gender"
+          isEditing={isEditing}
+          onChange={handleChange}
+          options={[
+            { value: "male", label: "Male" },
+            { value: "female", label: "Female" },
+            { value: "other", label: "Other" },
+            { value: "prefer_not_to_say", label: "Prefer not to say" },
+          ]}
+        />
+
         <ProfileField
           icon={Globe}
           label="Website/Portfolio"
-          value={formData.portfolio_link}
-          name="portfolio_link"
+          value={formData.portfolio_url}
+          name="portfolio_url"
           isEditing={isEditing}
           onChange={handleChange}
           type="url"
