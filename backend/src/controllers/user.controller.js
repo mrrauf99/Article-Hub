@@ -93,6 +93,7 @@ export async function updateUserProfile(req, res) {
       linkedin_url,
       facebook_url,
       instagram_url,
+      gender,
     } = req.body;
 
     // Validate profile data
@@ -211,18 +212,6 @@ export async function updateUserProfile(req, res) {
         WHERE id = $10
         RETURNING id
       `;
-      params = [
-        name,
-        expertise,
-        bio,
-        portfolio_url,
-        x_url,
-        linkedin_url,
-        facebook_url,
-        instagram_url,
-        gender || null,
-        userId,
-      ];
       params = [
         name,
         expertise,

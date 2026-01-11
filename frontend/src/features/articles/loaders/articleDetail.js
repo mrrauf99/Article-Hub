@@ -14,10 +14,11 @@ export default async function articleDetailLoader({ params }) {
       };
     }
 
-    // Ensure article has an id field
+    // Ensure article has an id field and map imageUrl to image_url
     const article = {
       id: articleId,
       ...data.data,
+      image_url: data.data.imageUrl || data.data.image_url,
     };
 
     // Increment view count in background (don't await - fire and forget)

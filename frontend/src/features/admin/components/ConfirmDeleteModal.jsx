@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
-import { AlertTriangle, Trash2, X } from "lucide-react";
+import { useLayoutEffect, useRef } from "react";
+import { AlertTriangle, X } from "lucide-react";
 
 export default function ConfirmDeleteModal({
   title,
@@ -11,28 +12,69 @@ export default function ConfirmDeleteModal({
   confirmText = "Delete",
   loadingText = "Deleting...",
 }) {
+  const modalRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const scrollY = window.scrollY;
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalPosition = window.getComputedStyle(document.body).position;
+    const originalTop = window.getComputedStyle(document.body).top;
+    const originalWidth = window.getComputedStyle(document.body).width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && !isLoading) {
+        onCancel();
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (modalRef.current && modalRef.current.contains(e.target)) {
+        return;
+      }
+      e.preventDefault();
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.body.style.overflow = originalStyle;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, [onCancel, isLoading]);
+
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div ref={modalRef} className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onCancel}
       />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all"
+          className="absolute top-4 right-4 z-10 w-8 h-8 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="p-6">
+        <div className="overflow-y-auto overflow-x-auto max-h-[calc(90vh-1px)]">
+          <div className="p-6">
           {/* Icon */}
           <div className="w-14 h-14 mx-auto rounded-full bg-gradient-to-br from-rose-100 to-red-100 flex items-center justify-center mb-4">
             <AlertTriangle className="w-7 h-7 text-rose-600" />
@@ -69,11 +111,11 @@ export default function ConfirmDeleteModal({
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-rose-500 to-red-500 text-white rounded-xl font-semibold hover:from-rose-600 hover:to-red-600 shadow-lg shadow-rose-500/25 transition-all hover:shadow-rose-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-500 to-red-500 text-white rounded-xl font-semibold hover:from-rose-600 hover:to-red-600 shadow-lg shadow-rose-500/25 transition-all hover:shadow-rose-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Trash2 className="w-4 h-4" />
               {isLoading ? loadingText : confirmText}
             </button>
+          </div>
           </div>
         </div>
       </div>

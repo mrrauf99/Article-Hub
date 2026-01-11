@@ -10,29 +10,21 @@ export default function StorySection() {
       </h2>
 
       <div className="prose prose-lg max-w-none">
-        <p>
+        <p className="text-slate-700 leading-relaxed mb-6">
           It started with a shared frustration. As developers and content
           creators ourselves, we were tired of platforms that prioritized
           engagement over experience, quantity over quality, and ad revenue over
-          user respect.
-        </p>
-
-        <p>
-          We noticed something troubling: the best writers we knew were
+          user respect. We noticed something troubling: the best writers we knew were
           publishing on platforms that actively worked against them. Intrusive
           ads, algorithmic suppression, confusing interfaces, and a constant
           push toward viral content rather than valuable content.
         </p>
 
-        <p>
+        <p className="text-slate-700 leading-relaxed">
           So we decided to build something different. Article Hub isn't trying
           to be the biggest platform or the most profitable. We're trying to be
           the <strong>best</strong>—for writers who care about their craft and
-          readers who value their time.
-        </p>
-
-        <p>
-          This is just the beginning. We're a small team with big ambitions, and
+          readers who value their time. This is just the beginning. We're a small team with big ambitions, and
           we're building in public, learning from our community, and staying
           true to our core values every step of the way.
         </p>

@@ -1,31 +1,20 @@
 import { useState } from "react";
-import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
-import { authApi } from "../features/api/authApi.js";
+import { Outlet, useLoaderData } from "react-router-dom";
 
 import ScrollToTop from "../components/ScrollToTop";
 import Navbar from "../components/navbar/Navbar.jsx";
 import Footer from "../components/Footer";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useLogout } from "../hooks/useLogout";
 
 export default function UserLayout() {
   const { user } = useLoaderData();
-  const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { handleLogout: logout, isLoggingOut } = useLogout();
 
   const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await authApi.logout();
-      navigate("/login", { replace: true });
-    } catch (error) {
-      console.error("Logout failed:", error);
-      // Still navigate to login even if logout API fails
-      navigate("/login", { replace: true });
-    } finally {
-      setIsLoggingOut(false);
-      setShowLogoutConfirm(false);
-    }
+    await logout();
+    setShowLogoutConfirm(false);
   };
 
   return (
