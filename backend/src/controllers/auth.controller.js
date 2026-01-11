@@ -286,7 +286,7 @@ export async function login(req, res) {
         role: user.role,
       });
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({
       success: false,
       message: "Something went wrong. Please try again later.",

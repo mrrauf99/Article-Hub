@@ -68,7 +68,7 @@ export default function ArticleDetailModal({
       document.body.style.width = originalWidth;
       window.scrollTo(0, scrollY);
     };
-  }, [onClose]);
+  }, [article, onClose]);
 
   if (!article) return null;
 
