@@ -95,7 +95,7 @@ export default function UserProfilePage() {
   return (
     <ProfileProvider value={profileValue}>
       <ScrollReveal animation="fade-up" duration={600}>
-        <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="w-full md:px-6 lg:px-8 py-6 sm:py-8">
           <div className="w-full max-w-6xl mx-auto">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
             <ProfileHeader

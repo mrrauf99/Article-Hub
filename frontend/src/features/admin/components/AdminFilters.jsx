@@ -62,17 +62,14 @@ export function SearchInput({
   );
 }
 
-// Page header component
 export function PageHeader({ title, subtitle, children }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-          {title}
-        </h1>
-        <p className="text-slate-500 mt-1">{subtitle}</p>
-      </div>
-      {children}
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+        {title}
+      </h1>
+      <p className="text-slate-500 mt-1">{subtitle}</p>
+      {children && <div className="text-sm text-slate-500 mt-2">{children}</div>}
     </div>
   );
 }

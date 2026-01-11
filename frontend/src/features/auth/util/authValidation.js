@@ -3,6 +3,8 @@ export function isEmailValid(email) {
 }
 
 export function isEmpty(val) {
+  if (val === null || val === undefined) return true;
+  if (typeof val !== "string") return false;
   return val.trim() === "";
 }
 

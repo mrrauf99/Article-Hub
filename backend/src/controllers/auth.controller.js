@@ -9,78 +9,94 @@ const MAX_VERIFY_ATTEMPTS = 5;
 const MAX_RESEND_COUNT = 3;
 
 export async function signUp(req, res) {
-  const { email, username, name, password, country } = req.body;
+  try {
+    const { email, username, name, password, country } = req.body;
 
-  const hashedPassword = await bcrypt.hash(
-    password,
-    Number(process.env.SALT_ROUNDS)
-  );
+    const hashedPassword = await bcrypt.hash(
+      password,
+      Number(process.env.SALT_ROUNDS)
+    );
 
-  const otp = crypto.randomInt(100000, 1000000).toString();
-  const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
+    const otp = crypto.randomInt(100000, 1000000).toString();
+    const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
-  req.session.otp = {
-    flow: "signup",
-    email,
-    code: otpHash,
-    expiresAt: Date.now() + OTP_TTL_MS,
-    attempts: 0,
-    resendCount: 0,
-    verified: false,
-    payload: {
+    req.session.otp = {
+      flow: "signup",
       email,
-      username,
-      name,
-      password: hashedPassword,
-      country,
-    },
-  };
+      code: otpHash,
+      expiresAt: Date.now() + OTP_TTL_MS,
+      attempts: 0,
+      resendCount: 0,
+      verified: false,
+      payload: {
+        email,
+        username,
+        name,
+        password: hashedPassword,
+        country,
+      },
+    };
 
-  req.session.cookie.maxAge = OTP_TTL_MS;
+    req.session.cookie.maxAge = OTP_TTL_MS;
 
-  await sendEmailVerificationOtp(email, otp);
+    await sendEmailVerificationOtp(email, otp);
 
-  res.json({
-    success: true,
-    message: "Verification code sent to your email.",
-  });
+    res.json({
+      success: true,
+      message: "Verification code sent to your email.",
+    });
+  } catch (err) {
+    console.error("Signup error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred. Please try again later.",
+    });
+  }
 }
 
 export async function forgetPassword(req, res) {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-  const { rowCount } = await db.query("SELECT 1 FROM users WHERE email = $1", [
-    email,
-  ]);
+    const { rowCount } = await db.query("SELECT 1 FROM users WHERE email = $1", [
+      email,
+    ]);
 
-  if (!rowCount) {
-    return res.json({
+    if (!rowCount) {
+      return res.json({
+        success: true,
+        message: "If an account exists, a verification code has been sent.",
+      });
+    }
+
+    const otp = crypto.randomInt(100000, 1000000).toString();
+    const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
+
+    req.session.otp = {
+      flow: "reset-password",
+      email,
+      code: otpHash,
+      expiresAt: Date.now() + OTP_TTL_MS,
+      attempts: 0,
+      resendCount: 0,
+      verified: false,
+    };
+
+    req.session.cookie.maxAge = OTP_TTL_MS;
+
+    await sendEmailVerificationOtp(email, otp);
+
+    res.json({
       success: true,
-      message: "If an account exists, a verification code has been sent.",
+      message: "Verification code sent to your email.",
+    });
+  } catch (err) {
+    console.error("Forget password error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred. Please try again later.",
     });
   }
-
-  const otp = crypto.randomInt(100000, 1000000).toString();
-  const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
-
-  req.session.otp = {
-    flow: "reset-password",
-    email,
-    code: otpHash,
-    expiresAt: Date.now() + OTP_TTL_MS,
-    attempts: 0,
-    resendCount: 0,
-    verified: false,
-  };
-
-  req.session.cookie.maxAge = OTP_TTL_MS;
-
-  await sendEmailVerificationOtp(email, otp);
-
-  res.json({
-    success: true,
-    message: "Verification code sent to your email.",
-  });
 }
 
 export async function resendOtp(req, res) {

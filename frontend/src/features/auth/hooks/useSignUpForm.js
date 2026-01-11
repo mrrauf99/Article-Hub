@@ -24,6 +24,10 @@ export function useSignUpForm() {
   const passwordErrors = validatePassword(values.password, values.confirmPassword);
 
   const validateField = (name, value, passwordToCheck = values.password, confirmPasswordToCheck = values.confirmPassword) => {
+    if (name === "country") {
+      return !value ? "Please fill out this field." : null;
+    }
+    
     if (isEmpty(value)) return "Please fill out this field.";
 
     switch (name) {
@@ -59,6 +63,10 @@ export function useSignUpForm() {
         } else {
           const passwordError = getPasswordGenericError(currentPasswordErrors, values.password);
           if (passwordError) newErrors.password = passwordError;
+        }
+      } else if (key === "country") {
+        if (!values[key]) {
+          newErrors[key] = "Please fill out this field.";
         }
       } else {
         const error = validateField(key, values[key], values.password, values.confirmPassword);
@@ -127,6 +135,9 @@ export function useSignUpForm() {
         : value !== values.password
         ? "Passwords do not match."
         : null;
+      setErrors((e) => ({ ...e, [name]: error }));
+    } else if (name === "country") {
+      const error = !value ? "Please fill out this field." : null;
       setErrors((e) => ({ ...e, [name]: error }));
     } else {
       const error = validateField(name, value, values.password, values.confirmPassword);
