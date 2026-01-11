@@ -2,7 +2,7 @@ import { Outlet, useLoaderData } from "react-router-dom";
 import { useState } from "react";
 
 import ScrollToTop from "@/components/ScrollToTop";
-import Navbar from "@/components/navbar/Navbar";
+import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useLogout } from "@/hooks/useLogout";
