@@ -14,7 +14,7 @@ export default async function createArticleAction({ request, params }) {
       await apiClient.post("articles", formData);
     }
 
-    return redirect("/dashboard/articles");
+    return redirect("/user/dashboard");
   } catch (err) {
     console.error("createArticleAction error:", err);
 

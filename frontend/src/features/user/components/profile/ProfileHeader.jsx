@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Mail, Award, Edit2, Pencil, X, Check } from "lucide-react";
 import Cropper from "react-easy-crop";
@@ -10,10 +10,18 @@ export default function ProfileHeader({ user, isEditing, onEdit }) {
   const fileInputRef = useRef(null);
   const [showCropper, setShowCropper] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState(null);
+  const [avatarError, setAvatarError] = useState(null);
 
   const handleAvatarClick = () => {
     if (isEditing && fileInputRef.current) {
+      setAvatarError(null);
       fileInputRef.current.click();
+    }
+  };
+
+  const resetFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -21,13 +29,19 @@ export default function ProfileHeader({ user, isEditing, onEdit }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    resetFileInput();
+
     if (!file.type.startsWith("image/")) {
+      setAvatarError("Only image files are allowed (JPG, PNG, GIF)");
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError("Image size should be less than 2MB. Please compress or choose a smaller image.");
       return;
     }
+
+    setAvatarError(null);
 
     // Show cropper for avatar (circular crop)
     const reader = new FileReader();
@@ -39,30 +53,19 @@ export default function ProfileHeader({ user, isEditing, onEdit }) {
   };
 
   const handleCropComplete = (croppedFile, croppedPreviewUrl) => {
-    // Update form data with cropped file and preview
     handleChange({ target: { name: "avatarPreview", value: croppedPreviewUrl } });
     handleChange({ target: { name: "avatarFile", value: croppedFile } });
-
-    // Clean up
     setTempImageSrc(null);
     setShowCropper(false);
-    
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    resetFileInput();
   };
 
   const handleCloseCropper = () => {
     setShowCropper(false);
     setTempImageSrc(null);
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    resetFileInput();
   };
 
-  // Use preview if available, otherwise use current avatar
   const displayAvatar = formData.avatarPreview || user.avatar_url || user.avatar;
 
   return (
@@ -141,6 +144,14 @@ export default function ProfileHeader({ user, isEditing, onEdit }) {
         </div>
       </div>
 
+      {/* Avatar Upload Error Message */}
+      {avatarError && (
+        <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+          <p className="font-medium">Avatar Upload Error</p>
+          <p className="text-xs mt-1">{avatarError}</p>
+        </div>
+      )}
+
       {/* Image Cropper Modal for Avatar (circular) */}
       {showCropper && tempImageSrc && (
         <AvatarCropper
@@ -152,6 +163,14 @@ export default function ProfileHeader({ user, isEditing, onEdit }) {
     </>
   );
 }
+
+const createImage = (url) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", (error) => reject(error));
+    image.src = url;
+  });
 
 function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -210,14 +229,6 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
     });
   };
 
-  const createImage = (url) =>
-    new Promise((resolve, reject) => {
-      const image = new Image();
-      image.addEventListener("load", () => resolve(image));
-      image.addEventListener("error", (error) => reject(error));
-      image.src = url;
-    });
-
   const handleSave = async () => {
     if (!croppedAreaPixels) return;
 
@@ -245,29 +256,32 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
     }
   };
 
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && !isProcessing) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose, isProcessing]);
+
   if (!imageSrc) return null;
 
   return createPortal(
     <div 
       className="fixed inset-0 z-[9999] flex items-center justify-center"
-      style={{ 
-        paddingTop: '4rem', 
-        paddingBottom: '2rem',
-        pointerEvents: 'auto'
-      }}
+      style={{ paddingTop: '4rem', paddingBottom: '2rem' }}
     >
       <div 
         className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-        onClick={onClose}
-        style={{ pointerEvents: 'auto' }}
       />
       <div 
         className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10" 
-        style={{ 
-          maxHeight: 'calc(100vh - 6rem)',
-          pointerEvents: 'auto',
-          height: 'auto'
-        }} 
+        style={{ maxHeight: 'calc(100vh - 6rem)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
