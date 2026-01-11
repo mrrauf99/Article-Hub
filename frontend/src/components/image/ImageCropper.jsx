@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Cropper from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
@@ -63,6 +63,17 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const onCropChange = useCallback((crop) => {
     setCrop(crop);
@@ -103,23 +114,51 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const scrollY = window.scrollY;
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalPosition = window.getComputedStyle(document.body).position;
+    const originalTop = window.getComputedStyle(document.body).top;
+    const originalWidth = window.getComputedStyle(document.body).width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
     const handleEscape = (e) => {
       if (e.key === "Escape" && !isProcessing) {
         onClose();
       }
     };
 
+    const handleTouchMove = (e) => {
+      if (modalRef.current && modalRef.current.contains(e.target)) {
+        return;
+      }
+      e.preventDefault();
+    };
+
     document.addEventListener("keydown", handleEscape);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+
     return () => {
       document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.body.style.overflow = originalStyle;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [onClose, isProcessing]);
 
   if (!imageSrc) return null;
 
+  const cropperHeight = isMobile ? '50vh' : 'calc(95vh - 120px)';
+
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4">
+    <div ref={modalRef} className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4">
       <div 
         className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
       />
@@ -142,9 +181,9 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
         <div 
           className="relative w-full bg-slate-100"
           style={{ 
-            height: 'calc(95vh - 120px)',
+            height: cropperHeight,
             minHeight: '300px',
-            maxHeight: 'calc(95vh - 120px)'
+            maxHeight: cropperHeight
           }}
         >
           <Cropper

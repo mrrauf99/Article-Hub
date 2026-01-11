@@ -28,7 +28,7 @@ export default function ProfileRadioField({
                 value={option.value}
                 checked={value === option.value}
                 onChange={onChange}
-                className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-0 focus:ring-offset-0 cursor-pointer"
               />
               <span className="text-sm lg:text-base text-gray-700 group-hover:text-indigo-600 transition-colors">
                 {option.label}

@@ -42,7 +42,7 @@ function ArticleCard({ article, mode }) {
         )}
 
         {mode !== "guest" && (
-          <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="absolute top-3 right-3 z-10 flex gap-2">
             <ActionButton title="Edit" onClick={handleEdit}>
               <Edit className="w-4 h-4 text-indigo-600" />
             </ActionButton>

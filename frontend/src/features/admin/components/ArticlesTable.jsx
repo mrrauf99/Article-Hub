@@ -40,27 +40,27 @@ export default function ArticlesTable({
 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden w-full">
-      <div className="overflow-x-auto -mx-3 sm:mx-0">
+      <div className="overflow-x-auto">
         <div className="inline-block min-w-full align-middle">
           <table className="min-w-full divide-y divide-slate-200">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="text-left px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[200px]">
+                <th className="text-left px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[200px]">
                   Article
                 </th>
-                <th className="text-left px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[120px]">
+                <th className="text-left px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[120px]">
                   Author
                 </th>
-                <th className="text-left px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[100px]">
+                <th className="text-left px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[100px]">
                   Category
                 </th>
-                <th className="text-left px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[100px]">
+                <th className="text-left px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[100px]">
                   Status
                 </th>
-                <th className="text-left px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[80px]">
+                <th className="text-left px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[80px]">
                   Views
                 </th>
-                <th className="text-right px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[140px]">
+                <th className="text-right px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap min-w-[140px]">
                   Actions
                 </th>
               </tr>
@@ -79,7 +79,7 @@ export default function ArticlesTable({
                   key={article.article_id}
                   className="hover:bg-slate-50 transition-colors"
                 >
-                  <td className="px-4 sm:px-5 md:px-6 py-3 sm:py-4 max-w-[300px]">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4 max-w-[300px]">
                     <button
                       onClick={() => onViewArticle(article)}
                       className="text-left group w-full"
@@ -92,7 +92,7 @@ export default function ArticlesTable({
                       </p>
                     </button>
                   </td>
-                  <td className="px-4 sm:px-5 md:px-6 py-3 sm:py-4">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                       <img
                         src={
@@ -109,21 +109,21 @@ export default function ArticlesTable({
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 sm:px-5 md:px-6 py-3 sm:py-4">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
                     <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-slate-100 text-xs font-medium text-slate-700 whitespace-nowrap">
                       {article.category}
                     </span>
                   </td>
-                  <td className="px-4 sm:px-5 md:px-6 py-3 sm:py-4">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
                     <StatusBadge status={article.status} />
                   </td>
-                  <td className="px-4 sm:px-5 md:px-6 py-3 sm:py-4">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-slate-600 whitespace-nowrap">
                       <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                       {article.views || 0}
                     </div>
                   </td>
-                  <td className="px-4 sm:px-5 md:px-6 py-3 sm:py-4">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center justify-end gap-1.5">
                       {article.status !== "approved" && (
                         <ActionButton

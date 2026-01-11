@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { useLayoutEffect, useRef } from "react";
 import { AlertTriangle, X } from "lucide-react";
 
 export default function ConfirmDialog({
@@ -12,6 +13,41 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }) {
+  const modalRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+
+    const scrollY = window.scrollY;
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalPosition = window.getComputedStyle(document.body).position;
+    const originalTop = window.getComputedStyle(document.body).top;
+    const originalWidth = window.getComputedStyle(document.body).width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    const handleTouchMove = (e) => {
+      if (modalRef.current && modalRef.current.contains(e.target)) {
+        return;
+      }
+      e.preventDefault();
+    };
+
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.body.style.overflow = originalStyle;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const variantStyles = {
@@ -32,7 +68,7 @@ export default function ConfirmDialog({
   const styles = variantStyles[variant] || variantStyles.danger;
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div ref={modalRef} className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -40,16 +76,17 @@ export default function ConfirmDialog({
       />
 
       {/* Dialog */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col transform transition-all animate-in fade-in zoom-in-95 duration-200">
         {/* Close button */}
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+          className="absolute top-4 right-4 z-10 p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="p-6">
+        <div className="overflow-y-auto overflow-x-auto max-h-[calc(90vh-1px)]">
+          <div className="p-6">
           {/* Icon */}
           <div
             className={`mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 ${styles.icon}`}
@@ -106,6 +143,7 @@ export default function ConfirmDialog({
                 confirmText
               )}
             </button>
+          </div>
           </div>
         </div>
       </div>

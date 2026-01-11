@@ -17,7 +17,7 @@ export default function AboutCTA() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/editor"
+              href="/login"
               className="bg-white text-sky-600 px-8 py-4 rounded-xl font-semibold
               inline-flex items-center justify-center gap-2
               transition duration-300 ease-out

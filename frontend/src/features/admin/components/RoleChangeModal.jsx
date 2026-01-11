@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { useLayoutEffect, useRef } from "react";
 import { User, Shield, X } from "lucide-react";
 
 const ROLES = [
@@ -24,30 +25,73 @@ export default function RoleChangeModal({
   onChangeRole,
   onClose,
 }) {
+  const modalRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!user) return;
+    const scrollY = window.scrollY;
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalPosition = window.getComputedStyle(document.body).position;
+    const originalTop = window.getComputedStyle(document.body).top;
+    const originalWidth = window.getComputedStyle(document.body).width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && !isLoading) {
+        onClose();
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (modalRef.current && modalRef.current.contains(e.target)) {
+        return;
+      }
+      e.preventDefault();
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.body.style.overflow = originalStyle;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, [onClose, isLoading]);
+
   if (!user) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div ref={modalRef} className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
       />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all z-10"
+          className="absolute top-4 right-4 z-10 w-8 h-8 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="p-6 border-b border-slate-100">
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto overflow-x-auto max-h-[calc(90vh-80px)]">
+          <div className="p-6 border-b border-slate-100">
           <div className="flex items-center gap-4">
             <img
               src={
@@ -125,9 +169,10 @@ export default function RoleChangeModal({
               </button>
             );
           })}
+          </div>
         </div>
 
-        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-t border-slate-200">
+        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-t border-slate-200 flex-shrink-0">
           <button
             onClick={onClose}
             className="w-full px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all"

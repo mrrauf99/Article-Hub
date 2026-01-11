@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { Mail, Award, Edit2, Pencil, X, Check } from "lucide-react";
 import Cropper from "react-easy-crop";
@@ -177,6 +177,7 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const modalRef = useRef(null);
 
   const onCropChange = useCallback((crop) => {
     setCrop(crop);
@@ -256,16 +257,42 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const scrollY = window.scrollY;
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalPosition = window.getComputedStyle(document.body).position;
+    const originalTop = window.getComputedStyle(document.body).top;
+    const originalWidth = window.getComputedStyle(document.body).width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
     const handleEscape = (e) => {
       if (e.key === "Escape" && !isProcessing) {
         onClose();
       }
     };
 
+    const handleTouchMove = (e) => {
+      if (modalRef.current && modalRef.current.contains(e.target)) {
+        return;
+      }
+      e.preventDefault();
+    };
+
     document.addEventListener("keydown", handleEscape);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+
     return () => {
       document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.body.style.overflow = originalStyle;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [onClose, isProcessing]);
 

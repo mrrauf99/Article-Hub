@@ -1,32 +1,22 @@
-import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
+import { Outlet, useLoaderData } from "react-router-dom";
 import { useState } from "react";
 
 import ScrollToTop from "@/components/ScrollToTop";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import { authApi } from "@/features/api/authApi";
+import { useLogout } from "@/hooks/useLogout";
 
 export default function PublicLayout() {
   const data = useLoaderData();
   const user = data?.user || null;
-  const navigate = useNavigate();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { handleLogout: logout, isLoggingOut } = useLogout();
 
   const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await authApi.logout();
-      navigate("/login", { replace: true });
-    } catch (error) {
-      console.error("Logout failed:", error);
-      navigate("/login", { replace: true });
-    } finally {
-      setIsLoggingOut(false);
-      setShowLogoutConfirm(false);
-    }
+    await logout();
+    setShowLogoutConfirm(false);
   };
 
   return (
