@@ -65,7 +65,7 @@ export default function RoleChangeModal({
       document.body.style.width = originalWidth;
       window.scrollTo(0, scrollY);
     };
-  }, [onClose, isLoading]);
+  }, [user, onClose, isLoading]);
 
   if (!user) return null;
 
