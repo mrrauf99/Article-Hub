@@ -1,10 +1,11 @@
-import { FileText, Clock, CheckCircle, TrendingUp, Eye } from "lucide-react";
+import { FileText, Clock, CheckCircle, TrendingUp, Eye, XCircle } from "lucide-react";
 import { ScrollReveal, StaggerReveal } from "@/components/ScrollReveal";
 
 export default function DashboardStats({ articles = [], stats = {} }) {
   const total = articles.length;
   const approved = articles.filter((a) => a.status === "approved").length;
   const pending = articles.filter((a) => a.status === "pending").length;
+  const rejected = articles.filter((a) => a.status === "rejected").length;
   const views = stats.views || 0;
 
   const statItems = [
@@ -44,6 +45,15 @@ export default function DashboardStats({ articles = [], stats = {} }) {
       iconBg: "bg-amber-100",
       iconColor: "text-amber-600",
     },
+    {
+      label: "Rejected",
+      value: rejected,
+      Icon: XCircle,
+      gradient: "from-rose-500 to-red-600",
+      bgGradient: "from-rose-50 to-red-50",
+      iconBg: "bg-rose-100",
+      iconColor: "text-rose-600",
+    },
   ];
 
   return (
@@ -65,7 +75,7 @@ export default function DashboardStats({ articles = [], stats = {} }) {
 
       {/* Stats Grid */}
       <StaggerReveal staggerDelay={100} animation="fade-up">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {statItems.map((stat) => (
             <StatCard key={stat.label} {...stat} />
           ))}
