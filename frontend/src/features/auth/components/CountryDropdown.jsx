@@ -26,14 +26,14 @@ export default function CountryDropdown({
         if (isOpen) {
           setIsOpen(false);
           setSearchTerm("");
-          onBlur?.({ target: { name } });
+          onBlur?.({ target: { name, value } });
         }
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen, onBlur, name]);
+  }, [isOpen, onBlur, name, value]);
 
   /* ---------------- Handlers ---------------- */
 
@@ -46,7 +46,7 @@ export default function CountryDropdown({
     onChange?.({ target: { name, value: country } });
     setIsOpen(false);
     setSearchTerm("");
-    onBlur?.({ target: { name } });
+    onBlur?.({ target: { name, value: country } });
   };
 
   const displayValue = value || "Select a country";
