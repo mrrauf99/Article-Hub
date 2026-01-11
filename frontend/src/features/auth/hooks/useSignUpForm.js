@@ -137,7 +137,9 @@ export function useSignUpForm() {
         : null;
       setErrors((e) => ({ ...e, [name]: error }));
     } else if (name === "country") {
-      const error = !value ? "Please fill out this field." : null;
+      // Use the value from event or fallback to state value
+      const countryValue = value !== undefined ? value : values.country;
+      const error = !countryValue ? "Please fill out this field." : null;
       setErrors((e) => ({ ...e, [name]: error }));
     } else {
       const error = validateField(name, value, values.password, values.confirmPassword);
