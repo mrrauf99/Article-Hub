@@ -1,4 +1,4 @@
-import { Form, useNavigation, useLoaderData } from "react-router-dom";
+import { useNavigation, useLoaderData, useSubmit } from "react-router-dom";
 import { useNewArticleForm } from "../hooks/useNewArticleForm.js";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import {
@@ -24,6 +24,7 @@ import styles from "../styles/ArticleForm.module.css";
 
 export default function CreateArticlePage() {
   const data = useLoaderData();
+  const submit = useSubmit();
   const {
     formData,
     charCounts,
@@ -40,10 +41,31 @@ export default function CreateArticlePage() {
   const isEditing = !!data?.article;
 
   const handleSubmit = (e) => {
+    e.preventDefault();
+    
     const isValid = validateForm();
     if (!isValid) {
-      e.preventDefault();
+      return;
     }
+
+    const submitData = new FormData();
+    
+    submitData.append("title", formData.title);
+    submitData.append("category", formData.category || "");
+    submitData.append("introduction", formData.introduction);
+    submitData.append("content", formData.content);
+    submitData.append("summary", formData.summary);
+
+    if (formData.imageFile) {
+      submitData.append("image", formData.imageFile);
+    } else if (isEditing && formData.imageUrl && !formData.imageUrl.startsWith("blob:")) {
+      submitData.append("existingImageUrl", formData.imageUrl);
+    }
+    
+    submit(submitData, {
+      method: "post",
+      encType: "multipart/form-data",
+    });
   };
 
   return (
@@ -76,9 +98,8 @@ export default function CreateArticlePage() {
 
           {/* Form Card */}
           <div className={styles.formCard}>
-            <Form
+            <form
               className={styles.articleForm}
-              method="post"
               onSubmit={handleSubmit}
             >
               {/* Section: Basic Info */}
@@ -239,7 +260,7 @@ export default function CreateArticlePage() {
                   Your article will be reviewed before publishing
                 </p>
               </div>
-            </Form>
+            </form>
           </div>
         </div>
       </ScrollReveal>

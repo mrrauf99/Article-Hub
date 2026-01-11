@@ -47,6 +47,9 @@ export default function Category({
         placeholder={placeholder}
         error={error}
       />
+      
+      {/* Hidden input to ensure category value is submitted with form */}
+      <input type="hidden" name={name} value={value || ""} />
 
       {error && <p className={styles.errorMsg}>{error}</p>}
     </div>
