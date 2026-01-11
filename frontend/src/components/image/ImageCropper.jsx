@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Cropper from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
@@ -21,30 +21,29 @@ async function getCroppedImg(imageSrc, pixelCrop) {
     return null;
   }
 
-  const maxSize = Math.max(image.width, image.height);
-  const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
+  // Target dimensions: 1200x675 (16:9 aspect ratio - modern standard)
+  const targetWidth = 1200;
+  const targetHeight = 675;
 
-  canvas.width = safeArea;
-  canvas.height = safeArea;
+  // Set canvas to target size
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
 
-  ctx.translate(safeArea / 2, safeArea / 2);
-  ctx.translate(-safeArea / 2, -safeArea / 2);
+  // Calculate scale factors
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
 
+  // Draw the cropped image, scaled to target dimensions
   ctx.drawImage(
     image,
-    safeArea / 2 - image.width * 0.5,
-    safeArea / 2 - image.height * 0.5
-  );
-
-  const data = ctx.getImageData(0, 0, safeArea, safeArea);
-
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
-
-  ctx.putImageData(
-    data,
-    Math.round(0 - safeArea / 2 + image.width * 0.5 - pixelCrop.x),
-    Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
+    pixelCrop.x * scaleX,
+    pixelCrop.y * scaleY,
+    pixelCrop.width * scaleX,
+    pixelCrop.height * scaleY,
+    0,
+    0,
+    targetWidth,
+    targetHeight
   );
 
   return new Promise((resolve) => {
@@ -104,48 +103,56 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
     }
   };
 
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && !isProcessing) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose, isProcessing]);
+
   if (!imageSrc) return null;
 
   return createPortal(
-    <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center"
-      style={{ 
-        paddingTop: '4rem', 
-        paddingBottom: '2rem',
-        pointerEvents: 'auto'
-      }}
-    >
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4">
       <div 
         className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-        onClick={onClose}
-        style={{ pointerEvents: 'auto' }}
       />
       <div 
-        className="relative w-full max-w-4xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10" 
-        style={{ 
-          maxHeight: 'calc(100vh - 6rem)',
-          pointerEvents: 'auto'
-        }} 
+        className="relative w-full max-w-4xl bg-white rounded-lg sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10" 
+        style={{ maxHeight: '95vh' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <h2 className="text-lg font-semibold text-slate-900">Crop Image</h2>
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-slate-200 flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-semibold text-slate-900">Crop Image</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition-colors"
             aria-label="Close"
           >
-            <X className="w-5 h-5 text-slate-600" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
           </button>
         </div>
 
-        <div className="relative w-full flex-1 bg-slate-100" style={{ minHeight: 0 }}>
+        <div 
+          className="relative w-full bg-slate-100"
+          style={{ 
+            height: 'calc(95vh - 120px)',
+            minHeight: '300px',
+            maxHeight: 'calc(95vh - 120px)'
+          }}
+        >
           <Cropper
             image={imageSrc}
             crop={crop}
             zoom={zoom}
             rotation={0}
-            aspect={16 / 10}
+            aspect={16 / 9}
             onCropChange={onCropChange}
             onZoomChange={onZoomChange}
             onRotationChange={() => {}}
@@ -163,19 +170,19 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
           />
         </div>
 
-        <div className="p-4 sm:p-6 border-t border-slate-200">
-          <div className="flex items-center justify-end gap-3">
+        <div className="p-3 sm:p-4 border-t border-slate-200 flex-shrink-0 bg-white">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
             <button
               onClick={onClose}
               disabled={isProcessing}
-              className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg font-medium transition-colors disabled:opacity-50"
+              className="px-4 py-2.5 text-slate-700 hover:bg-slate-100 rounded-lg font-medium transition-colors disabled:opacity-50 border border-slate-300 sm:border-0"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              disabled={isProcessing}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isProcessing || !croppedAreaPixels}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? (
                 <>

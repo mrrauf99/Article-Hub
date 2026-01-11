@@ -161,7 +161,6 @@ export const createArticle = async (req, res) => {
           folder: "article_hub/articles",
           resource_type: "image",
           transformation: [
-            { width: 1200, height: 630, crop: "limit" },
             { quality: "auto", fetch_format: "auto" },
           ],
         });
@@ -289,7 +288,6 @@ export const updateArticle = async (req, res) => {
           folder: "article_hub/articles",
           resource_type: "image",
           transformation: [
-            { width: 1200, height: 630, crop: "limit" },
             { quality: "auto", fetch_format: "auto" },
           ],
         });
@@ -449,7 +447,6 @@ export const uploadImageToCloudinary = async (req, res) => {
       folder: "article_hub/articles",
       resource_type: "image",
       transformation: [
-        { width: 1200, height: 630, crop: "limit" },
         { quality: "auto", fetch_format: "auto" },
       ],
     });
