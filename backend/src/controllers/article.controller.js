@@ -400,6 +400,18 @@ export const deleteArticle = async (req, res) => {
       });
     }
 
+    const imageUrl = article.image_url;
+
+    // Delete image from Cloudinary if it exists (before database deletion)
+    if (imageUrl && imageUrl.includes("cloudinary.com")) {
+      try {
+        await deleteImageByUrl(imageUrl);
+      } catch (deleteErr) {
+        // Log error but don't fail the request if deletion fails
+        console.error("Failed to delete image from Cloudinary:", deleteErr);
+      }
+    }
+
     // Delete the article from database
     const { rowCount } = await db.query(
       `DELETE FROM articles
@@ -412,16 +424,6 @@ export const deleteArticle = async (req, res) => {
         success: false,
         message: "Failed to delete article",
       });
-    }
-
-    // Delete image from Cloudinary if it exists
-    if (article.image_url && article.image_url.includes("cloudinary.com")) {
-      try {
-        await deleteImageByUrl(article.image_url);
-      } catch (deleteErr) {
-        // Log error but don't fail the request if deletion fails
-        console.error("Failed to delete image from Cloudinary:", deleteErr);
-      }
     }
 
     res.json({ success: true, message: "Article deleted" });
