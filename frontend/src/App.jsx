@@ -33,17 +33,19 @@ import publicLayoutLoader from "./loaders/publicLayout.js";
 // User
 import UserDashBoardPage from "./features/user/pages/UserDashBoardPage.jsx";
 import CreateArticlePage from "./features/user/pages/CreateArticlePage.jsx";
-import UserProfilePage from "./features/user/pages/UserProfilePage.jsx";
 import ExploreArticlesPage from "./features/user/pages/ExploreArticlesPage.jsx";
 
 import editArticleLoader from "./features/user/loaders/editArticle.js";
 import myArticlesLoader from "./features/user/loaders/myArticles.js";
 import userProfileLoader from "./features/user/loaders/userProfile.js";
-
-import profileStatsLoader from "./loaders/profileStats.js";
+import createArticleLoader from "./features/user/loaders/createArticle.js";
 
 import createArticleAction from "./features/user/actions/createArticle.js";
-import updateProfileAction from "./features/user/actions/updateProfile.js";
+
+// Profile (shared by admin and user)
+import ProfilePage from "./features/profile/pages/ProfilePage.jsx";
+import profileStatsLoader from "./features/profile/loaders/profileStats.js";
+import updateProfileAction from "./features/profile/actions/updateProfile.js";
 
 // Admin
 import AdminDashboardPage from "./features/admin/pages/AdminDashboardPage.jsx";
@@ -114,6 +116,7 @@ export default function App() {
 
     /* ---------- PUBLIC ---------- */
     {
+      id: "public-layout",
       element: <PublicLayout />,
       loader: publicLayoutLoader,
       children: [
@@ -161,6 +164,7 @@ export default function App() {
             {
               path: "new",
               element: <CreateArticlePage />,
+              loader: createArticleLoader,
               action: createArticleAction,
             },
             {
@@ -178,7 +182,7 @@ export default function App() {
         },
         {
           path: "profile",
-          element: <UserProfilePage />,
+          element: <ProfilePage />,
           loader: profileStatsLoader,
           action: updateProfileAction,
         },
@@ -211,7 +215,7 @@ export default function App() {
         },
         {
           path: "profile",
-          element: <UserProfilePage />,
+          element: <ProfilePage />,
           loader: profileStatsLoader,
           action: updateProfileAction,
         },

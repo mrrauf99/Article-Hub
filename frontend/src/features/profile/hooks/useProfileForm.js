@@ -11,6 +11,7 @@ function normalizeUser(user) {
     portfolio_url: user?.portfolio_url ?? "",
     bio: user?.bio ?? "",
     gender: user?.gender ?? "",
+    country: user?.country ?? "",
 
     x_url: user?.x_url ?? "",
     linkedin_url: user?.linkedin_url ?? "",

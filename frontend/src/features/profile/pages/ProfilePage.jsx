@@ -4,23 +4,25 @@ import {
   useNavigation,
   useActionData,
   useSubmit,
+  useRevalidator,
 } from "react-router-dom";
 
 import { CheckCircle, XCircle } from "lucide-react";
 
 import { useProfileForm } from "../hooks/useProfileForm";
-import ProfileHeader from "../components/profile/ProfileHeader";
-import AuthorInfo from "../components/profile/AuthorInfo";
-import SocialLinks from "../components/profile/SocialLinks";
-import ProfileActions from "../components/profile/ProfileActions";
+import ProfileHeader from "../components/ProfileHeader";
+import AuthorInfo from "../components/AuthorInfo";
+import SocialLinks from "../components/SocialLinks";
+import ProfileActions from "../components/ProfileActions";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
-import ProfileProvider from "../context/ProfileContext";
+import ProfileProvider from "../context/ProfileProvider";
 
-export default function UserProfilePage() {
+export default function ProfilePage() {
   const { user } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
+  const revalidator = useRevalidator();
 
   const [feedback, setFeedback] = useState(null);
   const { formData, handleChange, resetForm } = useProfileForm(user);
@@ -31,7 +33,9 @@ export default function UserProfilePage() {
   const navigation = useNavigation();
   const isSaving = navigation.state === "submitting";
 
-  const handleEdit = () => setIsEditing(true);
+  const handleEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
 
   const handleCancel = useCallback(() => {
     if (isSaving) return;
@@ -50,6 +54,7 @@ export default function UserProfilePage() {
     submitData.append("expertise", formData.expertise);
     submitData.append("bio", formData.bio);
     submitData.append("gender", formData.gender || "");
+    submitData.append("country", formData.country || "");
     submitData.append("portfolio_url", formData.portfolio_url);
     submitData.append("x_url", formData.x_url);
     submitData.append("linkedin_url", formData.linkedin_url);
@@ -73,12 +78,16 @@ export default function UserProfilePage() {
     lastActionDataRef.current = actionData;
     startTransition(() => {
       setFeedback(actionData);
-      if (actionData.success) setIsEditing(false);
+      if (actionData.success) {
+        setIsEditing(false);
+        // Revalidate to get the latest data from the server
+        revalidator.revalidate();
+      }
     });
 
     const timeoutId = setTimeout(() => setFeedback(null), 5000);
     return () => clearTimeout(timeoutId);
-  }, [actionData]);
+  }, [actionData, revalidator]);
 
   const profileValue = useMemo(
     () => ({
@@ -88,8 +97,9 @@ export default function UserProfilePage() {
       isSaving,
       handleChange,
       handleCancel,
+      handleEdit,
     }),
-    [user, formData, isEditing, isSaving, handleChange, handleCancel]
+    [user, formData, isEditing, isSaving, handleChange, handleCancel, handleEdit]
   );
 
   return (
@@ -98,11 +108,7 @@ export default function UserProfilePage() {
         <div className="w-full md:px-6 lg:px-8 py-6 sm:py-8">
           <div className="w-full max-w-6xl mx-auto">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
-            <ProfileHeader
-              user={user}
-              isEditing={isEditing}
-              onEdit={handleEdit}
-            />
+            <ProfileHeader />
 
             {/* FEEDBACK */}
             {feedback && (
@@ -125,11 +131,7 @@ export default function UserProfilePage() {
             <form onSubmit={handleSubmit}>
               <AuthorInfo />
               <SocialLinks />
-              <ProfileActions
-                isEditing={isEditing}
-                isSaving={isSaving}
-                onCancel={handleCancel}
-              />
+              <ProfileActions />
             </form>
             </div>
           </div>

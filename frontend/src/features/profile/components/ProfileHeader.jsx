@@ -3,10 +3,10 @@ import { createPortal } from "react-dom";
 import { Mail, Award, Edit2, Pencil, X, Check } from "lucide-react";
 import Cropper from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
-import { useProfile } from "../../hooks/useProfile";
+import { useProfile } from "../hooks/useProfile";
 
-export default function ProfileHeader({ user, isEditing, onEdit }) {
-  const { formData, handleChange } = useProfile();
+export default function ProfileHeader() {
+  const { user, formData, isEditing, handleChange, handleEdit } = useProfile();
   const fileInputRef = useRef(null);
   const [showCropper, setShowCropper] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState(null);
@@ -134,7 +134,7 @@ export default function ProfileHeader({ user, isEditing, onEdit }) {
           </div>
           {!isEditing && (
             <button
-              onClick={onEdit}
+              onClick={handleEdit}
               className="w-full sm:w-auto bg-white text-indigo-600 px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold hover:bg-indigo-50 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 whitespace-nowrap text-sm sm:text-base"
             >
               <Edit2 className="w-4 h-4" />

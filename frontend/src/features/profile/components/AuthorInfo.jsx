@@ -1,7 +1,8 @@
-import { User, Mail, BookOpen, Globe, Calendar, FileText, Users } from "lucide-react";
+import { User, Mail, BookOpen, Globe, Calendar, FileText, Users, MapPin } from "lucide-react";
 import ProfileField from "./ProfileField";
 import ProfileRadioField from "./ProfileRadioField";
-import { useProfile } from "../../hooks/useProfile";
+import CountryDropdown from "@/features/auth/components/CountryDropdown";
+import { useProfile } from "../hooks/useProfile";
 
 export default function AuthorInfo() {
   const { formData, isEditing, handleChange } = useProfile();
@@ -72,6 +73,27 @@ export default function AuthorInfo() {
             { value: "prefer_not_to_say", label: "Prefer not to say" },
           ]}
         />
+
+        <div className="space-y-2">
+          {isEditing ? (
+            <CountryDropdown
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              hasError={false}
+            />
+          ) : (
+            <>
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <MapPin className="w-4 h-4 text-indigo-600" />
+                Country/Region
+              </label>
+              <div className="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-sm lg:text-base text-gray-900">
+                {formData.country || "Not set"}
+              </div>
+            </>
+          )}
+        </div>
 
         <ProfileField
           icon={Globe}

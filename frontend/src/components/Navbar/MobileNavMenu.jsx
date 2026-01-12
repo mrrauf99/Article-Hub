@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { User, LogOut, Shield } from "lucide-react";
 import styles from "@/styles/navbar.module.css";
@@ -11,20 +12,26 @@ export default function MobileNavMenu({
   avatar,
   onLogout,
 }) {
+  const [avatarError, setAvatarError] = useState(false);
+
+  // Get initials for avatar fallback (memoized to avoid recalculation)
+  const initials = useMemo(() => {
+    if (!userName) return "U";
+    return userName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  }, [userName]);
+
+  // Helper to check if avatar is valid
+  const isValidAvatar = avatar && typeof avatar === 'string' && avatar.trim();
+
   if (!isOpen) return null;
 
   const isAdmin = role === "admin";
   const profilePath = isAdmin ? "/admin/profile" : "/user/profile";
-
-  // Get initials for avatar fallback
-  const initials = userName
-    ? userName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "U";
 
   return (
     <div className={styles.mobileMenu}>
@@ -33,12 +40,13 @@ export default function MobileNavMenu({
         {role !== "guest" && (
           <div className={styles.mobileUserHeader}>
             <div className={styles.mobileAvatarContainer}>
-              {avatar ? (
+              {isValidAvatar && !avatarError ? (
                 <img
                   src={avatar}
                   alt={userName}
                   className={styles.mobileAvatar}
                   loading="lazy"
+                  onError={() => setAvatarError(true)}
                 />
               ) : (
                 <span className={styles.mobileAvatarFallback}>{initials}</span>
