@@ -1,5 +1,5 @@
 /**
- * Handle action errors with consistent format
+ * Handle action errors
  */
 export function handleActionError(error, action = "operation") {
   console.error(`Failed to ${action}:`, error);
@@ -12,8 +12,6 @@ export function handleActionError(error, action = "operation") {
 /**
  * Create success response
  */
-export function handleActionSuccess(
-  message = "Operation completed successfully"
-) {
+export function handleActionSuccess(message = "Operation completed successfully") {
   return { success: true, message };
 }
