@@ -191,7 +191,7 @@ export default function ArticlesGrid({
 function ArticleCard({ article }) {
   return (
     <Link
-      to={`/user/articles/${article.article_id}`}
+      to={`/articles/${article.article_id}`}
       className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300 hover:-translate-y-1"
     >
       {/* Image */}
