@@ -29,6 +29,7 @@ import TermsPage from "./pages/Terms.jsx";
 import submitContactAction from "./features/contact/actions/submitContact.js";
 import publicArticlesLoader from "./features/articles/loaders/publicArticles.js";
 import publicLayoutLoader from "./loaders/publicLayout.js";
+import homePageLoader from "./features/guest/loaders/homePage.js";
 
 // User
 import UserDashBoardPage from "./features/user/pages/UserDashBoardPage.jsx";
@@ -65,7 +66,6 @@ import UserLayout from "./layouts/UserLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
 
-// (Admin, User and Public)
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
@@ -123,7 +123,7 @@ export default function App() {
         {
           index: true, // "/"
           element: <HomePage />,
-          loader: publicArticlesLoader,
+          loader: homePageLoader,
         },
         { path: "about", element: <AboutPage /> },
         {

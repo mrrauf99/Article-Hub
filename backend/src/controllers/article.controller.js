@@ -160,9 +160,7 @@ export const createArticle = async (req, res) => {
         const result = await cloudinary.uploader.upload(dataUri, {
           folder: "article_hub/articles",
           resource_type: "image",
-          transformation: [
-            { quality: "auto", fetch_format: "auto" },
-          ],
+          transformation: [{ quality: "auto", fetch_format: "auto" }],
         });
 
         imageUrl = result.secure_url;
@@ -200,7 +198,7 @@ export const createArticle = async (req, res) => {
     });
   } catch (err) {
     console.error("createArticle error:", err);
-    
+
     // Handle database errors
     if (err.code === "23505") {
       // Unique constraint violation
@@ -209,7 +207,7 @@ export const createArticle = async (req, res) => {
         message: "Article with this title already exists",
       });
     }
-    
+
     if (err.code === "23503") {
       // Foreign key constraint violation
       return res.status(400).json({
@@ -228,8 +226,14 @@ export const createArticle = async (req, res) => {
 export const updateArticle = async (req, res) => {
   try {
     const { articleId: id } = req.params;
-    const { title, introduction, content, summary, category, existingImageUrl } =
-      req.body;
+    const {
+      title,
+      introduction,
+      content,
+      summary,
+      category,
+      existingImageUrl,
+    } = req.body;
 
     if (!id) {
       return res.status(400).json({
@@ -287,9 +291,7 @@ export const updateArticle = async (req, res) => {
         const result = await cloudinary.uploader.upload(dataUri, {
           folder: "article_hub/articles",
           resource_type: "image",
-          transformation: [
-            { quality: "auto", fetch_format: "auto" },
-          ],
+          transformation: [{ quality: "auto", fetch_format: "auto" }],
         });
 
         imageUrl = result.secure_url;
@@ -303,8 +305,10 @@ export const updateArticle = async (req, res) => {
           try {
             await deleteImageByUrl(oldImageUrl);
           } catch (deleteErr) {
-            // Log error but don't fail the request if deletion fails
-            console.error("Failed to delete old image from Cloudinary:", deleteErr);
+            console.error(
+              "Failed to delete old image from Cloudinary:",
+              deleteErr
+            );
           }
         }
       } catch (uploadErr) {
@@ -315,12 +319,14 @@ export const updateArticle = async (req, res) => {
         });
       }
     } else if (existingImageUrl === null || existingImageUrl === "") {
-      // If no new file and existingImageUrl is explicitly null/empty, delete old image
       if (oldImageUrl && oldImageUrl.includes("cloudinary.com")) {
         try {
           await deleteImageByUrl(oldImageUrl);
         } catch (deleteErr) {
-          console.error("Failed to delete old image from Cloudinary:", deleteErr);
+          console.error(
+            "Failed to delete old image from Cloudinary:",
+            deleteErr
+          );
         }
       }
       imageUrl = null;
@@ -448,9 +454,7 @@ export const uploadImageToCloudinary = async (req, res) => {
     const result = await cloudinary.uploader.upload(dataUri, {
       folder: "article_hub/articles",
       resource_type: "image",
-      transformation: [
-        { quality: "auto", fetch_format: "auto" },
-      ],
+      transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
     return res.status(200).json({

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ARTICLE_CATEGORIES as categories } from "@/data/articleCategories";
+import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 
 export function useNewArticleForm(article) {
   const [formData, setFormData] = useState({
@@ -111,7 +111,7 @@ export function useNewArticleForm(article) {
     formData,
     charCounts,
     errors,
-    categories,
+    categories: ARTICLE_CATEGORIES,
     setFormData,
     handleChange,
     handleBlur,

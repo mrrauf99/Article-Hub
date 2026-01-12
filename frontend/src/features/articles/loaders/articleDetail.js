@@ -1,7 +1,6 @@
 import { apiClient } from "../../api/apiClient";
 
 export default async function articleDetailLoader({ params }) {
-  // Accept both 'id' and 'article_id' as parameter names
   const { id, article_id } = params;
   const articleId = id || article_id;
 
@@ -9,23 +8,16 @@ export default async function articleDetailLoader({ params }) {
     const { data } = await apiClient.get(`articles/${articleId}`);
 
     if (!data.success) {
-      return {
-        article: null,
-      };
+      return { article: null };
     }
 
-    // Ensure article has an id field and map imageUrl to image_url
     const article = {
       id: articleId,
       ...data.data,
       image_url: data.data.imageUrl || data.data.image_url,
     };
 
-    // Increment view count in background (don't await - fire and forget)
-    // The backend will check if user is admin and skip incrementing
-    apiClient.post(`articles/${articleId}/view`).catch(() => {
-      // Silent fail - view count is not critical
-    });
+    apiClient.post(`articles/${articleId}/view`).catch(() => {});
 
     return { article };
   } catch (error) {
