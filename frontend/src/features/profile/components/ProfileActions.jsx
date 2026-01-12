@@ -1,6 +1,9 @@
 import { Save } from "lucide-react";
+import { useProfile } from "../hooks/useProfile";
 
-export default function ProfileActions({ isEditing, isSaving, onCancel }) {
+export default function ProfileActions() {
+  const { isEditing, isSaving, handleCancel } = useProfile();
+  
   if (!isEditing) return null;
 
   return (
@@ -8,7 +11,7 @@ export default function ProfileActions({ isEditing, isSaving, onCancel }) {
       <div className="p-4 lg:p-6 pt-4">
         <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
           <button
-            onClick={onCancel}
+            onClick={handleCancel}
             disabled={isSaving}
             className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold
               hover:bg-gray-100 transition text-gray-700

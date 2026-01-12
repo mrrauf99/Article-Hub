@@ -15,6 +15,7 @@ export default async function updateProfileAction({ request }) {
       multipartData.append("expertise", formData.get("expertise") || "");
       multipartData.append("bio", formData.get("bio") || "");
       multipartData.append("gender", formData.get("gender") || "");
+      multipartData.append("country", formData.get("country") || "");
       multipartData.append(
         "portfolio_url",
         formData.get("portfolio_url") || ""
@@ -52,6 +53,7 @@ export default async function updateProfileAction({ request }) {
     expertise: formData.get("expertise"),
     bio: formData.get("bio"),
     gender: formData.get("gender") || null,
+    country: formData.get("country") || null,
     portfolio_url: formData.get("portfolio_url"),
     x_url: formData.get("x_url"),
     linkedin_url: formData.get("linkedin_url"),
