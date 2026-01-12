@@ -11,7 +11,6 @@ export function useOTPForm() {
   const [canResend, setCanResend] = useState(false);
 
   const inputRefs = useRef([]);
-
   const isOtpComplete = otp.every(Boolean);
 
   /* ---------------- Timer ---------------- */
@@ -58,15 +57,41 @@ export function useOTPForm() {
     [otp]
   );
 
-  const handlePaste = useCallback((e) => {
+  const handlePaste = useCallback((e, startIndex = 0) => {
     e.preventDefault();
     const text = e.clipboardData.getData("text").slice(0, OTP_LENGTH);
     if (!/^\d+$/.test(text)) return;
 
     const chars = text.split("");
-    setOtp([...chars, ...Array(OTP_LENGTH - chars.length).fill("")]);
+    setOtp((prev) => {
+      const next = [...prev];
+      const endIndex = Math.min(startIndex + chars.length, OTP_LENGTH);
+      for (let i = startIndex; i < endIndex; i++) {
+        next[i] = chars[i - startIndex];
+      }
+      return next;
+    });
 
-    inputRefs.current[Math.min(chars.length, OTP_LENGTH - 1)]?.focus();
+    const focusIndex = Math.min(startIndex + chars.length, OTP_LENGTH - 1);
+    inputRefs.current[focusIndex]?.focus();
+  }, []);
+
+  // Handle OTP string (for clipboard paste)
+  const handleOtpString = useCallback((otpString) => {
+    const text = otpString.replace(/\D/g, "").slice(0, OTP_LENGTH);
+    if (!/^\d+$/.test(text)) return;
+
+    const chars = text.split("");
+    setOtp((prev) => {
+      const next = [...prev];
+      for (let i = 0; i < Math.min(chars.length, OTP_LENGTH); i++) {
+        next[i] = chars[i];
+      }
+      return next;
+    });
+
+    const focusIndex = Math.min(chars.length, OTP_LENGTH - 1);
+    inputRefs.current[focusIndex]?.focus();
   }, []);
 
   const reset = useCallback(() => {
@@ -85,6 +110,7 @@ export function useOTPForm() {
     handleChange,
     handleKeyDown,
     handlePaste,
+    handleOtpString,
     reset,
   };
 }

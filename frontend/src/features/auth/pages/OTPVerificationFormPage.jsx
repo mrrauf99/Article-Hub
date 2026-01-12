@@ -122,6 +122,7 @@ export default function OTPVerificationForm() {
             handleChange={otpForm.handleChange}
             handleKeyDown={otpForm.handleKeyDown}
             handlePaste={otpForm.handlePaste}
+            handleOtpString={otpForm.handleOtpString}
             isSubmitting={isVerifying || isVerifySuccess}
             status={status}
             onUserInput={() => setMode("idle")}

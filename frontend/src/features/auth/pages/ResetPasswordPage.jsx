@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, startTransition } from "react";
+import { useEffect, useState, useRef, startTransition, useCallback, useMemo } from "react";
 import { Form, useActionData, useNavigation } from "react-router-dom";
 
 import { Lock } from "lucide-react";
@@ -11,11 +11,16 @@ import Button from "../components/Button";
 
 import { useResetPasswordForm } from "../hooks/useResetPasswordForm";
 
+const SUBTITLE_STYLE = { fontSize: "1rem", color: "#6b7280", lineHeight: "1.5" };
+
 export default function ResetPassword() {
   const form = useResetPasswordForm();
   const actionData = useActionData();
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+  const isSubmitting = useMemo(
+    () => navigation.state === "submitting",
+    [navigation.state]
+  );
 
   const [alertMessage, setAlertMessage] = useState("");
   const lastActionDataRef = useRef(null);
@@ -29,17 +34,30 @@ export default function ResetPassword() {
     }
   }, [actionData]);
 
-  function handleSubmit(e) {
-    if (!form.validate()) {
-      e.preventDefault();
-    }
-  }
+  const handleSubmit = useCallback(
+    (e) => {
+      if (!form.validate()) {
+        e.preventDefault();
+      }
+    },
+    [form]
+  );
+
+  const passwordEntered = useMemo(
+    () => form.values.password.length > 0,
+    [form.values.password]
+  );
+
+  const confirmEntered = useMemo(
+    () => form.values.confirmPassword.length > 0,
+    [form.values.confirmPassword]
+  );
 
   return (
     <AuthLayout
       title="Reset Password"
       subtitle="Create a new secure password for your account."
-      subtitleStyle={{ fontSize: "1rem", color: "#6b7280", lineHeight: "1.5" }}
+      subtitleStyle={SUBTITLE_STYLE}
     >
       {alertMessage && (
         <AlertMessageBox
@@ -72,14 +90,15 @@ export default function ResetPassword() {
           name="confirmPassword"
           value={form.values.confirmPassword}
           onChange={form.handleChange}
+          onFocus={form.handleFocus}
           onBlur={form.handleBlur}
           error={form.errors.confirmPassword}
         />
 
         <PasswordRequirements
           errors={form.passwordErrors}
-          passwordEntered={form.values.password.length > 0}
-          confirmEntered={form.values.confirmPassword.length > 0}
+          passwordEntered={passwordEntered}
+          confirmEntered={confirmEntered}
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>
