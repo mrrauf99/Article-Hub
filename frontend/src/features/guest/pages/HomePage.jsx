@@ -32,7 +32,6 @@ export default function HomePage() {
     });
   }, [articles, activeCategory]);
 
-  // Calculate article counts per category (normalized)
   const articleCounts = useMemo(() => {
     const counts = {};
     articles.forEach((article) => {
@@ -42,7 +41,6 @@ export default function HomePage() {
     return counts;
   }, [articles]);
 
-  // Build category list sorted by popularity and excluding empty ones
   const categories = useMemo(() => {
     const ranked = Object.entries(articleCounts)
       .filter(([, count]) => count > 0)
@@ -57,7 +55,6 @@ export default function HomePage() {
     return ["All", ...ranked, ...remaining];
   }, [articleCounts]);
 
-  // Get unique authors count
   const authorCount = useMemo(() => {
     const authors = new Set(articles.map((a) => a.author_name));
     return authors.size;

@@ -337,9 +337,8 @@ export const getAllUsers = async (req, res) => {
     });
   } catch (err) {
     console.error("getAllUsers error:", err);
-    
-    // Check if error is due to missing column
-    if (err.code === '42703') {
+
+    if (err.code === "42703") {
       return res.status(500).json({
         success: false,
         message: "Database column error. Please check users table schema.",
@@ -381,9 +380,8 @@ export const getUserDetails = async (req, res) => {
     });
   } catch (err) {
     console.error("getUserDetails error:", err);
-    
-    // Check if error is due to missing column
-    if (err.code === '42703') {
+
+    if (err.code === "42703") {
       return res.status(500).json({
         success: false,
         message: "Database column error. Please check users table schema.",
@@ -473,7 +471,10 @@ export const deleteUser = async (req, res) => {
         try {
           await deleteImageByUrl(article.image_url);
         } catch (deleteErr) {
-          console.error("Failed to delete article image from Cloudinary:", deleteErr);
+          console.error(
+            "Failed to delete article image from Cloudinary:",
+            deleteErr
+          );
         }
       }
     }

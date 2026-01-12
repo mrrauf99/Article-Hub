@@ -13,10 +13,7 @@ export default async function publicArticlesLoader() {
 
     return { articles };
   } catch (error) {
-    console.error("articlesLoader error:", error);
-
-    throw new Response("Failed to load articles", {
-      status: 500,
-    });
+    console.error("publicArticlesLoader error:", error);
+    throw new Response("Failed to load articles", { status: 500 });
   }
 }

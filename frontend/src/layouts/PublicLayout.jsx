@@ -7,6 +7,11 @@ import Footer from "@/components/Footer";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useLogout } from "@/hooks/useLogout";
 
+/**
+ * Layout for public pages (About, Contact, Terms, Privacy, etc.)
+ * Shows authenticated navbar (user/admin) if logged in, guest navbar otherwise
+ * This follows industry standard - authenticated users keep their session context
+ */
 export default function PublicLayout() {
   const data = useLoaderData();
   const user = data?.user || null;

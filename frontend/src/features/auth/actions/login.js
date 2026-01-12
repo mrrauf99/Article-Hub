@@ -1,5 +1,5 @@
 import { authApi } from "../../api/authApi";
-import { redirect } from "react-router-dom";
+import { redirectToDashboard } from "@/utils/authUtils.js";
 
 export default async function loginAction({ request }) {
   const data = await request.formData();
@@ -10,10 +10,8 @@ export default async function loginAction({ request }) {
 
   try {
     const { data } = await authApi.login(payload);
-    if (data.success) {
-      if (data.role === "user") return redirect("/user/dashboard");
-
-      if (data.role === "admin") return redirect("/admin/dashboard");
+    if (data.success && data.role) {
+      return redirectToDashboard(data.role);
     }
 
     return {
@@ -21,17 +19,13 @@ export default async function loginAction({ request }) {
       message: data.message,
     };
   } catch (err) {
-    // RATE LIMIT ERROR
     if (err.response?.status === 429) {
-      const { retryAfterSeconds } = err.response.data;
-
       return {
         success: false,
-        retryAfterSeconds,
+        retryAfterSeconds: err.response.data.retryAfterSeconds,
       };
     }
 
-    // AUTH ERROR
     return {
       success: false,
       message:
