@@ -359,47 +359,102 @@ export async function checkUsernameAvailability(req, res) {
 }
 
 export async function resetPassword(req, res) {
-  const { password } = req.body;
-  const otp = req.session.otp;
+  try {
+    const { password } = req.body;
+    const otp = req.session?.otp;
 
-  if (!otp.verified || otp.flow !== "reset-password") {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized reset attempt.",
-    });
-  }
-
-  const { rows } = await db.query(
-    "SELECT password FROM users WHERE email = $1",
-    [otp.email]
-  );
-
-  if (rows.length > 0) {
-    const isSamePassword = await bcrypt.compare(password, rows[0].password);
-    if (isSamePassword) {
-      return res.status(400).json({
+    // Validate OTP session
+    if (!otp) {
+      console.error("Reset password error: No OTP session found");
+      return res.status(401).json({
         success: false,
-        message: "New password cannot be the same as the old password.",
+        message: "Your verification session has expired. Please request a new code.",
       });
     }
+
+    if (!otp.verified || otp.flow !== "reset-password") {
+      const errorMsg = !otp.verified
+        ? "Please verify your OTP code first."
+        : "Unauthorized reset attempt.";
+      console.error("Reset password error:", !otp.verified ? "OTP not verified" : `Invalid flow: ${otp.flow}`);
+      return res.status(401).json({
+        success: false,
+        message: errorMsg,
+      });
+    }
+
+    // Validate password input
+    if (!password || typeof password !== "string" || password.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Password is required.",
+      });
+    }
+
+    const passwordLength = password.length;
+    if (passwordLength < 8 || passwordLength > 64) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be between 8 and 64 characters.",
+      });
+    }
+
+    // Check if user exists and get current password
+    const { rows } = await db.query("SELECT password FROM users WHERE email = $1", [otp.email]);
+
+    if (rows.length === 0) {
+      console.error("Reset password error: User not found", otp.email);
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Check if new password is different from old password (only if user has a password)
+    const existingPassword = rows[0].password;
+    if (existingPassword) {
+      const isSamePassword = await bcrypt.compare(password, existingPassword);
+      if (isSamePassword) {
+        return res.status(400).json({
+          success: false,
+          message: "New password cannot be the same as the old password.",
+        });
+      }
+    }
+
+    // Hash and update password
+    const saltRounds = Number(process.env.SALT_ROUNDS || 10);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const updateResult = await db.query("UPDATE users SET password = $1 WHERE email = $2", [
+      hashedPassword,
+      otp.email,
+    ]);
+
+    if (updateResult.rowCount === 0) {
+      console.error("Reset password error: Failed to update password");
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update password. Please try again.",
+      });
+    }
+
+    // Destroy session after successful update
+    req.session.destroy((err) => {
+      if (err) console.error("Error destroying session:", err);
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successful.",
+    });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Unable to reset password. Please try again.",
+    });
   }
-
-  const hashedPassword = await bcrypt.hash(
-    password,
-    Number(process.env.SALT_ROUNDS)
-  );
-
-  await db.query("UPDATE users SET password = $1 WHERE email = $2", [
-    hashedPassword,
-    otp.email,
-  ]);
-
-  req.session.destroy(() => {});
-
-  res.status(200).json({
-    success: true,
-    message: "Password reset successful.",
-  });
 }
 
 export async function completeGoogleSignup(req, res) {
