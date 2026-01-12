@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { isEmpty, validatePassword, getPasswordGenericError } from "../util/authValidation";
 
 const INITIAL_VALUES = {
@@ -6,13 +6,21 @@ const INITIAL_VALUES = {
   confirmPassword: "",
 };
 
+const FIELD_NAMES = {
+  PASSWORD: "password",
+  CONFIRM_PASSWORD: "confirmPassword",
+};
+
 export function useResetPasswordForm() {
   const [values, setValues] = useState(INITIAL_VALUES);
   const [errors, setErrors] = useState({});
 
-  const passwordErrors = validatePassword(values.password, values.confirmPassword);
+  const passwordErrors = useMemo(
+    () => validatePassword(values.password, values.confirmPassword),
+    [values.password, values.confirmPassword]
+  );
 
-  const validate = () => {
+  const validate = useCallback(() => {
     const newErrors = {};
     const currentPasswordErrors = validatePassword(values.password, values.confirmPassword);
 
@@ -31,55 +39,65 @@ export function useResetPasswordForm() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [values.password, values.confirmPassword]);
 
-  const handleFocus = (e) => {
+  const handleFocus = useCallback((e) => {
     const { name } = e.target;
-    if (name === "password") {
-      setErrors((prev) => ({ ...prev, password: null }));
-    }
-  };
+    setErrors((prev) => (prev[name] ? { ...prev, [name]: null } : prev));
+  }, []);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
 
     setValues((prev) => {
-      const newValues = { ...prev, [name]: value };
+      const next = {
+        ...prev,
+        [name]: value,
+      };
 
-      if (name === "password") {
-        if (prev.confirmPassword?.length) {
-          const confirmError = value !== prev.confirmPassword ? "Passwords do not match." : null;
-          setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: confirmError }));
-        }
-      } else if (name === "confirmPassword") {
-        const confirmError = value.length > 0
-          ? (value !== prev.password ? "Passwords do not match." : null)
-          : null;
-        setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: confirmError }));
-      } else {
-        setErrors((prevErrors) => ({ ...prevErrors, [name]: null }));
+      // Re-evaluate confirmPassword error when password changes
+      if (name === FIELD_NAMES.PASSWORD && prev.confirmPassword) {
+        setErrors((err) => {
+          // If passwords now match, clear confirmPassword error
+          if (err.confirmPassword && value === prev.confirmPassword) {
+            return { ...err, confirmPassword: null };
+          }
+          // If passwords don't match and confirmPassword has a value, set error
+          if (value !== prev.confirmPassword && prev.confirmPassword) {
+            return { ...err, confirmPassword: "Passwords do not match." };
+          }
+          return err;
+        });
       }
 
-      return newValues;
+      return next;
     });
-  };
 
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
+    // Clear error when user starts typing
+    setErrors((prev) => (prev[name] ? { ...prev, [name]: null } : prev));
+  }, []);
 
-    if (name === "password") {
-      const currentPasswordErrors = validatePassword(value, values.confirmPassword);
-      const error = isEmpty(value) ? "Please fill out this field." : getPasswordGenericError(currentPasswordErrors, value);
-      setErrors((prev) => ({ ...prev, [name]: error }));
-    } else if (name === "confirmPassword") {
-      const error = isEmpty(value)
-        ? "Please fill out this field."
-        : value !== values.password
-        ? "Passwords do not match."
-        : null;
-      setErrors((prev) => ({ ...prev, [name]: error }));
-    }
-  };
+  const handleBlur = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+
+      if (name === FIELD_NAMES.PASSWORD) {
+        const currentPasswordErrors = validatePassword(value, values.confirmPassword);
+        const error = isEmpty(value)
+          ? "Please fill out this field."
+          : getPasswordGenericError(currentPasswordErrors, value);
+        setErrors((prev) => ({ ...prev, [name]: error }));
+      } else if (name === FIELD_NAMES.CONFIRM_PASSWORD) {
+        const error = isEmpty(value)
+          ? "Please fill out this field."
+          : value !== values.password
+          ? "Passwords do not match."
+          : null;
+        setErrors((prev) => ({ ...prev, [name]: error }));
+      }
+    },
+    [values.password, values.confirmPassword]
+  );
 
   return {
     values,
