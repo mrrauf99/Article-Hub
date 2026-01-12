@@ -11,7 +11,7 @@ export async function getProfile(req, res) {
       `
       SELECT username, name, email, expertise, avatar_url AS avatar,  
       joined_at, bio, portfolio_url, x_url, linkedin_url, 
-      instagram_url, facebook_url, role, gender FROM users WHERE id = $1
+      instagram_url, facebook_url, role, gender, country FROM users WHERE id = $1
       `,
       [userId]
     );
@@ -94,6 +94,7 @@ export async function updateUserProfile(req, res) {
       facebook_url,
       instagram_url,
       gender,
+      country,
     } = req.body;
 
     // Validate profile data
@@ -107,6 +108,7 @@ export async function updateUserProfile(req, res) {
       facebook_url,
       instagram_url,
       gender,
+      country,
     });
 
     if (validationErrors.length > 0) {
@@ -180,8 +182,9 @@ export async function updateUserProfile(req, res) {
           facebook_url = $7,
           instagram_url = $8,
           gender = $9,
-          avatar_url = $10
-        WHERE id = $11
+          country = $10,
+          avatar_url = $11
+        WHERE id = $12
         RETURNING id
       `;
       params = [
@@ -194,6 +197,7 @@ export async function updateUserProfile(req, res) {
         facebook_url,
         instagram_url,
         gender || null,
+        country || null,
         avatarUrl,
         userId,
       ];
@@ -208,8 +212,9 @@ export async function updateUserProfile(req, res) {
           linkedin_url = $6,
           facebook_url = $7,
           instagram_url = $8,
-          gender = $9
-        WHERE id = $10
+          gender = $9,
+          country = $10
+        WHERE id = $11
         RETURNING id
       `;
       params = [
@@ -222,6 +227,7 @@ export async function updateUserProfile(req, res) {
         facebook_url,
         instagram_url,
         gender || null,
+        country || null,
         userId,
       ];
     }

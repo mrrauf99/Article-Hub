@@ -7,5 +7,5 @@ export const ProfileContext = createContext({
   isSaving: false,
   handleChange: () => {},
   handleCancel: () => {},
+  handleEdit: () => {},
 });
-

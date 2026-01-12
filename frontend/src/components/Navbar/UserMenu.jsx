@@ -1,16 +1,17 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   User,
   LogOut,
   ChevronDown,
-  LayoutDashboard,
   Shield,
 } from "lucide-react";
 import styles from "@/styles/navbar.module.css";
 
 export default function UserMenu({ role, userName, avatar, onLogout }) {
   const [open, setOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+  const [dropdownAvatarError, setDropdownAvatarError] = useState(false);
   const menuRef = useRef(null);
 
   // Close on click outside
@@ -37,6 +38,17 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open]);
 
+  // Get initials for avatar fallback (memoized to avoid recalculation)
+  const initials = useMemo(() => {
+    if (!userName) return "U";
+    return userName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  }, [userName]);
+
   // GUEST
   if (role === "guest") {
     return (
@@ -53,17 +65,9 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
 
   const isAdmin = role === "admin";
   const profilePath = isAdmin ? "/admin/profile" : "/user/profile";
-  // ...existing code...
 
-  // Get initials for avatar fallback
-  const initials = userName
-    ? userName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "U";
+  // Helper to check if avatar is valid
+  const isValidAvatar = avatar && typeof avatar === 'string' && avatar.trim();
 
   return (
     <div className={styles.userMenuWrapper} ref={menuRef}>
@@ -76,8 +80,13 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
         aria-haspopup="true"
       >
         <div className={styles.avatarContainer}>
-          {avatar ? (
-            <img src={avatar} alt={userName} className={styles.avatarImage} />
+          {isValidAvatar && !avatarError ? (
+            <img
+              src={avatar}
+              alt={userName}
+              className={styles.avatarImage}
+              onError={() => setAvatarError(true)}
+            />
           ) : (
             <span className={styles.avatarFallback}>{initials}</span>
           )}
@@ -94,8 +103,13 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
         {/* User info header */}
         <div className={styles.dropdownHeader}>
           <div className={styles.dropdownAvatarLarge}>
-            {avatar ? (
-              <img src={avatar} alt={userName} className={styles.avatarImage} />
+            {isValidAvatar && !dropdownAvatarError ? (
+              <img
+                src={avatar}
+                alt={userName}
+                className={styles.avatarImage}
+                onError={() => setDropdownAvatarError(true)}
+              />
             ) : (
               <span className={styles.avatarFallbackLarge}>{initials}</span>
             )}
