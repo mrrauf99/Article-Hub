@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Calendar, User, Tag, Clock, Share2, Eye, Heart } from "lucide-react";
 
@@ -7,6 +7,21 @@ export default function ArticleDetailPage() {
   const { article } = useLoaderData();
 
   const [showShareTooltip, setShowShareTooltip] = useState(false);
+
+  // Ensure page scrolls to top on mount (especially important for mobile)
+  useEffect(() => {
+    if (!article) return;
+    
+    // Immediate scroll
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    
+    // Additional scroll after render to handle mobile layout shifts
+    const timeoutId = setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }, 0);
+    
+    return () => clearTimeout(timeoutId);
+  }, [article?.id]); // Re-run if article changes
 
   /* ---------------- Guards ---------------- */
   if (!article) {

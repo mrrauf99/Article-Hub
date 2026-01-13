@@ -10,33 +10,31 @@ export default function ScrollToTop() {
     
     // Only scroll on pathname change (route navigation), not search param changes (pagination/filters)
     if (pathnameChanged) {
-      const scrollToTop = () => {
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: "instant",
-        });
-      };
-
-      // Use requestAnimationFrame to ensure DOM is ready
+      // Scroll immediately multiple times to prevent visible scroll down on mobile
+      // This handles timing issues where content renders before scroll happens
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      
+      // Use multiple requestAnimationFrame calls to ensure scroll happens after layout
       requestAnimationFrame(() => {
-        requestAnimationFrame(scrollToTop);
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        });
       });
-
-      prevLocationRef.current = { pathname, search };
-    } else {
-      // Update search params in ref even if pathname didn't change
-      prevLocationRef.current = { pathname, search };
+      
+      // Additional scroll after a short delay for mobile browsers
+      const timeoutId = setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      }, 0);
+      
+      return () => clearTimeout(timeoutId);
     }
+    
+    prevLocationRef.current = { pathname, search };
   }, [pathname, search]);
 
-  // Also scroll on initial mount
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant",
-    });
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, []);
 
   return null;
