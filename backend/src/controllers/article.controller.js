@@ -472,6 +472,7 @@ export const uploadImageToCloudinary = async (req, res) => {
 
 export const incrementArticleViews = async (req, res) => {
   const { id } = req.params;
+  const userId = req.session?.userId ?? null;
 
   try {
     if (req.session?.userRole === "admin") {
@@ -479,6 +480,20 @@ export const incrementArticleViews = async (req, res) => {
         success: true,
         message: "View not counted for admin",
       });
+    }
+
+    if (userId) {
+      const authorCheck = await db.query(
+        `SELECT author_id FROM articles WHERE article_id = $1`,
+        [id]
+      );
+
+      if (authorCheck.rows.length > 0 && authorCheck.rows[0].author_id === userId) {
+        return res.status(200).json({
+          success: true,
+          message: "View not counted for article author",
+        });
+      }
     }
 
     const { rowCount } = await db.query(

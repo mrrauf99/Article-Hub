@@ -18,6 +18,9 @@ function OTPInputs({
   const handlePasteWrapper = useCallback(
     (index) => (e) => {
       if (isSubmitting) return;
+      // Container handler with capture phase handles multi-digit pastes
+      // This only handles single character pastes as fallback
+      e.stopPropagation();
       onUserInput?.();
       handlePaste(e, index);
     },
@@ -35,13 +38,15 @@ function OTPInputs({
       if (text && /^\d+$/.test(text)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         onUserInput?.();
         handleOtpString?.(text);
       }
     };
 
-    container.addEventListener("paste", handleContainerPaste);
-    return () => container.removeEventListener("paste", handleContainerPaste);
+    // Use capture phase to handle paste before individual inputs
+    container.addEventListener("paste", handleContainerPaste, true);
+    return () => container.removeEventListener("paste", handleContainerPaste, true);
   }, [isSubmitting, onUserInput, handleOtpString]);
 
   return (
@@ -54,6 +59,12 @@ function OTPInputs({
           inputMode="numeric"
           pattern="[0-9]*"
           autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck="false"
+          data-1p-ignore="true"
+          data-lpignore="true"
+          data-form-type="other"
           maxLength={1}
           value={digit}
           disabled={isSubmitting}
@@ -61,7 +72,28 @@ function OTPInputs({
           onChange={(e) => {
             if (isSubmitting) return;
             onUserInput?.();
-            handleChange(index, e.target.value);
+            const value = e.target.value;
+            // Handle autofill: if multiple digits are entered at once, treat as full OTP
+            if (value.length > 1 && /^\d+$/.test(value)) {
+              // Clear the input value since it contains multiple digits
+              e.target.value = "";
+              // Process the full OTP string
+              handleOtpString?.(value);
+              return;
+            }
+            handleChange(index, value);
+          }}
+          onInput={(e) => {
+            if (isSubmitting) return;
+            const value = e.target.value;
+            // Handle autofill suggestions that fill multiple digits (onInput fires before onChange)
+            if (value.length > 1 && /^\d+$/.test(value)) {
+              // Clear the input value
+              e.target.value = "";
+              e.stopPropagation();
+              onUserInput?.();
+              handleOtpString?.(value);
+            }
           }}
           onKeyDown={(e) => {
             if (isSubmitting) return;
