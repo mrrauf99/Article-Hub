@@ -1,46 +1,62 @@
 import db from "../config/db.config.js";
 import { deleteImageByUrl } from "../utils/cloudinary.utils.js";
 
+async function fetchDashboardStats() {
+  const statsQuery = await db.query(`
+    SELECT
+      (SELECT COUNT(*) FROM users WHERE role = 'user') AS total_users,
+      (SELECT COUNT(*) FROM users WHERE role = 'admin') AS total_admins,
+      (SELECT COUNT(*) FROM articles) AS total_articles,
+      (SELECT COUNT(*) FROM articles WHERE status = 'approved') AS approved_articles,
+      (SELECT COUNT(*) FROM articles WHERE status = 'pending') AS pending_articles,
+      (SELECT COUNT(*) FROM articles WHERE status = 'rejected') AS rejected_articles,
+      (SELECT COALESCE(SUM(views), 0) FROM articles) AS total_views
+  `);
+
+  return statsQuery.rows[0];
+}
+
+async function fetchRecentActivity() {
+  const recentArticles = await db.query(`
+    SELECT
+      a.article_id,
+      a.title,
+      a.status,
+      a.created_at,
+      u.name AS author_name,
+      u.avatar_url AS author_avatar
+    FROM articles a
+    JOIN users u ON u.id = a.author_id
+    ORDER BY a.created_at DESC
+    LIMIT 5
+  `);
+
+  const recentUsers = await db.query(`
+    SELECT id, username, name, email, avatar_url AS avatar, role, joined_at
+    FROM users
+    ORDER BY joined_at DESC
+    LIMIT 5
+  `);
+
+  return {
+    recentArticles: recentArticles.rows,
+    recentUsers: recentUsers.rows,
+  };
+}
+
 export const getDashboardStats = async (req, res) => {
   try {
-    const statsQuery = await db.query(`
-      SELECT
-        (SELECT COUNT(*) FROM users WHERE role = 'user') AS total_users,
-        (SELECT COUNT(*) FROM users WHERE role = 'admin') AS total_admins,
-        (SELECT COUNT(*) FROM articles) AS total_articles,
-        (SELECT COUNT(*) FROM articles WHERE status = 'approved') AS approved_articles,
-        (SELECT COUNT(*) FROM articles WHERE status = 'pending') AS pending_articles,
-        (SELECT COUNT(*) FROM articles WHERE status = 'rejected') AS rejected_articles,
-        (SELECT COALESCE(SUM(views), 0) FROM articles) AS total_views
-    `);
-
-    const recentArticles = await db.query(`
-      SELECT
-        a.article_id,
-        a.title,
-        a.status,
-        a.created_at,
-        u.name AS author_name,
-        u.avatar_url AS author_avatar
-      FROM articles a
-      JOIN users u ON u.id = a.author_id
-      ORDER BY a.created_at DESC
-      LIMIT 5
-    `);
-
-    const recentUsers = await db.query(`
-      SELECT id, username, name, email, avatar_url AS avatar, role, joined_at
-      FROM users
-      ORDER BY joined_at DESC
-      LIMIT 5
-    `);
+    const [stats, recent] = await Promise.all([
+      fetchDashboardStats(),
+      fetchRecentActivity(),
+    ]);
 
     res.json({
       success: true,
       data: {
-        stats: statsQuery.rows[0],
-        recentArticles: recentArticles.rows,
-        recentUsers: recentUsers.rows,
+        stats,
+        recentArticles: recent.recentArticles,
+        recentUsers: recent.recentUsers,
       },
     });
   } catch (err) {
@@ -48,6 +64,36 @@ export const getDashboardStats = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch dashboard stats" });
+  }
+};
+
+export const getDashboardSummary = async (req, res) => {
+  try {
+    const stats = await fetchDashboardStats();
+    res.json({
+      success: true,
+      data: { stats },
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch dashboard stats" });
+  }
+};
+
+export const getDashboardRecent = async (req, res) => {
+  try {
+    const recent = await fetchRecentActivity();
+    res.json({
+      success: true,
+      data: recent,
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch recent activity" });
   }
 };
 

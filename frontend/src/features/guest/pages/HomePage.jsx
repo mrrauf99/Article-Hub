@@ -12,7 +12,7 @@ import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 import { normalizeCategory, getCanonicalCategory } from "@/utils/categoryUtils";
 
 export default function HomePage() {
-  const { articles } = useLoaderData();
+  const { articles, pagination, meta } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const rawCategory = searchParams.get("category");
@@ -24,22 +24,14 @@ export default function HomePage() {
     return canonical || "All";
   }, [rawCategory]);
 
-  const filteredArticles = useMemo(() => {
-    if (activeCategory === "All") return articles;
-    return articles.filter((a) => {
-      const articleCategory = normalizeCategory(a.category);
-      return articleCategory === activeCategory;
-    });
-  }, [articles, activeCategory]);
-
   const articleCounts = useMemo(() => {
     const counts = {};
-    articles.forEach((article) => {
-      const normalized = normalizeCategory(article.category);
-      counts[normalized] = (counts[normalized] || 0) + 1;
+    (meta?.categoryCounts || []).forEach(({ category, count }) => {
+      const normalized = normalizeCategory(category);
+      counts[normalized] = count;
     });
     return counts;
-  }, [articles]);
+  }, [meta?.categoryCounts]);
 
   const categories = useMemo(() => {
     const ranked = Object.entries(articleCounts)
@@ -55,10 +47,8 @@ export default function HomePage() {
     return ["All", ...ranked, ...remaining];
   }, [articleCounts]);
 
-  const authorCount = useMemo(() => {
-    const authors = new Set(articles.map((a) => a.author_name));
-    return authors.size;
-  }, [articles]);
+  const authorCount = meta?.authorCount ?? 0;
+  const totalArticles = meta?.overallCount ?? articles.length;
 
   function handleCategorySelect(category) {
     const params = new URLSearchParams(searchParams);
@@ -82,7 +72,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <HeroSection articleCount={articles.length} authorCount={authorCount} />
+      <HeroSection articleCount={totalArticles} authorCount={authorCount} />
 
       {/* Featured Articles */}
       <FeaturedArticles articles={articles} />
@@ -99,12 +89,14 @@ export default function HomePage() {
 
       {/* All Articles Grid */}
       <ArticlesGrid
-        articles={filteredArticles}
+        articles={articles}
         categories={categories}
         activeCategory={activeCategory}
         onCategorySelect={handleCategorySelect}
         page={pageParam}
         onPageChange={handlePageChange}
+        totalCount={pagination?.totalCount ?? articles.length}
+        totalPages={pagination?.totalPages ?? 1}
       />
 
       {/* Newsletter Section */}

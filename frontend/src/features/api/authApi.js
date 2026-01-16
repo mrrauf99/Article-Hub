@@ -19,9 +19,15 @@ export const authApi = {
 
   resetPassword: (data) => apiClient.post("auth/reset-password", data),
 
+  verifyTwoFactorLogin: (data) => apiClient.post("auth/2fa/verify-login", data),
+
   oauthComplete: (data) => apiClient.post("auth/oauth/complete", data),
 
   oauthSession: () => apiClient.get("auth/oauth-session"),
 
   otpSession: () => apiClient.get("auth/otp-session"),
+
+  twoFactorSession: () => apiClient.get("auth/2fa-session"),
+
+  session: () => apiClient.get("auth/session"),
 };

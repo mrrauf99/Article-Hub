@@ -26,29 +26,4 @@ export const FOUNDERS = [
       },
     ],
   },
-  {
-    name: "Tayyab Ali",
-    role: "UI/UX Designer & Frontend Developer",
-    bio: `Design-oriented frontend developer passionate about crafting intuitive, accessible, and visually refined user experiences. Specializes in translating complex ideas into clean, user-friendly interfaces and scalable design systems.`,
-    avatar: "https://avatars.githubusercontent.com/u/192490949?v=4",
-    tags: ["UI Design", "Design Systems", "Frontend"],
-    featured: false,
-    socials: [
-      {
-        name: "GitHub",
-        url: "https://github.com/Tayyab054",
-        icon: Github,
-      },
-      {
-        name: "LinkedIn",
-        url: "https://www.linkedin.com/in/tayyab054/",
-        icon: Linkedin,
-      },
-      {
-        name: "Portfolio",
-        url: "",
-        icon: Globe,
-      },
-    ],
-  },
 ];

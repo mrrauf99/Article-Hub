@@ -4,6 +4,10 @@ import {
   getProfile,
   getUserStats,
   updateUserProfile,
+  changePassword,
+  startTwoFactorSetup,
+  verifyTwoFactorSetup,
+  disableTwoFactor,
 } from "../controllers/user.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { uploadImage } from "../middlewares/uploadImage.middleware.js";
@@ -20,5 +24,11 @@ userRoutes.patch(
   uploadImage.single("avatar"),
   updateUserProfile
 );
+
+userRoutes.post("/change-password", requireAuth, changePassword);
+
+userRoutes.post("/2fa/setup", requireAuth, startTwoFactorSetup);
+userRoutes.post("/2fa/verify", requireAuth, verifyTwoFactorSetup);
+userRoutes.post("/2fa/disable", requireAuth, disableTwoFactor);
 
 export default userRoutes;

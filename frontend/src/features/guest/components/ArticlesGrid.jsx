@@ -5,8 +5,6 @@ import Pagination from "@/features/articles/components/Pagination";
 import CategoryFilter from "@/components/CategoryFilter";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
-const PER_PAGE = 9;
-
 export default function ArticlesGrid({
   articles,
   categories,
@@ -14,14 +12,11 @@ export default function ArticlesGrid({
   onCategorySelect,
   page,
   onPageChange,
+  totalCount,
+  totalPages,
 }) {
-  const totalPages = Math.ceil(articles.length / PER_PAGE);
   const safePage = Math.min(Math.max(page, 1), totalPages || 1);
-
-  const paginatedArticles = useMemo(() => {
-    const start = (safePage - 1) * PER_PAGE;
-    return articles.slice(start, start + PER_PAGE);
-  }, [articles, safePage]);
+  const resolvedTotalCount = totalCount ?? articles.length;
 
   const prevPageRef = useRef(safePage);
   const prevCategoryRef = useRef(activeCategory);
@@ -82,8 +77,8 @@ export default function ArticlesGrid({
                 : `${activeCategory} Articles`}
             </h2>
             <p className="text-slate-600">
-              Browse {articles.length}{" "}
-              {articles.length === 1 ? "article" : "articles"}{" "}
+              Browse {resolvedTotalCount}{" "}
+              {resolvedTotalCount === 1 ? "article" : "articles"}{" "}
               {activeCategory !== "All" && `in ${activeCategory}`}
             </p>
           </div>
@@ -130,7 +125,7 @@ export default function ArticlesGrid({
         </div>
 
         {/* Articles Grid */}
-        {paginatedArticles.length === 0 ? (
+        {articles.length === 0 ? (
           <ScrollReveal animation="fade-up">
             <div className="py-20 text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-200 mb-5">
@@ -159,7 +154,7 @@ export default function ArticlesGrid({
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {paginatedArticles.map((article, index) => (
+              {articles.map((article, index) => (
                 <ScrollReveal
                   key={`${article.article_id}-${safePage}`}
                   animation="fade-up"
