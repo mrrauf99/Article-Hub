@@ -5,7 +5,10 @@ import { validateArticleData } from "../utils/validation.utils.js";
 
 export const getApprovedArticles = async (req, res) => {
   try {
-    const { category } = req.query || {};
+    const { category, page = "1", limit = "9" } = req.query || {};
+    const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
+    const limitNumber = Math.min(Math.max(parseInt(limit, 10) || 9, 1), 30);
+    const offset = (pageNumber - 1) * limitNumber;
 
     let query = `
       SELECT
@@ -30,13 +33,65 @@ export const getApprovedArticles = async (req, res) => {
       values.push(category);
     }
 
-    query += ` ORDER BY a.published_at DESC`;
+    query += ` ORDER BY a.published_at DESC LIMIT $${values.length + 1} OFFSET $${
+      values.length + 2
+    }`;
 
-    const { rows } = await db.query(query, values);
+    const totalCountQuery = await db.query(
+      `
+      SELECT COUNT(*)::int AS count
+      FROM articles a
+      WHERE a.status = 'approved'
+      ${category ? "AND a.category = $1" : ""}
+      `,
+      category ? [category] : []
+    );
+
+    const overallCountQuery = await db.query(`
+      SELECT COUNT(*)::int AS count
+      FROM articles
+      WHERE status = 'approved'
+    `);
+
+    const authorCountQuery = await db.query(`
+      SELECT COUNT(DISTINCT author_id)::int AS count
+      FROM articles
+      WHERE status = 'approved'
+    `);
+
+    const categoryCountsQuery = await db.query(`
+      SELECT category, COUNT(*)::int AS count
+      FROM articles
+      WHERE status = 'approved'
+      GROUP BY category
+    `);
+
+    const { rows } = await db.query(query, [
+      ...values,
+      limitNumber,
+      offset,
+    ]);
+
+    const totalCount = totalCountQuery.rows[0]?.count || 0;
+    const overallCount = overallCountQuery.rows[0]?.count || 0;
+    const authorCount = authorCountQuery.rows[0]?.count || 0;
 
     return res.status(200).json({
       success: true,
-      data: rows,
+      data: {
+        articles: rows,
+        pagination: {
+          page: pageNumber,
+          limit: limitNumber,
+          totalCount,
+          totalPages: Math.ceil(totalCount / limitNumber),
+        },
+        meta: {
+          overallCount,
+          authorCount,
+          categoryCounts: categoryCountsQuery.rows,
+        },
+      },
     });
   } catch (err) {
     console.error("getApprovedArticles error:", err);
@@ -50,10 +105,22 @@ export const getApprovedArticles = async (req, res) => {
 export const getMyArticles = async (req, res) => {
   try {
     const { rows } = await db.query(
-      `SELECT *
-       FROM articles
-       WHERE author_id = $1
-       ORDER BY created_at DESC`,
+      `
+      SELECT
+        a.article_id,
+        a.title,
+        a.summary,
+        a.category,
+        a.status,
+        a.views,
+        a.image_url,
+        a.published_at,
+        u.name AS author_name
+      FROM articles a
+      JOIN users u ON u.id = a.author_id
+      WHERE a.author_id = $1
+      ORDER BY a.created_at DESC
+      `,
       [req.session.userId]
     );
 

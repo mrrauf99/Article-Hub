@@ -3,7 +3,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function StatsSection() {
   const stats = [
-    { number: "2", label: "Founders", sublabel: "Building together" },
+    { number: "1", label: "Founder", sublabel: "Building with purpose" },
     { number: "100%", label: "Ad-Free", sublabel: "Forever" },
     { number: "∞", label: "Possibilities", sublabel: "For creators" },
     { number: "2025", label: "Founded", sublabel: "Just getting started" },

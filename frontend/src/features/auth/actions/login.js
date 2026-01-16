@@ -1,4 +1,5 @@
 import { authApi } from "../../api/authApi";
+import { redirect } from "react-router-dom";
 import { redirectToDashboard } from "@/utils/authUtils.js";
 
 export default async function loginAction({ request }) {
@@ -10,6 +11,10 @@ export default async function loginAction({ request }) {
 
   try {
     const { data } = await authApi.login(payload);
+    if (data.success && data.twoFactorRequired) {
+      return redirect("/two-factor");
+    }
+
     if (data.success && data.role) {
       return redirectToDashboard(data.role);
     }

@@ -3,6 +3,8 @@ import { apiClient } from "./apiClient.js";
 export const adminApi = {
   // Dashboard
   getDashboardStats: () => apiClient.get("admin/dashboard/stats"),
+  getDashboardSummary: () => apiClient.get("admin/dashboard/summary"),
+  getDashboardRecent: () => apiClient.get("admin/dashboard/recent"),
 
   // Articles
   getAllArticles: (params = {}) => apiClient.get("admin/articles", { params }),

@@ -14,6 +14,7 @@ import ProfileHeader from "../components/ProfileHeader";
 import AuthorInfo from "../components/AuthorInfo";
 import SocialLinks from "../components/SocialLinks";
 import ProfileActions from "../components/ProfileActions";
+import SecuritySettings from "../components/SecuritySettings";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 import ProfileProvider from "../context/ProfileProvider";
@@ -133,6 +134,8 @@ export default function ProfilePage() {
               <SocialLinks />
               <ProfileActions />
             </form>
+
+            <SecuritySettings />
             </div>
           </div>
         </div>

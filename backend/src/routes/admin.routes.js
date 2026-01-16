@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
   getDashboardStats,
+  getDashboardSummary,
+  getDashboardRecent,
   getAllArticles,
   getArticleDetails,
   getPendingArticles,
@@ -23,6 +25,8 @@ adminRoutes.use(requireAuth, requireAdmin);
 
 // Dashboard
 adminRoutes.get("/dashboard/stats", getDashboardStats);
+adminRoutes.get("/dashboard/summary", getDashboardSummary);
+adminRoutes.get("/dashboard/recent", getDashboardRecent);
 
 // Articles
 adminRoutes.get("/articles", getAllArticles);

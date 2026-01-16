@@ -5,6 +5,7 @@ import LoginPage from "./features/auth/pages/LoginPage.jsx";
 import SignUpPage from "./features/auth/pages/SignUpPage.jsx";
 import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./features/auth/pages/ResetPasswordPage.jsx";
+import TwoFactorPage from "./features/auth/pages/TwoFactorPage.jsx";
 import OTPVerificationFormPage from "./features/auth/pages/OTPVerificationFormPage.jsx";
 import CompleteProfile from "./features/auth/pages/CompleteProfile.jsx";
 
@@ -13,10 +14,12 @@ import signUpAction from "./features/auth/actions/signUp";
 import otpAction from "./features/auth/actions/otp";
 import forgotPasswordAction from "./features/auth/actions/forgotPassword";
 import resetPasswordAction from "./features/auth/actions/resetPassword";
+import verifyTwoFactorLoginAction from "./features/auth/actions/verifyTwoFactorLogin.js";
 import completeProfileAction from "./features/auth/actions/completeProfile.js";
 
 import completeProfileLoader from "./features/auth/loaders/completeProfile.js";
 import resetPasswordLoader from "./features/auth/loaders/resetPassword.js";
+import twoFactorSessionLoader from "./features/auth/loaders/twoFactorSession.js";
 import verifyOtpPageLoader from "./features/auth/loaders/verifyOtpPage.js";
 
 // Public
@@ -104,6 +107,12 @@ export default function App() {
           element: <ResetPasswordPage />,
           action: resetPasswordAction,
           loader: resetPasswordLoader,
+        },
+        {
+          path: "/two-factor",
+          element: <TwoFactorPage />,
+          action: verifyTwoFactorLoginAction,
+          loader: twoFactorSessionLoader,
         },
         {
           path: "/complete-profile",
