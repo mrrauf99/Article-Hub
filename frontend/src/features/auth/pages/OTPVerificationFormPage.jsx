@@ -179,7 +179,7 @@ export default function OTPVerificationForm() {
                   Verified
                 </>
               ) : (
-                "Verify OTP"
+                "Verify & Continue"
               )}
             </Button>
           </Form>

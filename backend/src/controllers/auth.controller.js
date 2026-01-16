@@ -1,7 +1,11 @@
 import db from "../config/db.config.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
-import { sendEmailVerificationOtp } from "../services/email.service.js";
+import speakeasy from "speakeasy";
+import {
+  sendEmailVerificationOtp,
+  sendLoginNotificationEmail,
+} from "../services/email.service.js";
 
 const OTP_TTL_MS = 5 * 60 * 1000;
 const OTP_HASH_ROUNDS = 10;
@@ -58,9 +62,10 @@ export async function forgetPassword(req, res) {
   try {
     const { email } = req.body;
 
-    const { rowCount } = await db.query("SELECT 1 FROM users WHERE email = $1", [
-      email,
-    ]);
+    const { rowCount } = await db.query(
+      "SELECT 1 FROM users WHERE email = $1",
+      [email]
+    );
 
     if (!rowCount) {
       return res.json({
@@ -213,16 +218,16 @@ export async function verifyOtp(req, res) {
       req.session.destroy(() => {});
     } catch (insertErr) {
       console.error("Error inserting user during signup:", insertErr);
-      
+
       // Handle specific database errors
-      if (insertErr.code === '42703') {
+      if (insertErr.code === "42703") {
         return res.status(500).json({
           success: false,
           message: "Database column error. Please check users table schema.",
         });
       }
-      
-      if (insertErr.code === '23505') {
+
+      if (insertErr.code === "23505") {
         return res.status(400).json({
           success: false,
           message: "Email or username already exists.",
@@ -248,7 +253,7 @@ export async function login(req, res) {
 
   try {
     const { rows } = await db.query(
-      "SELECT id, password, role FROM users WHERE email = $1 OR username = $1",
+      "SELECT id, password, role, email, username, name, two_factor_enabled FROM users WHERE email = $1 OR username = $1",
       [identifier]
     );
 
@@ -269,7 +274,7 @@ export async function login(req, res) {
       });
     }
 
-    req.session.regenerate((err) => {
+    req.session.regenerate(async (err) => {
       if (err) {
         return res.status(500).json({
           success: false,
@@ -277,8 +282,36 @@ export async function login(req, res) {
         });
       }
 
+      if (user.two_factor_enabled) {
+        req.session.pending2fa = {
+          userId: user.id,
+          role: user.role,
+          createdAt: Date.now(),
+        };
+        req.session.cookie.maxAge = 5 * 60 * 1000;
+
+        return res.status(200).json({
+          success: true,
+          twoFactorRequired: true,
+        });
+      }
+
       req.session.userId = user.id;
+      req.session.userRole = user.role;
       req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000;
+
+      const ipAddress = req.ip;
+      const userAgent = req.get("user-agent");
+
+      sendLoginNotificationEmail({
+        to: user.email,
+        name: user.name || user.username || identifier,
+        ipAddress,
+        userAgent,
+        loggedInAt: new Date(),
+      }).catch((mailErr) => {
+        console.error("Login notification email error:", mailErr);
+      });
 
       res.status(200).json({
         success: true,
@@ -290,6 +323,101 @@ export async function login(req, res) {
     res.status(500).json({
       success: false,
       message: "Something went wrong. Please try again later.",
+    });
+  }
+}
+
+export async function verifyTwoFactorLogin(req, res) {
+  try {
+    const { token } = req.body;
+    const pending = req.session.pending2fa;
+
+    if (!pending) {
+      return res.status(401).json({
+        success: false,
+        message: "2FA session expired. Please log in again.",
+      });
+    }
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "Authentication code is required.",
+      });
+    }
+
+    if (Date.now() - pending.createdAt > 5 * 60 * 1000) {
+      delete req.session.pending2fa;
+      return res.status(401).json({
+        success: false,
+        message: "2FA session expired. Please log in again.",
+      });
+    }
+
+    const { rows } = await db.query(
+      "SELECT id, role, email, username, name, two_factor_secret, two_factor_enabled FROM users WHERE id = $1",
+      [pending.userId]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    const user = rows[0];
+
+    if (!user.two_factor_enabled || !user.two_factor_secret) {
+      return res.status(400).json({
+        success: false,
+        message: "Two-factor authentication is not enabled.",
+      });
+    }
+
+    const isValid = speakeasy.totp.verify({
+      secret: user.two_factor_secret,
+      encoding: "base32",
+      token,
+      window: 1,
+    });
+
+    if (!isValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid authentication code.",
+      });
+    }
+
+    delete req.session.pending2fa;
+
+    req.session.userId = user.id;
+    req.session.userRole = user.role;
+    req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000;
+
+    const ipAddress = req.ip;
+    const userAgent = req.get("user-agent");
+
+    sendLoginNotificationEmail({
+      to: user.email,
+      name: user.name || user.username,
+      ipAddress,
+      userAgent,
+      loggedInAt: new Date(),
+    }).catch((mailErr) => {
+      console.error("Login notification email error:", mailErr);
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully.",
+      role: user.role,
+    });
+  } catch (err) {
+    console.error("verifyTwoFactorLogin error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to verify 2FA. Please try again.",
     });
   }
 }
@@ -368,7 +496,8 @@ export async function resetPassword(req, res) {
       console.error("Reset password error: No OTP session found");
       return res.status(401).json({
         success: false,
-        message: "Your verification session has expired. Please request a new code.",
+        message:
+          "Your verification session has expired. Please request a new code.",
       });
     }
 
@@ -376,7 +505,10 @@ export async function resetPassword(req, res) {
       const errorMsg = !otp.verified
         ? "Please verify your OTP code first."
         : "Unauthorized reset attempt.";
-      console.error("Reset password error:", !otp.verified ? "OTP not verified" : `Invalid flow: ${otp.flow}`);
+      console.error(
+        "Reset password error:",
+        !otp.verified ? "OTP not verified" : `Invalid flow: ${otp.flow}`
+      );
       return res.status(401).json({
         success: false,
         message: errorMsg,
@@ -400,7 +532,10 @@ export async function resetPassword(req, res) {
     }
 
     // Check if user exists and get current password
-    const { rows } = await db.query("SELECT password FROM users WHERE email = $1", [otp.email]);
+    const { rows } = await db.query(
+      "SELECT password FROM users WHERE email = $1",
+      [otp.email]
+    );
 
     if (rows.length === 0) {
       console.error("Reset password error: User not found", otp.email);
@@ -426,10 +561,10 @@ export async function resetPassword(req, res) {
     const saltRounds = Number(process.env.SALT_ROUNDS || 10);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const updateResult = await db.query("UPDATE users SET password = $1 WHERE email = $2", [
-      hashedPassword,
-      otp.email,
-    ]);
+    const updateResult = await db.query(
+      "UPDATE users SET password = $1 WHERE email = $2",
+      [hashedPassword, otp.email]
+    );
 
     if (updateResult.rowCount === 0) {
       console.error("Reset password error: Failed to update password");
@@ -485,16 +620,16 @@ export async function completeGoogleSignup(req, res) {
     res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
   } catch (insertErr) {
     console.error("Error inserting user during Google signup:", insertErr);
-    
+
     // Handle specific database errors
-    if (insertErr.code === '42703') {
+    if (insertErr.code === "42703") {
       return res.status(500).json({
         success: false,
         message: "Database column error. Please check users table schema.",
       });
     }
-    
-    if (insertErr.code === '23505') {
+
+    if (insertErr.code === "23505") {
       return res.status(400).json({
         success: false,
         message: "Username already taken. Please choose a different username.",

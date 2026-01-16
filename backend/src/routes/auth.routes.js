@@ -11,6 +11,7 @@ import {
   checkEmailAvailability,
   checkUsernameAvailability,
   completeGoogleSignup,
+  verifyTwoFactorLogin,
 } from "../controllers/auth.controller.js";
 
 import { requireOAuthSession } from "../middlewares/oauth.middleware.js";
@@ -30,6 +31,9 @@ authRoutes.post("/resend-otp", resendOtp);
 
 // Login with email & password
 authRoutes.post("/login", loginLimiter, login);
+
+// Verify 2FA login
+authRoutes.post("/2fa/verify-login", verifyTwoFactorLogin);
 
 // Logout user and destroy session
 authRoutes.get("/logout", (req, res) => {
@@ -74,6 +78,9 @@ authRoutes.get(
     // Existing user → login directly
     if (user.id) {
       req.session.userId = user.id;
+      if (user.role) {
+        req.session.userRole = user.role;
+      }
       // Redirect based on role
       const dashboardPath =
         user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
@@ -114,6 +121,25 @@ authRoutes.get("/otp-session", requireOtpSession, (req, res) => {
 // OAuth session validation
 authRoutes.get("/oauth-session", requireOAuthSession, (req, res) => {
   res.status(200).json({ success: true });
+});
+
+// 2FA session validation
+authRoutes.get("/2fa-session", (req, res) => {
+  if (!req.session?.pending2fa) {
+    return res.status(401).json({ success: false });
+  }
+  return res.status(200).json({ success: true });
+});
+
+// Auth session validation (no DB hit)
+authRoutes.get("/session", (req, res) => {
+  if (!req.session?.userId || !req.session?.userRole) {
+    return res.status(401).json({ success: false });
+  }
+  return res.status(200).json({
+    success: true,
+    role: req.session.userRole,
+  });
 });
 
 export default authRoutes;

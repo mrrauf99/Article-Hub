@@ -46,7 +46,8 @@ function OTPInputs({
 
     // Use capture phase to handle paste before individual inputs
     container.addEventListener("paste", handleContainerPaste, true);
-    return () => container.removeEventListener("paste", handleContainerPaste, true);
+    return () =>
+      container.removeEventListener("paste", handleContainerPaste, true);
   }, [isSubmitting, onUserInput, handleOtpString]);
 
   return (
@@ -65,7 +66,7 @@ function OTPInputs({
           data-1p-ignore="true"
           data-lpignore="true"
           data-form-type="other"
-          maxLength={1}
+          maxLength={otp.length}
           value={digit}
           disabled={isSubmitting}
           className={`${styles.input} ${isSubmitting ? styles.disabled : ""}`}
