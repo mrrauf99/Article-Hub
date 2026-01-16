@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { KeyRound, ShieldCheck, QrCode, Lock } from "lucide-react";
+import { KeyRound, ShieldCheck, QrCode, Lock, Copy } from "lucide-react";
 import { useProfile } from "../hooks/useProfile";
 import { userApi } from "@/features/api/userApi";
 import InputField from "@/components/InputField";
@@ -36,6 +36,7 @@ export default function SecuritySettings() {
   const [disableLoading, setDisableLoading] = useState(false);
   const [disableMessage, setDisableMessage] = useState(null);
   const [disableErrors, setDisableErrors] = useState({});
+  const [copiedSecret, setCopiedSecret] = useState(false);
 
   useEffect(() => {
     setTwoFactorEnabled(Boolean(user?.two_factor_enabled));
@@ -201,6 +202,7 @@ export default function SecuritySettings() {
         qrCodeDataUrl: data.qrCodeDataUrl,
         secret: data.secret,
       });
+      setSetupPassword("");
       setSetupMessage({
         success: true,
         message: "Scan the QR code and enter the 6-digit code to enable 2FA.",
@@ -294,6 +296,27 @@ export default function SecuritySettings() {
       setDisableLoading(false);
     }
   };
+
+  const handleCopySecret = useCallback(async () => {
+    if (!setupData?.secret) return;
+    try {
+      await navigator.clipboard.writeText(setupData.secret);
+      setCopiedSecret(true);
+      setTimeout(() => setCopiedSecret(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = setupData.secret;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopiedSecret(true);
+      setTimeout(() => setCopiedSecret(false), 2000);
+    }
+  }, [setupData?.secret]);
 
   const statusBadge = useMemo(
     () => (
@@ -426,7 +449,11 @@ export default function SecuritySettings() {
                       setSetupErrors((prev) => ({ ...prev, password: null }));
                     }
                   }}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                    setupErrors.password
+                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
+                  }`}
                   autoComplete="current-password"
                 />
                 {setupErrors.password && (
@@ -468,9 +495,23 @@ export default function SecuritySettings() {
                   <p className="text-xs text-slate-500 mt-3">
                     Or enter this key manually:
                   </p>
-                  <p className="mt-1 font-mono text-sm text-slate-800 break-all">
-                    {setupData.secret}
-                  </p>
+                  <div className="mt-2 flex items-center justify-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+                    <p className="font-mono text-xs text-slate-800 break-all flex-1 text-center">
+                      {setupData.secret}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleCopySecret}
+                      className="flex-shrink-0 w-16 px-2 py-1.5 rounded hover:bg-slate-200 transition-colors text-xs font-semibold flex items-center justify-center"
+                      title={copiedSecret ? "Copied!" : "Copy secret"}
+                    >
+                      {copiedSecret ? (
+                        <span className="text-slate-700">Copied!</span>
+                      ) : (
+                        <Copy className="w-4 h-4 text-slate-600" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <input
@@ -484,7 +525,11 @@ export default function SecuritySettings() {
                       setSetupErrors((prev) => ({ ...prev, token: null }));
                     }
                   }}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                    setupErrors.token
+                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
+                  }`}
                 />
                 {setupErrors.token && (
                   <p className="text-sm text-rose-600">{setupErrors.token}</p>
@@ -540,7 +585,11 @@ export default function SecuritySettings() {
                       }));
                     }
                   }}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                    disableErrors.password
+                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
+                  }`}
                   autoComplete="current-password"
                 />
                 {disableErrors.password && (
@@ -559,7 +608,11 @@ export default function SecuritySettings() {
                       setDisableErrors((prev) => ({ ...prev, token: null }));
                     }
                   }}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                    disableErrors.token
+                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
+                  }`}
                 />
                 {disableErrors.token && (
                   <p className="text-sm text-rose-600">{disableErrors.token}</p>

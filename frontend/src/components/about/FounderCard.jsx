@@ -69,10 +69,12 @@ export default function FounderCard({ founder }) {
               ) : (
                 <span
                   key={social.name}
-                  className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 text-slate-300 cursor-not-allowed"
-                  title={`${social.name} (Coming Soon)`}
+                  className="relative flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 text-slate-300 cursor-not-allowed transition-all duration-200 hover:bg-slate-100 group/portfolio"
                 >
                   <Icon className="w-4 h-4" />
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg shadow-lg opacity-0 invisible group-hover/portfolio:opacity-100 group-hover/portfolio:visible pointer-events-none whitespace-nowrap transition-all duration-200 z-50 after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-slate-900">
+                    Portfolio coming soon
+                  </span>
                 </span>
               );
             })}
