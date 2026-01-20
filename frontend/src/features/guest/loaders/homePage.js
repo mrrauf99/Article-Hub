@@ -4,6 +4,9 @@ import { authApi } from "@/features/api/authApi.js";
 
 /**
  * Redirects authenticated users to dashboard, loads articles for guests
+ * Uses session to check current auth status
+ * If role was changed by admin, user's old session will be destroyed
+ * forcing them to login again with new role
  */
 export default async function homePageLoader({ request }) {
   try {

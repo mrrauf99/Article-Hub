@@ -71,8 +71,7 @@ export default function ProfileHeader() {
     resetFileInput();
   };
 
-  const displayAvatar =
-    formData.avatarPreview || user.avatar_url || user.avatar;
+  const displayAvatar = formData.avatarPreview || user.avatar_url;
 
   return (
     <>

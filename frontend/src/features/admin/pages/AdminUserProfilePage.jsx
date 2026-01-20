@@ -173,7 +173,7 @@ export default function AdminUserProfilePage() {
   const userWithAvatar = useMemo(
     () => ({
       ...user,
-      avatar_url: user.avatar || user.avatar_url,
+      avatar_url: user.avatar_url,
     }),
     [user],
   );

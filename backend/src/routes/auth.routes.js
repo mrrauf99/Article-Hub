@@ -62,7 +62,7 @@ authRoutes.get(
   "/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
-  })
+  }),
 );
 
 // Google OAuth callback handler
@@ -96,7 +96,7 @@ authRoutes.get(
     };
 
     return res.redirect(`${process.env.CLIENT_BASE_URL}/complete-profile`);
-  }
+  },
 );
 
 // Check if email already exists

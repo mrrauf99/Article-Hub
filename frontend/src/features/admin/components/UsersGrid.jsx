@@ -54,7 +54,7 @@ export default function UsersGrid({ users, onChangeRole, onDelete }) {
             <div className="flex items-center gap-3 sm:gap-4 pr-16 sm:pr-20">
               <img
                 src={
-                  user.avatar ||
+                  user.avatar_url ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(
                     user.name,
                   )}&background=6366f1&color=fff&size=80`
