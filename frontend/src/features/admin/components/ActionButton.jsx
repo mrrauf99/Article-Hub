@@ -4,8 +4,7 @@ export default function ActionButton({
   icon: Icon,
   tooltip,
   onClick,
-  disabled = false,
-  variant = "slate"
+  variant = "slate",
 }) {
   const variantClasses = {
     emerald: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
@@ -13,15 +12,11 @@ export default function ActionButton({
     slate: "bg-slate-100 text-slate-700 hover:bg-slate-200",
   };
 
-  const baseClasses = "inline-flex items-center justify-center w-8 h-8 rounded-lg hover:shadow-sm transition-all";
-  const variantClass = variantClasses[variant];
-
   return (
     <Tooltip text={tooltip}>
       <button
         onClick={onClick}
-        disabled={disabled}
-        className={`${baseClasses} ${variantClass} ${disabled ? "disabled:opacity-50 disabled:cursor-not-allowed" : ""}`}
+        className={`inline-flex items-center justify-center w-8 h-8 rounded-lg hover:shadow-sm transition-all ${variantClasses[variant]}`}
       >
         <Icon className="w-4 h-4" />
       </button>

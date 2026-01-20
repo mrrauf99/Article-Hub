@@ -1,4 +1,11 @@
-import { useEffect, useState, useRef, startTransition, useCallback, useMemo } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  startTransition,
+  useCallback,
+  useMemo,
+} from "react";
 import { Form, useActionData, useNavigation } from "react-router-dom";
 
 import { Lock } from "lucide-react";
@@ -11,7 +18,11 @@ import Button from "../components/Button";
 
 import { useResetPasswordForm } from "../hooks/useResetPasswordForm";
 
-const SUBTITLE_STYLE = { fontSize: "1rem", color: "#6b7280", lineHeight: "1.5" };
+const SUBTITLE_STYLE = {
+  fontSize: "1rem",
+  color: "#6b7280",
+  lineHeight: "1.5",
+};
 
 export default function ResetPassword() {
   const form = useResetPasswordForm();
@@ -19,14 +30,17 @@ export default function ResetPassword() {
   const navigation = useNavigation();
   const isSubmitting = useMemo(
     () => navigation.state === "submitting",
-    [navigation.state]
+    [navigation.state],
   );
 
   const [alertMessage, setAlertMessage] = useState("");
   const lastActionDataRef = useRef(null);
 
   useEffect(() => {
-    if (actionData?.success === false && actionData !== lastActionDataRef.current) {
+    if (
+      actionData?.success === false &&
+      actionData !== lastActionDataRef.current
+    ) {
       lastActionDataRef.current = actionData;
       startTransition(() => {
         setAlertMessage(actionData.message);
@@ -40,17 +54,17 @@ export default function ResetPassword() {
         e.preventDefault();
       }
     },
-    [form]
+    [form],
   );
 
   const passwordEntered = useMemo(
     () => form.values.password.length > 0,
-    [form.values.password]
+    [form.values.password],
   );
 
   const confirmEntered = useMemo(
     () => form.values.confirmPassword.length > 0,
-    [form.values.confirmPassword]
+    [form.values.confirmPassword],
   );
 
   return (
@@ -81,6 +95,7 @@ export default function ResetPassword() {
           onFocus={form.handleFocus}
           onBlur={form.handleBlur}
           error={form.errors.password}
+          disabled={isSubmitting}
         />
 
         <InputField
@@ -93,6 +108,7 @@ export default function ResetPassword() {
           onFocus={form.handleFocus}
           onBlur={form.handleBlur}
           error={form.errors.confirmPassword}
+          disabled={isSubmitting}
         />
 
         <PasswordRequirements

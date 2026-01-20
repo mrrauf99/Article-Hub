@@ -6,7 +6,7 @@
   html {
     @apply overflow-x-hidden;
   }
-  
+
   body {
     @apply overflow-x-hidden;
   }
@@ -67,5 +67,11 @@
 }
 
 .scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide Edge/IE password reveal and clear buttons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
   display: none;
 }

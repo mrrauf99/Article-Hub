@@ -52,6 +52,7 @@ export default function AdminArticlesPage() {
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [confirmApprove, setConfirmApprove] = useState(null);
+  const [confirmReject, setConfirmReject] = useState(null);
 
   const isSubmitting = fetcher.state !== "idle";
   const pendingArticleId = fetcher.formData?.get("articleId");
@@ -81,7 +82,10 @@ export default function AdminArticlesPage() {
   };
 
   const prevPageRef = useRef(pagination.page);
-  const prevFiltersRef = useRef({ status: filters.status, search: filters.search });
+  const prevFiltersRef = useRef({
+    status: filters.status,
+    search: filters.search,
+  });
 
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams);
@@ -91,7 +95,7 @@ export default function AdminArticlesPage() {
 
   useEffect(() => {
     const pageChanged = prevPageRef.current !== pagination.page;
-    const filtersChanged = 
+    const filtersChanged =
       prevFiltersRef.current.status !== filters.status ||
       prevFiltersRef.current.search !== filters.search;
 
@@ -107,21 +111,20 @@ export default function AdminArticlesPage() {
       }, 100);
 
       prevPageRef.current = pagination.page;
-      prevFiltersRef.current = { status: filters.status, search: filters.search };
+      prevFiltersRef.current = {
+        status: filters.status,
+        search: filters.search,
+      };
 
       return () => clearTimeout(timeoutId);
     }
   }, [pagination.page, filters.status, filters.search]);
 
-  const handleAction = (intent, articleId) => {
-    fetcher.submit({ intent, articleId }, { method: "post" });
-  };
-
   const handleDelete = () => {
     if (!confirmDelete) return;
     fetcher.submit(
       { intent: "delete", articleId: confirmDelete.article_id },
-      { method: "post" }
+      { method: "post" },
     );
     setConfirmDelete(null);
   };
@@ -130,9 +133,18 @@ export default function AdminArticlesPage() {
     if (!confirmApprove) return;
     fetcher.submit(
       { intent: "approve", articleId: confirmApprove.article_id },
-      { method: "post" }
+      { method: "post" },
     );
     setConfirmApprove(null);
+  };
+
+  const handleReject = () => {
+    if (!confirmReject) return;
+    fetcher.submit(
+      { intent: "reject", articleId: confirmReject.article_id },
+      { method: "post" },
+    );
+    setConfirmReject(null);
   };
 
   // Helper to check if an action is pending for a specific article
@@ -185,7 +197,7 @@ export default function AdminArticlesPage() {
         getLoadingAction={getLoadingAction}
         onViewArticle={setSelectedArticle}
         onApprove={(article) => setConfirmApprove(article)}
-        onReject={(id) => handleAction("reject", id)}
+        onReject={(article) => setConfirmReject(article)}
         onDelete={setConfirmDelete}
       />
 
@@ -204,7 +216,7 @@ export default function AdminArticlesPage() {
           article={selectedArticle}
           onClose={() => setSelectedArticle(null)}
           onApprove={(article) => setConfirmApprove(article)}
-          onReject={(id) => handleAction("reject", id)}
+          onReject={(id) => setConfirmReject({ article_id: id })}
         />
       )}
 
@@ -224,7 +236,7 @@ export default function AdminArticlesPage() {
         />
       )}
 
-      {/* Approve Confirmation Modal (reusing shared ConfirmDialog) */}
+      {/* Approve Confirmation Dialog */}
       <ConfirmDialog
         isOpen={!!confirmApprove}
         title="Approve Article"
@@ -233,12 +245,29 @@ export default function AdminArticlesPage() {
             ? `Are you sure you want to approve "${confirmApprove.title}"?`
             : ""
         }
-        confirmText="Approve"
+        confirmText="Yes, Approve"
         cancelText="Cancel"
         variant="info"
         isLoading={isSubmitting && pendingIntent === "approve"}
         onConfirm={handleApprove}
         onCancel={() => setConfirmApprove(null)}
+      />
+
+      {/* Reject Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!confirmReject}
+        title="Reject Article"
+        message={
+          confirmReject
+            ? `Are you sure you want to reject "${confirmReject.title}"?`
+            : ""
+        }
+        confirmText="Yes, Reject"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isSubmitting && pendingIntent === "reject"}
+        onConfirm={handleReject}
+        onCancel={() => setConfirmReject(null)}
       />
     </div>
   );

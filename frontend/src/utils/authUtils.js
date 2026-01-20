@@ -12,7 +12,8 @@ export function getDashboardPath(role) {
 /**
  * Redirect to role-based dashboard
  */
-export function redirectToDashboard(role) {
+export function redirectToDashboard(role, doRedirect = true) {
   const path = getDashboardPath(role);
-  return path ? redirect(path) : null;
+  if (!path) return null;
+  return doRedirect ? redirect(path) : path;
 }
