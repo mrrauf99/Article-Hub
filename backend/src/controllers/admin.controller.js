@@ -32,7 +32,7 @@ async function fetchRecentActivity() {
   `);
 
   const recentUsers = await db.query(`
-    SELECT id, username, name, email, avatar_url AS avatar, role, joined_at
+    SELECT id, username, name, email, avatar_url, role, joined_at
     FROM users
     ORDER BY joined_at DESC
     LIMIT 5
@@ -357,7 +357,7 @@ export const getAllUsers = async (req, res) => {
         username,
         name,
         email,
-        avatar_url AS avatar,
+        avatar_url,
         role,
         bio,
         joined_at,
@@ -399,7 +399,7 @@ export const getUserDetails = async (req, res) => {
   const { userId } = req.params;
   try {
     const userQuery = await db.query(
-      `SELECT id, username, name, email, avatar_url AS avatar, role, bio, expertise, gender, country, portfolio_url, x_url, linkedin_url, facebook_url, instagram_url, joined_at
+      `SELECT id, username, name, email, avatar_url, role, bio, expertise, gender, country, portfolio_url, x_url, linkedin_url, facebook_url, instagram_url, joined_at
        FROM users WHERE id = $1`,
       [userId],
     );
@@ -458,6 +458,7 @@ export const updateUserRole = async (req, res) => {
   }
 
   try {
+    // Update user role in database
     const { rowCount } = await db.query(
       `UPDATE users SET role = $1 WHERE id = $2`,
       [role, userId],
@@ -468,6 +469,12 @@ export const updateUserRole = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found" });
     }
+
+    // Destroy user's sessions from database so they must login again with new role
+    // This ensures their new session cookie has the correct role
+    await db.query(`DELETE FROM user_sessions WHERE sess->>'userId' = $1`, [
+      userId.toString(),
+    ]);
 
     res.json({ success: true, message: `User role updated to ${role}` });
   } catch (err) {

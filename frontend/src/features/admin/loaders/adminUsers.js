@@ -19,6 +19,7 @@ export default async function adminUsersLoader({ request }) {
       filters: { role: params.role, search: params.search },
     };
   } catch (error) {
+    console.error("Admin users loader error:", error);
     return handleLoaderError(error, "Failed to load users");
   }
 }

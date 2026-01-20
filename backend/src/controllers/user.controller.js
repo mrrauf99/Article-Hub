@@ -15,12 +15,12 @@ export async function getProfile(req, res) {
 
     const { rows } = await db.query(
       `
-      SELECT username, name, email, expertise, avatar_url AS avatar,  
+      SELECT username, name, email, expertise, avatar_url,  
       joined_at, bio, portfolio_url, x_url, linkedin_url, 
       instagram_url, facebook_url, role, gender, country, two_factor_enabled
       FROM users WHERE id = $1
       `,
-      [userId]
+      [userId],
     );
 
     if (rows.length === 0) {
@@ -39,7 +39,7 @@ export async function getProfile(req, res) {
     console.error("User Profile retrieval failed:", error);
 
     // Check if error is due to missing column
-    if (error.code === '42703') {
+    if (error.code === "42703") {
       return res.status(500).json({
         success: false,
         message: "Database column error. Please check users table schema.",
@@ -63,7 +63,7 @@ export async function getUserStats(req, res) {
       COALESCE(SUM(views), 0)::int AS views
       FROM articles WHERE author_id = $1
     `,
-      [userId]
+      [userId],
     );
 
     return res.status(200).json({
@@ -132,7 +132,7 @@ export async function updateUserProfile(req, res) {
         // First, get the current avatar URL to delete it later
         const currentUserQuery = await db.query(
           "SELECT avatar_url FROM users WHERE id = $1",
-          [userId]
+          [userId],
         );
         const currentAvatarUrl = currentUserQuery.rows[0]?.avatar_url;
 
@@ -149,11 +149,11 @@ export async function updateUserProfile(req, res) {
             (error, result) => {
               if (error) reject(error);
               else resolve(result);
-            }
+            },
           );
           uploadStream.end(req.file.buffer);
         });
-        
+
         avatarUrl = result.secure_url;
 
         // Delete old avatar from Cloudinary if it exists and is from Cloudinary
@@ -162,7 +162,10 @@ export async function updateUserProfile(req, res) {
             await deleteImageByUrl(currentAvatarUrl);
           } catch (deleteErr) {
             // Log error but don't fail the request if deletion fails
-            console.error("Failed to delete old avatar from Cloudinary:", deleteErr);
+            console.error(
+              "Failed to delete old avatar from Cloudinary:",
+              deleteErr,
+            );
           }
         }
       } catch (uploadErr) {
@@ -253,9 +256,9 @@ export async function updateUserProfile(req, res) {
     });
   } catch (err) {
     console.error("updateUserProfile error:", err);
-    
+
     // Check if error is due to missing column
-    if (err.code === '42703') {
+    if (err.code === "42703") {
       return res.status(500).json({
         success: false,
         message: "Database column error. Please check users table schema.",
@@ -288,7 +291,10 @@ export async function changePassword(req, res) {
       });
     }
 
-    if (newPassword.length < PASSWORD_MIN || newPassword.length > PASSWORD_MAX) {
+    if (
+      newPassword.length < PASSWORD_MIN ||
+      newPassword.length > PASSWORD_MAX
+    ) {
       return res.status(400).json({
         success: false,
         message: "Password must be between 8 and 64 characters.",
@@ -297,7 +303,7 @@ export async function changePassword(req, res) {
 
     const { rows } = await db.query(
       "SELECT password FROM users WHERE id = $1",
-      [userId]
+      [userId],
     );
 
     if (!rows.length) {
@@ -366,7 +372,7 @@ export async function startTwoFactorSetup(req, res) {
 
     const { rows } = await db.query(
       "SELECT email, password, two_factor_enabled FROM users WHERE id = $1",
-      [userId]
+      [userId],
     );
 
     if (!rows.length) {
@@ -459,7 +465,7 @@ export async function verifyTwoFactorSetup(req, res) {
 
     await db.query(
       "UPDATE users SET two_factor_enabled = TRUE, two_factor_secret = $1 WHERE id = $2",
-      [setup.secret, userId]
+      [setup.secret, userId],
     );
 
     delete req.session.twoFactorSetup;
@@ -491,7 +497,7 @@ export async function disableTwoFactor(req, res) {
 
     const { rows } = await db.query(
       "SELECT password, two_factor_enabled, two_factor_secret FROM users WHERE id = $1",
-      [userId]
+      [userId],
     );
 
     if (!rows.length) {
@@ -539,7 +545,7 @@ export async function disableTwoFactor(req, res) {
 
     await db.query(
       "UPDATE users SET two_factor_enabled = FALSE, two_factor_secret = NULL WHERE id = $1",
-      [userId]
+      [userId],
     );
 
     return res.status(200).json({

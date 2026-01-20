@@ -24,7 +24,7 @@ export default function UserLayout() {
       <Navbar
         role={user.role}
         userName={user.username}
-        avatar={user.avatar}
+        avatar={user.avatar_url}
         onLogout={() => setShowLogoutConfirm(true)}
       />
 

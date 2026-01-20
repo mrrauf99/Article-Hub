@@ -1,5 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { useLoaderData, useSearchParams, useFetcher } from "react-router-dom";
+import { useState, useEffect, useRef, useMemo } from "react";
+import {
+  useLoaderData,
+  useSearchParams,
+  useFetcher,
+  useOutletContext,
+  useRevalidator,
+} from "react-router-dom";
 import { Users, User, Shield } from "lucide-react";
 
 import {
@@ -11,6 +17,7 @@ import Pagination from "@/features/articles/components/Pagination";
 import UsersGrid from "../components/UsersGrid";
 import RoleChangeModal from "../components/RoleChangeModal";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const ROLE_OPTIONS = [
   {
@@ -36,16 +43,28 @@ const ROLE_OPTIONS = [
 ];
 
 export default function AdminUsersPage() {
-  const { users, pagination, filters } = useLoaderData();
+  const { users: allUsers, pagination, filters } = useLoaderData();
+  const outletContext = useOutletContext();
+  const currentUser = outletContext?.user;
   const [searchParams, setSearchParams] = useSearchParams();
   const fetcher = useFetcher();
+  const revalidator = useRevalidator();
 
   const [searchValue, setSearchValue] = useState(filters.search);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [selectedUserForRoleChange, setSelectedUserForRoleChange] =
+    useState(null);
   const [confirmRoleChange, setConfirmRoleChange] = useState(null);
 
   const isSubmitting = fetcher.state !== "idle";
   const pendingIntent = fetcher.formData?.get("intent");
+
+  // Filter out the current admin from the users list
+  const users = useMemo(() => {
+    if (!allUsers || !Array.isArray(allUsers)) return [];
+    if (!currentUser?.id) return allUsers;
+    return allUsers.filter((user) => user.id !== currentUser.id);
+  }, [allUsers, currentUser]);
 
   const handleRoleFilter = (role) => {
     const params = new URLSearchParams(searchParams);
@@ -81,7 +100,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     const pageChanged = prevPageRef.current !== pagination.page;
-    const filtersChanged = 
+    const filtersChanged =
       prevFiltersRef.current.role !== filters.role ||
       prevFiltersRef.current.search !== filters.search;
 
@@ -103,19 +122,37 @@ export default function AdminUsersPage() {
     }
   }, [pagination.page, filters.role, filters.search]);
 
+  // Revalidate loaders when action succeeds
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data?.success) {
+      revalidator.revalidate();
+    }
+  }, [fetcher.state, fetcher.data?.success, revalidator]);
+
   const handleRoleChange = (userId, newRole) => {
     fetcher.submit(
       { intent: "changeRole", userId, newRole },
-      { method: "post" }
+      { method: "post" },
     );
     setConfirmRoleChange(null);
+    setSelectedUserForRoleChange(null);
+  };
+
+  const handleRoleChangeConfirm = (userId, newRole) => {
+    const user = selectedUserForRoleChange;
+    setSelectedUserForRoleChange(null);
+    setConfirmRoleChange({ user, newRole });
+  };
+
+  const handleInitiateRoleChange = (user) => {
+    setSelectedUserForRoleChange(user);
   };
 
   const handleDelete = () => {
     if (!confirmDelete) return;
     fetcher.submit(
       { intent: "delete", userId: confirmDelete.id },
-      { method: "post" }
+      { method: "post" },
     );
     setConfirmDelete(null);
   };
@@ -159,7 +196,7 @@ export default function AdminUsersPage() {
       {/* Users Grid */}
       <UsersGrid
         users={users}
-        onChangeRole={setConfirmRoleChange}
+        onChangeRole={handleInitiateRoleChange}
         onDelete={setConfirmDelete}
       />
 
@@ -173,12 +210,32 @@ export default function AdminUsersPage() {
       )}
 
       {/* Role Change Modal */}
-      {confirmRoleChange && (
+      {selectedUserForRoleChange && (
         <RoleChangeModal
-          user={confirmRoleChange}
+          user={selectedUserForRoleChange}
           isLoading={isSubmitting && pendingIntent === "changeRole"}
-          onChangeRole={handleRoleChange}
-          onClose={() => setConfirmRoleChange(null)}
+          onChangeRole={handleRoleChangeConfirm}
+          onClose={() => setSelectedUserForRoleChange(null)}
+        />
+      )}
+
+      {/* Confirm Role Change Dialog */}
+      {confirmRoleChange && (
+        <ConfirmDialog
+          isOpen={!!confirmRoleChange}
+          title="Confirm Role Change"
+          message={`Are you sure you want to change ${confirmRoleChange.user.name}'s role to "${confirmRoleChange.newRole}"?`}
+          confirmText={`Yes, Change to ${confirmRoleChange.newRole.charAt(0).toUpperCase() + confirmRoleChange.newRole.slice(1)}`}
+          cancelText="Cancel"
+          variant="info"
+          isLoading={isSubmitting && pendingIntent === "changeRole"}
+          onConfirm={() =>
+            handleRoleChange(
+              confirmRoleChange.user.id,
+              confirmRoleChange.newRole,
+            )
+          }
+          onCancel={() => setConfirmRoleChange(null)}
         />
       )}
 
