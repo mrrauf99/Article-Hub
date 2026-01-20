@@ -120,7 +120,7 @@ export const getAllArticles = async (req, res) => {
 
     const countQuery = await db.query(
       `SELECT COUNT(*) FROM articles a JOIN users u ON u.id = a.author_id ${whereClause}`,
-      params
+      params,
     );
     const totalCount = parseInt(countQuery.rows[0].count);
 
@@ -143,7 +143,7 @@ export const getAllArticles = async (req, res) => {
        ${whereClause}
        ORDER BY a.created_at DESC
        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
-      [...params, limit, offset]
+      [...params, limit, offset],
     );
 
     res.json({
@@ -179,7 +179,7 @@ export const getArticleDetails = async (req, res) => {
        FROM articles a
        JOIN users u ON u.id = a.author_id
        WHERE a.article_id = $1`,
-      [articleId]
+      [articleId],
     );
 
     if (!rows.length) {
@@ -208,7 +208,7 @@ export const getPendingArticles = async (req, res) => {
        FROM articles a
        JOIN users u ON u.id = a.author_id
        WHERE a.status = 'pending'
-       ORDER BY a.created_at ASC`
+       ORDER BY a.created_at ASC`,
     );
 
     res.json({ success: true, data: rows });
@@ -229,7 +229,7 @@ export const approveArticle = async (req, res) => {
        SET status = 'approved',
            published_at = NOW()
        WHERE article_id = $1`,
-      [articleId]
+      [articleId],
     );
 
     if (!rowCount) {
@@ -255,7 +255,7 @@ export const rejectArticle = async (req, res) => {
        SET status = 'rejected',
            published_at = NULL
        WHERE article_id = $1`,
-      [articleId]
+      [articleId],
     );
 
     if (!rowCount) {
@@ -279,7 +279,7 @@ export const deleteArticle = async (req, res) => {
     // First, get the article to fetch image URL before deletion
     const articleQuery = await db.query(
       `SELECT image_url FROM articles WHERE article_id = $1`,
-      [articleId]
+      [articleId],
     );
 
     if (articleQuery.rows.length === 0) {
@@ -305,7 +305,7 @@ export const deleteArticle = async (req, res) => {
     // Delete the article from database
     const { rowCount } = await db.query(
       `DELETE FROM articles WHERE article_id = $1`,
-      [articleId]
+      [articleId],
     );
 
     if (!rowCount) {
@@ -347,7 +347,7 @@ export const getAllUsers = async (req, res) => {
 
     const countQuery = await db.query(
       `SELECT COUNT(*) FROM users ${whereClause}`,
-      params
+      params,
     );
     const totalCount = parseInt(countQuery.rows[0].count);
 
@@ -366,7 +366,7 @@ export const getAllUsers = async (req, res) => {
        ${whereClause}
        ORDER BY joined_at DESC
        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
-      [...params, limit, offset]
+      [...params, limit, offset],
     );
 
     res.json({
@@ -399,9 +399,9 @@ export const getUserDetails = async (req, res) => {
   const { userId } = req.params;
   try {
     const userQuery = await db.query(
-      `SELECT id, username, name, email, avatar_url AS avatar, role, bio, joined_at
+      `SELECT id, username, name, email, avatar_url AS avatar, role, bio, expertise, gender, country, portfolio_url, x_url, linkedin_url, facebook_url, instagram_url, joined_at
        FROM users WHERE id = $1`,
-      [userId]
+      [userId],
     );
 
     if (!userQuery.rows.length) {
@@ -414,7 +414,7 @@ export const getUserDetails = async (req, res) => {
       `SELECT article_id, title, status, created_at, views
        FROM articles WHERE author_id = $1
        ORDER BY created_at DESC`,
-      [userId]
+      [userId],
     );
 
     res.json({
@@ -460,7 +460,7 @@ export const updateUserRole = async (req, res) => {
   try {
     const { rowCount } = await db.query(
       `UPDATE users SET role = $1 WHERE id = $2`,
-      [role, userId]
+      [role, userId],
     );
 
     if (!rowCount) {
@@ -494,12 +494,12 @@ export const deleteUser = async (req, res) => {
     // First, get user's articles and avatar URL before deletion
     const articlesQuery = await db.query(
       `SELECT image_url FROM articles WHERE author_id = $1 AND image_url IS NOT NULL`,
-      [userId]
+      [userId],
     );
 
     const userQuery = await db.query(
       `SELECT avatar_url FROM users WHERE id = $1`,
-      [userId]
+      [userId],
     );
 
     if (userQuery.rows.length === 0) {
@@ -519,7 +519,7 @@ export const deleteUser = async (req, res) => {
         } catch (deleteErr) {
           console.error(
             "Failed to delete article image from Cloudinary:",
-            deleteErr
+            deleteErr,
           );
         }
       }

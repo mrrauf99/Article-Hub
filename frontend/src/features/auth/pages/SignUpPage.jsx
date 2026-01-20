@@ -28,7 +28,7 @@ export default function SignUp() {
         className="flex flex-col gap-2"
         onSubmit={handleSubmit}
       >
-        <SignUpFields form={form} />
+        <SignUpFields form={form} isDisabled={isSubmitting} />
 
         <PasswordRequirements
           errors={form.passwordErrors}

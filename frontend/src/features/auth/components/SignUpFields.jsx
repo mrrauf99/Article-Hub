@@ -2,7 +2,7 @@ import InputField from "@/components/InputField";
 import CountryDropdown from "./CountryDropdown";
 import { UserCircle, User, Mail, Lock } from "lucide-react";
 
-export default function SignUpFields({ form }) {
+export default function SignUpFields({ form, isDisabled = false }) {
   return (
     <>
       {/* Name */}
@@ -14,6 +14,7 @@ export default function SignUpFields({ form }) {
         onChange={form.handleChange}
         onBlur={form.handleBlur}
         error={form.errors.name}
+        disabled={isDisabled}
       />
 
       {/* Username */}
@@ -32,6 +33,7 @@ export default function SignUpFields({ form }) {
           (form.usernameCheck.status === "error" && form.usernameCheck.message)
         }
         success={form.usernameCheck.status === "available"}
+        disabled={isDisabled}
       />
 
       {/* Email */}
@@ -52,6 +54,7 @@ export default function SignUpFields({ form }) {
           (form.emailCheck.status === "error" && form.emailCheck.message)
         }
         success={form.emailCheck.status === "available"}
+        disabled={isDisabled}
       />
 
       {/* Country */}
@@ -61,6 +64,7 @@ export default function SignUpFields({ form }) {
         onChange={form.handleChange}
         onBlur={form.handleBlur}
         hasError={Boolean(form.errors.country)}
+        disabled={isDisabled}
       />
 
       {/* Password */}
@@ -74,6 +78,7 @@ export default function SignUpFields({ form }) {
         onFocus={form.handleFocus}
         onBlur={form.handleBlur}
         error={form.errors.password}
+        disabled={isDisabled}
       />
 
       {/* Confirm Password */}
@@ -86,6 +91,7 @@ export default function SignUpFields({ form }) {
         onChange={form.handleChange}
         onBlur={form.handleBlur}
         error={form.errors.confirmPassword}
+        disabled={isDisabled}
       />
 
       {/* Hidden country input for POST */}

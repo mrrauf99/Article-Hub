@@ -22,7 +22,10 @@ export default function Login() {
   const lastActionDataRef = useRef(null);
 
   useEffect(() => {
-    if (actionData?.success === false && actionData !== lastActionDataRef.current) {
+    if (
+      actionData?.success === false &&
+      actionData !== lastActionDataRef.current
+    ) {
       lastActionDataRef.current = actionData;
       let msg = actionData.message || "Too many login attempts.";
       const seconds = actionData.retryAfterSeconds;
@@ -75,6 +78,7 @@ export default function Login() {
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           error={form.errors.identifier}
+          disabled={isSubmitting}
         />
 
         <InputField
@@ -86,6 +90,7 @@ export default function Login() {
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           error={form.errors.password}
+          disabled={isSubmitting}
         />
 
         <div className="text-right">

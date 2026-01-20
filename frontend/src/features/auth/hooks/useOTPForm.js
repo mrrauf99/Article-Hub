@@ -54,7 +54,7 @@ export function useOTPForm() {
         inputRefs.current[index - 1]?.focus();
       }
     },
-    [otp]
+    [otp],
   );
 
   const handlePaste = useCallback((e, startIndex = 0) => {
@@ -79,19 +79,22 @@ export function useOTPForm() {
   // Handle OTP string (for clipboard paste)
   const handleOtpString = useCallback((otpString) => {
     const text = otpString.replace(/\D/g, "").slice(0, OTP_LENGTH);
-    if (!/^\d+$/.test(text)) return;
+    if (!text || !/^\d+$/.test(text)) return;
 
     const chars = text.split("");
-    setOtp((prev) => {
-      const next = [...prev];
-      for (let i = 0; i < Math.min(chars.length, OTP_LENGTH); i++) {
-        next[i] = chars[i];
-      }
-      return next;
-    });
+    const newOtp = emptyOtp();
 
+    for (let i = 0; i < Math.min(chars.length, OTP_LENGTH); i++) {
+      newOtp[i] = chars[i];
+    }
+
+    setOtp(newOtp);
+
+    // Focus the next empty field or last field if all filled
     const focusIndex = Math.min(chars.length, OTP_LENGTH - 1);
-    inputRefs.current[focusIndex]?.focus();
+    setTimeout(() => {
+      inputRefs.current[focusIndex]?.focus();
+    }, 0);
   }, []);
 
   const reset = useCallback(() => {

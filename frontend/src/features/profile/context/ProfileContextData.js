@@ -5,6 +5,7 @@ export const ProfileContext = createContext({
   formData: {},
   isEditing: false,
   isSaving: false,
+  canEdit: true,
   handleChange: () => {},
   handleCancel: () => {},
   handleEdit: () => {},
