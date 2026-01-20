@@ -6,7 +6,8 @@ import "react-easy-crop/react-easy-crop.css";
 import { useProfile } from "../hooks/useProfile";
 
 export default function ProfileHeader() {
-  const { user, formData, isEditing, handleChange, handleEdit } = useProfile();
+  const { user, formData, isEditing, handleChange, handleEdit, canEdit } =
+    useProfile();
   const fileInputRef = useRef(null);
   const [showCropper, setShowCropper] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState(null);
@@ -37,7 +38,9 @@ export default function ProfileHeader() {
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      setAvatarError("Image size should be less than 2MB. Please compress or choose a smaller image.");
+      setAvatarError(
+        "Image size should be less than 2MB. Please compress or choose a smaller image.",
+      );
       return;
     }
 
@@ -53,7 +56,9 @@ export default function ProfileHeader() {
   };
 
   const handleCropComplete = (croppedFile, croppedPreviewUrl) => {
-    handleChange({ target: { name: "avatarPreview", value: croppedPreviewUrl } });
+    handleChange({
+      target: { name: "avatarPreview", value: croppedPreviewUrl },
+    });
     handleChange({ target: { name: "avatarFile", value: croppedFile } });
     setTempImageSrc(null);
     setShowCropper(false);
@@ -66,7 +71,8 @@ export default function ProfileHeader() {
     resetFileInput();
   };
 
-  const displayAvatar = formData.avatarPreview || user.avatar_url || user.avatar;
+  const displayAvatar =
+    formData.avatarPreview || user.avatar_url || user.avatar;
 
   return (
     <>
@@ -127,12 +133,14 @@ export default function ProfileHeader() {
               <div className="flex items-center gap-2 text-blue-200">
                 <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span className="text-xs sm:text-xs lg:text-sm">
-                  {user.role === "admin" ? "Administrator" : "Contributing Writer"}
+                  {user.role === "admin"
+                    ? "Administrator"
+                    : "Contributing Writer"}
                 </span>
               </div>
             </div>
           </div>
-          {!isEditing && (
+          {!isEditing && canEdit && (
             <button
               onClick={handleEdit}
               className="w-full sm:w-auto bg-white text-indigo-600 px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold hover:bg-indigo-50 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 whitespace-nowrap text-sm sm:text-base"
@@ -187,9 +195,12 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
     setZoom(zoom);
   }, []);
 
-  const onCropCompleteCallback = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
+  const onCropCompleteCallback = useCallback(
+    (croppedArea, croppedAreaPixels) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    [],
+  );
 
   const getCroppedImg = async (imageSrc, pixelCrop) => {
     const image = await createImage(imageSrc);
@@ -218,15 +229,19 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
       0,
       0,
       size,
-      size
+      size,
     );
 
     return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        const fileUrl = URL.createObjectURL(blob);
-        resolve({ fileUrl, blob });
-      }, "image/jpeg", 0.9);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return;
+          const fileUrl = URL.createObjectURL(blob);
+          resolve({ fileUrl, blob });
+        },
+        "image/jpeg",
+        0.9,
+      );
     });
   };
 
@@ -235,18 +250,13 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
 
     setIsProcessing(true);
     try {
-      const croppedImage = await getCroppedImg(
-        imageSrc,
-        croppedAreaPixels
-      );
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
 
       if (croppedImage) {
-        const file = new File(
-          [croppedImage.blob],
-          `avatar-${Date.now()}.jpg`,
-          { type: "image/jpeg" }
-        );
-        
+        const file = new File([croppedImage.blob], `avatar-${Date.now()}.jpg`, {
+          type: "image/jpeg",
+        });
+
         onCropComplete(file, croppedImage.fileUrl);
         onClose();
       }
@@ -299,16 +309,14 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
   if (!imageSrc) return null;
 
   return createPortal(
-    <div 
+    <div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
-      style={{ paddingTop: '4rem', paddingBottom: '2rem' }}
+      style={{ paddingTop: "4rem", paddingBottom: "2rem" }}
     >
-      <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-      />
-      <div 
-        className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10" 
-        style={{ maxHeight: 'calc(100vh - 6rem)' }}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div
+        className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10"
+        style={{ maxHeight: "calc(100vh - 6rem)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
@@ -322,7 +330,10 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
           </button>
         </div>
 
-        <div className="relative w-full bg-slate-100" style={{ height: '400px', minHeight: '400px' }}>
+        <div
+          className="relative w-full bg-slate-100"
+          style={{ height: "400px", minHeight: "400px" }}
+        >
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -376,6 +387,6 @@ function AvatarCropper({ imageSrc, onClose, onCropComplete }) {
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

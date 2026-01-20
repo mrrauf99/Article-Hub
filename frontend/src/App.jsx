@@ -55,11 +55,13 @@ import updateProfileAction from "./features/profile/actions/updateProfile.js";
 import AdminDashboardPage from "./features/admin/pages/AdminDashboardPage.jsx";
 import AdminArticlesPage from "./features/admin/pages/AdminArticlesPage.jsx";
 import AdminUsersPage from "./features/admin/pages/AdminUsersPage.jsx";
+import AdminUserProfilePage from "./features/admin/pages/AdminUserProfilePage.jsx";
 
 import adminProfileLoader from "./features/admin/loaders/adminProfile.js";
 import adminDashboardLoader from "./features/admin/loaders/adminDashboard.js";
 import adminArticlesLoader from "./features/admin/loaders/adminArticles.js";
 import adminUsersLoader from "./features/admin/loaders/adminUsers.js";
+import adminUserDetailsLoader from "./features/admin/loaders/adminUserDetails.js";
 import { adminArticlesAction } from "./features/admin/actions/adminArticles.js";
 import { adminUsersAction } from "./features/admin/actions/adminUsers.js";
 
@@ -221,6 +223,11 @@ export default function App() {
           element: <AdminUsersPage />,
           loader: adminUsersLoader,
           action: adminUsersAction,
+        },
+        {
+          path: "users/:userId",
+          element: <AdminUserProfilePage />,
+          loader: adminUserDetailsLoader,
         },
         {
           path: "profile",
