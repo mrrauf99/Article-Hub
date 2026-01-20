@@ -109,8 +109,12 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
                     <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xl sm:text-2xl font-bold text-slate-900">{value}</p>
-                    <p className="text-xs sm:text-sm text-slate-600">{stat.label}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900">
+                      {value}
+                    </p>
+                    <p className="text-xs sm:text-sm text-slate-600">
+                      {stat.label}
+                    </p>
                   </div>
                 </div>
               );
@@ -160,7 +164,7 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
                         src={
                           article.author_avatar ||
                           `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            article.author_name
+                            article.author_name,
                           )}&background=6366f1&color=fff`
                         }
                         alt={article.author_name}
@@ -193,7 +197,9 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
                   <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-semibold text-slate-900">Recent Users</h3>
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-900">
+                    Recent Users
+                  </h3>
                   <p className="text-xs text-slate-500">Newest registrations</p>
                 </div>
               </div>
@@ -219,9 +225,9 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
                     <div className="flex items-center gap-2 sm:gap-3">
                       <img
                         src={
-                          user.avatar ||
+                          user.avatar_url ||
                           `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            user.name
+                            user.name,
                           )}&background=6366f1&color=fff`
                         }
                         alt={user.name}

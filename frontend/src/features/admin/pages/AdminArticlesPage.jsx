@@ -122,29 +122,29 @@ export default function AdminArticlesPage() {
 
   const handleDelete = () => {
     if (!confirmDelete) return;
+    setConfirmDelete(null);
     fetcher.submit(
       { intent: "delete", articleId: confirmDelete.article_id },
       { method: "post" },
     );
-    setConfirmDelete(null);
   };
 
   const handleApprove = () => {
     if (!confirmApprove) return;
+    setConfirmApprove(null);
     fetcher.submit(
       { intent: "approve", articleId: confirmApprove.article_id },
       { method: "post" },
     );
-    setConfirmApprove(null);
   };
 
   const handleReject = () => {
     if (!confirmReject) return;
+    setConfirmReject(null);
     fetcher.submit(
       { intent: "reject", articleId: confirmReject.article_id },
       { method: "post" },
     );
-    setConfirmReject(null);
   };
 
   // Helper to check if an action is pending for a specific article
@@ -197,7 +197,12 @@ export default function AdminArticlesPage() {
         getLoadingAction={getLoadingAction}
         onViewArticle={setSelectedArticle}
         onApprove={(article) => setConfirmApprove(article)}
-        onReject={(article) => setConfirmReject(article)}
+        onReject={(article) =>
+          setConfirmReject({
+            article_id: article.article_id,
+            title: article.title,
+          })
+        }
         onDelete={setConfirmDelete}
       />
 
@@ -215,8 +220,15 @@ export default function AdminArticlesPage() {
         <ArticleDetailModal
           article={selectedArticle}
           onClose={() => setSelectedArticle(null)}
-          onApprove={(article) => setConfirmApprove(article)}
-          onReject={(id) => setConfirmReject({ article_id: id })}
+          onApprove={(article) => {
+            setConfirmApprove(article);
+            setSelectedArticle(null);
+          }}
+          onReject={(id) => {
+            setConfirmReject({ article_id: id, title: selectedArticle?.title });
+            setSelectedArticle(null);
+          }}
+          showInternalConfirmations={false}
         />
       )}
 

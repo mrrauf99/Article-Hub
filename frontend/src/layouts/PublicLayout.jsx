@@ -30,7 +30,7 @@ export default function PublicLayout() {
       <Navbar
         role={user?.role || "guest"}
         userName={user?.username}
-        avatar={user?.avatar}
+        avatar={user?.avatar_url}
         onLogout={user ? () => setShowLogoutConfirm(true) : undefined}
       />
       <main className="w-full min-h-screen overflow-x-hidden">
