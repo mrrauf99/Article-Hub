@@ -112,6 +112,7 @@ export default function AdminUserProfilePage() {
   );
 
   const displayName = user.name || user.username;
+  const showArticleSections = user.role !== "admin";
 
   const handleArticleClick = async (article) => {
     setArticleLoading(true);
@@ -252,97 +253,101 @@ export default function AdminUserProfilePage() {
               <AuthorInfo />
               <SocialLinks />
 
-              {/* Stats Section */}
-              <div className="p-4 lg:p-6 border-t border-slate-200">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl shadow-lg shadow-sky-500/25">
-                    <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900">
-                      Performance Overview
-                    </h2>
-                    <p className="text-sm text-slate-500">
-                      Article statistics and engagement
-                    </p>
-                  </div>
-                </div>
-
-                <StaggerReveal staggerDelay={80} animation="fade-up">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-                    {statCards.map((stat) => (
-                      <StatCard key={stat.label} {...stat} />
-                    ))}
-                  </div>
-                </StaggerReveal>
-              </div>
-
-              {/* Recent Articles Section */}
-              <div className="p-4 lg:p-6 border-t border-slate-200">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              {showArticleSections && (
+                <>
+                  {/* Stats Section */}
+                  <div className="p-4 lg:p-6 border-t border-slate-200">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="p-2 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl shadow-lg shadow-sky-500/25">
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-900">
+                          Performance Overview
+                        </h2>
+                        <p className="text-sm text-slate-500">
+                          Article statistics and engagement
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                        Recent Articles
-                      </h3>
-                      <p className="text-xs sm:text-sm text-slate-500">
-                        Click to view details
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-semibold text-indigo-600">
-                    {articles.length} total
-                  </span>
-                </div>
 
-                {articles.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                      <FileText className="w-7 h-7 text-slate-400" />
-                    </div>
-                    <p className="font-semibold text-slate-900 mb-1">
-                      No Articles Yet
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      This user hasn't published any articles.
-                    </p>
+                    <StaggerReveal staggerDelay={80} animation="fade-up">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                        {statCards.map((stat) => (
+                          <StatCard key={stat.label} {...stat} />
+                        ))}
+                      </div>
+                    </StaggerReveal>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {articles.slice(0, 10).map((article) => (
-                      <button
-                        key={article.article_id}
-                        onClick={() => handleArticleClick(article)}
-                        disabled={articleLoading}
-                        className="w-full text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all group cursor-pointer disabled:opacity-50"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors line-clamp-1">
-                            {article.title}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                            <ArticleChip status={article.status} />
-                            <span className="inline-flex items-center gap-1">
-                              <Calendar className="h-3.5 w-3.5" />
-                              {formatDate(article.created_at)}
-                            </span>
-                            <span className="inline-flex items-center gap-1">
-                              <Eye className="h-3.5 w-3.5" />
-                              {article.views ?? 0} views
-                            </span>
-                          </div>
+
+                  {/* Recent Articles Section */}
+                  <div className="p-4 lg:p-6 border-t border-slate-200">
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                          <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
-                        <span className="text-xs font-medium text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                          View Details →
-                        </span>
-                      </button>
-                    ))}
+                        <div>
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                            Recent Articles
+                          </h3>
+                          <p className="text-xs sm:text-sm text-slate-500">
+                            Click to view details
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-sm font-semibold text-indigo-600">
+                        {articles.length} total
+                      </span>
+                    </div>
+
+                    {articles.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                          <FileText className="w-7 h-7 text-slate-400" />
+                        </div>
+                        <p className="font-semibold text-slate-900 mb-1">
+                          No Articles Yet
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          This user hasn't published any articles.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {articles.slice(0, 10).map((article) => (
+                          <button
+                            key={article.article_id}
+                            onClick={() => handleArticleClick(article)}
+                            disabled={articleLoading}
+                            className="w-full text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all group cursor-pointer disabled:opacity-50"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors line-clamp-1">
+                                {article.title}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                                <ArticleChip status={article.status} />
+                                <span className="inline-flex items-center gap-1">
+                                  <Calendar className="h-3.5 w-3.5" />
+                                  {formatDate(article.created_at)}
+                                </span>
+                                <span className="inline-flex items-center gap-1">
+                                  <Eye className="h-3.5 w-3.5" />
+                                  {article.views ?? 0} views
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-xs font-medium text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                              View Details →
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
           </div>
 
