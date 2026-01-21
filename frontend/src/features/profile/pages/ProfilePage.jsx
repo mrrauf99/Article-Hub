@@ -1,4 +1,11 @@
-import { useState, useEffect, useMemo, useRef, useCallback, startTransition } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+  startTransition,
+} from "react";
 import {
   useLoaderData,
   useNavigation,
@@ -96,11 +103,20 @@ export default function ProfilePage() {
       formData,
       isEditing,
       isSaving,
+      canEdit: true,
       handleChange,
       handleCancel,
       handleEdit,
     }),
-    [user, formData, isEditing, isSaving, handleChange, handleCancel, handleEdit]
+    [
+      user,
+      formData,
+      isEditing,
+      isSaving,
+      handleChange,
+      handleCancel,
+      handleEdit,
+    ],
   );
 
   return (
@@ -109,33 +125,33 @@ export default function ProfilePage() {
         <div className="w-full md:px-6 lg:px-8 py-6 sm:py-8">
           <div className="w-full max-w-6xl mx-auto">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
-            <ProfileHeader />
+              <ProfileHeader />
 
-            {/* FEEDBACK */}
-            {feedback && (
-              <div
-                className={`mx-6 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
-                  feedback.success
-                    ? "border-green-200 bg-green-50 text-green-800"
-                    : "border-red-200 bg-red-50 text-red-800"
-                }`}
-              >
-                {feedback.success ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-red-600" />
-                )}
-                <span>{feedback.message}</span>
-              </div>
-            )}
+              {/* FEEDBACK */}
+              {feedback && (
+                <div
+                  className={`mx-6 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
+                    feedback.success
+                      ? "border-green-200 bg-green-50 text-green-800"
+                      : "border-red-200 bg-red-50 text-red-800"
+                  }`}
+                >
+                  {feedback.success ? (
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  ) : (
+                    <XCircle className="h-5 w-5 text-red-600" />
+                  )}
+                  <span>{feedback.message}</span>
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit}>
-              <AuthorInfo />
-              <SocialLinks />
-              <ProfileActions />
-            </form>
+              <form onSubmit={handleSubmit}>
+                <AuthorInfo />
+                <SocialLinks />
+                <ProfileActions />
+              </form>
 
-            <SecuritySettings />
+              <SecuritySettings />
             </div>
           </div>
         </div>
