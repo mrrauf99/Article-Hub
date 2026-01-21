@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   useLoaderData,
   useSearchParams,
@@ -59,12 +59,41 @@ export default function AdminUsersPage() {
   const isSubmitting = fetcher.state !== "idle";
   const pendingIntent = fetcher.formData?.get("intent");
 
+  const normalizeId = useCallback((user) => {
+    if (!user) return null;
+    return user.id ?? user.user_id ?? user._id ?? null;
+  }, []);
+
+  const isCurrentUser = useCallback(
+    (user) => {
+      const currentId = normalizeId(currentUser);
+      const targetId = normalizeId(user);
+
+      if (currentId && targetId) {
+        return String(currentId) === String(targetId);
+      }
+
+      if (currentUser?.email && user?.email) {
+        return currentUser.email.toLowerCase() === user.email.toLowerCase();
+      }
+
+      return false;
+    },
+    [currentUser, normalizeId],
+  );
+
   // Filter out the current admin from the users list
   const users = useMemo(() => {
     if (!allUsers || !Array.isArray(allUsers)) return [];
-    if (!currentUser?.id) return allUsers;
-    return allUsers.filter((user) => user.id !== currentUser.id);
-  }, [allUsers, currentUser]);
+    return allUsers.filter((user) => !isCurrentUser(user));
+  }, [allUsers, isCurrentUser]);
+
+  const baseCount =
+    typeof pagination?.totalCount === "number"
+      ? pagination.totalCount
+      : allUsers?.length || 0;
+  const shouldSubtract = allUsers?.some((user) => isCurrentUser(user)) ? 1 : 0;
+  const displayTotalCount = Math.max(baseCount - shouldSubtract, 0);
 
   const handleRoleFilter = (role) => {
     const params = new URLSearchParams(searchParams);
@@ -166,7 +195,7 @@ export default function AdminUsersPage() {
         <div className="text-sm text-slate-500">
           Total:{" "}
           <span className="font-semibold text-slate-900">
-            {pagination.totalCount}
+            {displayTotalCount}
           </span>{" "}
           users
         </div>
