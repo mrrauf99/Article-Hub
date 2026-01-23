@@ -219,6 +219,11 @@ export default function App() {
           action: adminArticlesAction,
         },
         {
+          path: "articles/:id",
+          element: <ArticleDetailPage />,
+          loader: articleDetailLoader,
+        },
+        {
           path: "users",
           element: <AdminUsersPage />,
           loader: adminUsersLoader,
