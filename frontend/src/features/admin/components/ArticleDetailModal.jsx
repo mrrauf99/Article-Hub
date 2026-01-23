@@ -174,7 +174,7 @@ export default function ArticleDetailModal({
         {/* Modal Footer */}
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
           <button
-            onClick={() => navigate(`/articles/${article.article_id}`)}
+            onClick={() => navigate(`/admin/articles/${article.article_id}`)}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 shadow-lg shadow-indigo-500/25 transition-all hover:shadow-indigo-500/40"
           >
             <ExternalLink className="w-4 h-4" />

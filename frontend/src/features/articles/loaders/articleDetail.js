@@ -1,23 +1,34 @@
 import { apiClient } from "../../api/apiClient";
 
-export default async function articleDetailLoader({ params }) {
+export default async function articleDetailLoader({ params, request }) {
   const { id, article_id } = params;
   const articleId = id || article_id;
 
-  try {
-    const { data } = await apiClient.get(`articles/${articleId}`);
+  const url = new URL(request?.url || window.location.href);
+  const isAdminRoute = url.pathname.startsWith("/admin/");
 
-    if (!data.success) {
+  try {
+    const endpoint = isAdminRoute
+      ? `admin/articles/${articleId}`
+      : `articles/${articleId}`;
+
+    const { data } = await apiClient.get(endpoint);
+
+    if (!data?.success) {
       return { article: null };
     }
 
+    const raw = data.data || {};
     const article = {
       id: articleId,
-      ...data.data,
-      image_url: data.data.imageUrl || data.data.image_url,
+      ...raw,
+      image_url: raw.imageUrl || raw.image_url,
     };
 
-    apiClient.post(`articles/${articleId}/view`).catch(() => {});
+    // Only increment views on public/user routes
+    if (!isAdminRoute) {
+      apiClient.post(`articles/${articleId}/view`).catch(() => {});
+    }
 
     return { article };
   } catch (error) {
