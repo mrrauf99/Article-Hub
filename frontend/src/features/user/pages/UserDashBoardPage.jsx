@@ -1,5 +1,9 @@
 import { useMemo, useEffect, useRef } from "react";
-import { useLoaderData, useSearchParams } from "react-router-dom";
+import {
+  useLoaderData,
+  useSearchParams,
+  useRevalidator,
+} from "react-router-dom";
 
 import DashboardStats from "../components/DashboardStats";
 import ArticlesSection from "@/features/articles/components/ArticlesSection";
@@ -10,13 +14,14 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 export default function UserDashBoardPage() {
   const { articles, stats } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
+  const revalidator = useRevalidator();
 
   const pageParam = Number(searchParams.get("page")) || 1;
   const statusParam = searchParams.get("status") || "all";
 
   const { paginatedArticles, totalPages, safePage } = useMemo(
     () => calculatePagination(articles, statusParam, true, pageParam),
-    [articles, statusParam, pageParam]
+    [articles, statusParam, pageParam],
   );
 
   const prevPageRef = useRef(pageParam);
@@ -38,6 +43,11 @@ export default function UserDashBoardPage() {
     params.set("page", "1");
     setSearchParams(params, { preventScrollReset: true });
   }
+
+  const handleArticleDelete = () => {
+    // Revalidate to refresh the data from the loader
+    revalidator.revalidate();
+  };
 
   useEffect(() => {
     const pageChanged = prevPageRef.current !== pageParam;
@@ -75,6 +85,7 @@ export default function UserDashBoardPage() {
         onStatusChange={handleStatusChange}
         showStatusFilter
         showPagination={false}
+        onDelete={handleArticleDelete}
       />
 
       {/* Pagination - Outside Articles Section */}
