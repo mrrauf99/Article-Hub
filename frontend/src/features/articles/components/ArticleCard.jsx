@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 
 import ConfirmModal from "../ui/ConfirmModal";
 import StatusBadge from "./StatusBadge";
+import { userApi } from "@/features/api/userApi";
 
-function ArticleCard({ article, mode }) {
+function ArticleCard({ article, mode, onDelete }) {
   const navigate = useNavigate();
   const confirmRef = useRef(null);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const openArticle = () => {
     navigate(`/user/articles/${article.article_id}`);
@@ -24,8 +26,21 @@ function ArticleCard({ article, mode }) {
     confirmRef.current?.open();
   };
 
-  const confirmDelete = () => {
-    // Implement delete functionality here
+  const confirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await userApi.deleteArticle(article.article_id);
+
+      // Call the onDelete callback if provided
+      if (onDelete) {
+        onDelete(article.article_id);
+      }
+    } catch (error) {
+      console.error("Failed to delete article:", error);
+      alert(error.response?.data?.message || "Failed to delete article");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -117,6 +132,8 @@ function ArticleCard({ article, mode }) {
         title="Delete Article"
         description={`Are you sure you want to delete "${article.title}"?`}
         onConfirm={confirmDelete}
+        confirmText={isDeleting ? "Deleting..." : "Yes, Delete"}
+        confirmDisabled={isDeleting}
       />
     </>
   );

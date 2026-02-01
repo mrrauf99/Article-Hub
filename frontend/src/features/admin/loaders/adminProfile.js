@@ -1,17 +1,24 @@
 import { redirect } from "react-router-dom";
 import { apiClient } from "../../api/apiClient.js";
+import { adminApi } from "../../api/adminApi.js";
 
 export default async function adminProfileLoader() {
   try {
-    const response = await apiClient.get("user/profile");
-    const user = response.data.data;
+    const [profileResponse, pendingResponse] = await Promise.all([
+      apiClient.get("user/profile"),
+      adminApi.getPendingArticles().catch(() => ({ data: { data: [] } })),
+    ]);
+
+    const user = profileResponse.data.data;
 
     // Redirect non-admin users
     if (user.role !== "admin") {
       return redirect("/user/dashboard");
     }
 
-    return { user };
+    const pendingCount = pendingResponse.data.data?.length || 0;
+
+    return { user, pendingCount };
   } catch (error) {
     if (error.response?.status === 401) {
       return redirect("/login");

@@ -7,10 +7,17 @@ import NavLogo from "./NavLogo";
 import DesktopNavLinks from "./DesktopNavLinks";
 import UserMenu from "./UserMenu";
 import MobileNavMenu from "./MobileNavMenu";
+import NotificationBell from "./NotificationBell";
 
 import styles from "@/styles/navbar.module.css";
 
-export default function Navbar({ userName, avatar, role, onLogout }) {
+export default function Navbar({
+  userName,
+  avatar,
+  role,
+  onLogout,
+  pendingCount = 0,
+}) {
   const [open, setOpen] = useState(false);
   const navItems = getNavItemsForRole(role);
 
@@ -21,12 +28,16 @@ export default function Navbar({ userName, avatar, role, onLogout }) {
 
         {navItems.length > 0 && <DesktopNavLinks navItems={navItems} />}
 
-        <UserMenu
-          role={role}
-          userName={userName}
-          avatar={avatar}
-          onLogout={onLogout}
-        />
+        <div className="flex items-center gap-2">
+          {role === "admin" && <NotificationBell count={pendingCount} />}
+
+          <UserMenu
+            role={role}
+            userName={userName}
+            avatar={avatar}
+            onLogout={onLogout}
+          />
+        </div>
 
         <button
           className={styles.mobileToggle}
@@ -46,6 +57,7 @@ export default function Navbar({ userName, avatar, role, onLogout }) {
         userName={userName}
         avatar={avatar}
         onLogout={onLogout}
+        pendingCount={pendingCount}
       />
     </nav>
   );
