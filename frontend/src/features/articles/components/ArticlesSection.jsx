@@ -20,6 +20,7 @@ export default function ArticlesSection({
   onStatusChange,
   showStatusFilter = false,
   showPagination = true,
+  onDelete,
 }) {
   // Filter articles by status
   const filteredByStatus = useMemo(() => {
@@ -47,7 +48,9 @@ export default function ArticlesSection({
                 <Layers className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900">{title}</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                  {title}
+                </h2>
                 <p className="text-xs sm:text-sm text-slate-500">
                   {filteredByStatus.length} article
                   {filteredByStatus.length !== 1 ? "s" : ""} found
@@ -110,6 +113,7 @@ export default function ArticlesSection({
                   key={article.article_id}
                   article={article}
                   mode={mode}
+                  onDelete={onDelete}
                 />
               ))}
             </div>
@@ -132,4 +136,3 @@ export default function ArticlesSection({
     </>
   );
 }
-

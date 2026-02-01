@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { User, LogOut, Shield } from "lucide-react";
+import { User, LogOut, Shield, Bell } from "lucide-react";
 import styles from "@/styles/navbar.module.css";
 
 export default function MobileNavMenu({
@@ -11,6 +11,7 @@ export default function MobileNavMenu({
   userName,
   avatar,
   onLogout,
+  pendingCount = 0,
 }) {
   const [avatarError, setAvatarError] = useState(false);
 
@@ -26,7 +27,7 @@ export default function MobileNavMenu({
   }, [userName]);
 
   // Helper to check if avatar is valid
-  const isValidAvatar = avatar && typeof avatar === 'string' && avatar.trim();
+  const isValidAvatar = avatar && typeof avatar === "string" && avatar.trim();
 
   if (!isOpen) return null;
 
@@ -82,6 +83,23 @@ export default function MobileNavMenu({
                 {label}
               </Link>
             ))}
+
+            {/* Pending articles notification for admin */}
+            {isAdmin && (
+              <Link
+                to="/admin/articles?status=pending"
+                onClick={onClose}
+                className={styles.mobileLink}
+              >
+                <Bell className={styles.mobileLinkIcon} />
+                Pending Articles
+                {pendingCount > 0 && (
+                  <span className="ml-auto bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    {pendingCount > 99 ? "99+" : pendingCount}
+                  </span>
+                )}
+              </Link>
+            )}
           </div>
         )}
 

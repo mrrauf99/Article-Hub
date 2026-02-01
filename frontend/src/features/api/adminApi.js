@@ -9,6 +9,8 @@ export const adminApi = {
   // Articles
   getAllArticles: (params = {}) => apiClient.get("admin/articles", { params }),
 
+  getPendingArticles: () => apiClient.get("admin/articles/pending"),
+
   getArticleDetails: (articleId) =>
     apiClient.get(`admin/articles/${articleId}`),
 
