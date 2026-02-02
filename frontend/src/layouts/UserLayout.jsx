@@ -39,11 +39,13 @@ export default function UserLayout() {
       <ConfirmDialog
         isOpen={showLogoutConfirm}
         title="Log Out"
-        message="Are you sure you want to log out of your account?"
+        message="You will be signed out of your account. Any unsaved changes may be lost."
         confirmText="Log Out"
         cancelText="Cancel"
         variant="warning"
         isLoading={isLoggingOut}
+        loadingText="Logging out"
+        showLoadingDots={false}
         onConfirm={handleLogout}
         onCancel={() => setShowLogoutConfirm(false)}
       />
