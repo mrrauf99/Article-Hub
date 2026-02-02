@@ -2,6 +2,7 @@ import { Outlet, useLoaderData } from "react-router-dom";
 import { useState } from "react";
 
 import ScrollToTop from "@/components/ScrollToTop";
+import NavigationProgress from "@/components/NavigationProgress";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -27,6 +28,7 @@ export default function PublicLayout() {
   return (
     <>
       <ScrollToTop />
+      <NavigationProgress />
       <Navbar
         role={user?.role || "guest"}
         userName={user?.username}
