@@ -8,6 +8,7 @@ export const FOUNDERS = [
     avatar: "https://avatars.githubusercontent.com/u/216373840?v=4",
     tags: [
       "Full Stack",
+      "UI/UX Design",
       "JavaScript",
       "React",
       "Node",

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import ConfirmModal from "../ui/ConfirmModal";
 import StatusBadge from "./StatusBadge";
+import LoadingOverlay from "@/components/LoadingOverlay";
 import { userApi } from "@/features/api/userApi";
 
 function ArticleCard({ article, mode, onDelete }) {
@@ -45,6 +46,8 @@ function ArticleCard({ article, mode, onDelete }) {
 
   return (
     <>
+      <LoadingOverlay isLoading={isDeleting} message="Deleting article..." />
+
       <article
         onClick={openArticle}
         className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden hover:-translate-y-1"
