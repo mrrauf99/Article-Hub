@@ -36,7 +36,11 @@ export default function ContactForm() {
   };
 
   useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.success && fetcher.data !== lastFetcherDataRef.current) {
+    if (
+      fetcher.state === "idle" &&
+      fetcher.data?.success &&
+      fetcher.data !== lastFetcherDataRef.current
+    ) {
       lastFetcherDataRef.current = fetcher.data;
       const data = fetcher.data;
       startTransition(() => {
@@ -138,7 +142,7 @@ export default function ContactForm() {
               {isSubmitting ? (
                 <>
                   <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                  Sending message…
+                  Sending message...
                 </>
               ) : (
                 <>

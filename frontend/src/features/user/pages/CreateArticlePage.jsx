@@ -5,10 +5,8 @@ import {
   Feather,
   Type,
   FolderOpen,
-  FileText,
   ListChecks,
   ImagePlus,
-  Sparkles,
   Send,
   Loader2,
   PenLine,
@@ -95,7 +93,6 @@ export default function CreateArticlePage() {
               <h1 className={styles.headerTitle}>
                 {isEditing ? "Edit Article" : "Create Article"}
               </h1>
-              <Sparkles className={styles.sparkleIcon} />
             </div>
             <p className={styles.headerSubtitle}>
               {isEditing
@@ -132,7 +129,7 @@ export default function CreateArticlePage() {
                     error={errors.title}
                     placeholder="Enter a captivating title..."
                     icon={<Type className="w-4 h-4" />}
-                    maxLength={200}
+                    maxLength={150}
                     charCount={charCounts.title}
                   />
 
@@ -174,7 +171,7 @@ export default function CreateArticlePage() {
                   onBlur={handleBlur}
                   error={errors.introduction}
                   placeholder="Hook your readers with an engaging introduction..."
-                  maxLength={500}
+                  maxLength={1000}
                   charCount={charCounts.introduction}
                   rows={4}
                   icon={<AlignLeft className="w-4 h-4" />}
@@ -189,6 +186,8 @@ export default function CreateArticlePage() {
                   onBlur={handleBlur}
                   error={errors.content}
                   placeholder="Share your insights, ideas, and knowledge..."
+                  maxLength={100000}
+                  charCount={charCounts.content}
                   rows={10}
                   icon={<PenLine className="w-4 h-4" />}
                 />
@@ -202,7 +201,7 @@ export default function CreateArticlePage() {
                   onBlur={handleBlur}
                   error={errors.summary}
                   placeholder="Wrap up with key takeaways..."
-                  maxLength={300}
+                  maxLength={500}
                   charCount={charCounts.summary}
                   rows={3}
                   icon={<ListChecks className="w-4 h-4" />}

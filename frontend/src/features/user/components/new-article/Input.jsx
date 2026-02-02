@@ -37,7 +37,6 @@ export default function Input({
         onChange={onChange}
         onBlur={onBlur}
         placeholder={placeholder}
-        maxLength={maxLength}
         className={`${styles.control} ${error ? styles.errorControl : ""}`}
       />
 
