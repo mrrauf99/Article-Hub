@@ -1,13 +1,33 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-// Auth
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+);
+
+// Auth - Critical (keep static)
 import LoginPage from "./features/auth/pages/LoginPage.jsx";
 import SignUpPage from "./features/auth/pages/SignUpPage.jsx";
-import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage.jsx";
-import ResetPasswordPage from "./features/auth/pages/ResetPasswordPage.jsx";
-import TwoFactorPage from "./features/auth/pages/TwoFactorPage.jsx";
-import OTPVerificationFormPage from "./features/auth/pages/OTPVerificationFormPage.jsx";
-import CompleteProfile from "./features/auth/pages/CompleteProfile.jsx";
+
+// Auth - Secondary (lazy load)
+const ForgotPasswordPage = lazy(
+  () => import("./features/auth/pages/ForgotPasswordPage.jsx"),
+);
+const ResetPasswordPage = lazy(
+  () => import("./features/auth/pages/ResetPasswordPage.jsx"),
+);
+const TwoFactorPage = lazy(
+  () => import("./features/auth/pages/TwoFactorPage.jsx"),
+);
+const OTPVerificationFormPage = lazy(
+  () => import("./features/auth/pages/OTPVerificationFormPage.jsx"),
+);
+const CompleteProfile = lazy(
+  () => import("./features/auth/pages/CompleteProfile.jsx"),
+);
 
 import loginAction from "./features/auth/actions/login";
 import signUpAction from "./features/auth/actions/signUp";
@@ -22,22 +42,32 @@ import resetPasswordLoader from "./features/auth/loaders/resetPassword.js";
 import twoFactorSessionLoader from "./features/auth/loaders/twoFactorSession.js";
 import verifyOtpPageLoader from "./features/auth/loaders/verifyOtpPage.js";
 
-// Public
+// Public - Critical (keep static)
 import HomePage from "./features/guest/pages/HomePage.jsx";
-import AboutPage from "./pages/AboutPage.jsx";
-import ContactPage from "./features/contact/pages/ContactPage.jsx";
-import PrivacyPage from "./pages/PrivacyPage.jsx";
-import TermsPage from "./pages/Terms.jsx";
+
+// Public - Static pages (lazy load)
+const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
+const ContactPage = lazy(
+  () => import("./features/contact/pages/ContactPage.jsx"),
+);
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage.jsx"));
+const TermsPage = lazy(() => import("./pages/Terms.jsx"));
 
 import submitContactAction from "./features/contact/actions/submitContact.js";
 import publicArticlesLoader from "./features/articles/loaders/publicArticles.js";
 import publicLayoutLoader from "./loaders/publicLayout.js";
 import homePageLoader from "./features/guest/loaders/homePage.js";
 
-// User
-import UserDashBoardPage from "./features/user/pages/UserDashBoardPage.jsx";
-import CreateArticlePage from "./features/user/pages/CreateArticlePage.jsx";
-import ExploreArticlesPage from "./features/user/pages/ExploreArticlesPage.jsx";
+// User - All lazy loaded (require auth)
+const UserDashBoardPage = lazy(
+  () => import("./features/user/pages/UserDashBoardPage.jsx"),
+);
+const CreateArticlePage = lazy(
+  () => import("./features/user/pages/CreateArticlePage.jsx"),
+);
+const ExploreArticlesPage = lazy(
+  () => import("./features/user/pages/ExploreArticlesPage.jsx"),
+);
 
 import editArticleLoader from "./features/user/loaders/editArticle.js";
 import myArticlesLoader from "./features/user/loaders/myArticles.js";
@@ -46,16 +76,26 @@ import createArticleLoader from "./features/user/loaders/createArticle.js";
 
 import createArticleAction from "./features/user/actions/createArticle.js";
 
-// Profile (shared by admin and user)
-import ProfilePage from "./features/profile/pages/ProfilePage.jsx";
+// Profile - Lazy loaded (shared by admin and user)
+const ProfilePage = lazy(
+  () => import("./features/profile/pages/ProfilePage.jsx"),
+);
 import profileStatsLoader from "./features/profile/loaders/profileStats.js";
 import updateProfileAction from "./features/profile/actions/updateProfile.js";
 
-// Admin
-import AdminDashboardPage from "./features/admin/pages/AdminDashboardPage.jsx";
-import AdminArticlesPage from "./features/admin/pages/AdminArticlesPage.jsx";
-import AdminUsersPage from "./features/admin/pages/AdminUsersPage.jsx";
-import AdminUserProfilePage from "./features/admin/pages/AdminUserProfilePage.jsx";
+// Admin - All lazy loaded (admin only)
+const AdminDashboardPage = lazy(
+  () => import("./features/admin/pages/AdminDashboardPage.jsx"),
+);
+const AdminArticlesPage = lazy(
+  () => import("./features/admin/pages/AdminArticlesPage.jsx"),
+);
+const AdminUsersPage = lazy(
+  () => import("./features/admin/pages/AdminUsersPage.jsx"),
+);
+const AdminUserProfilePage = lazy(
+  () => import("./features/admin/pages/AdminUserProfilePage.jsx"),
+);
 
 import adminProfileLoader from "./features/admin/loaders/adminProfile.js";
 import adminDashboardLoader from "./features/admin/loaders/adminDashboard.js";
@@ -73,7 +113,9 @@ import AuthLayout from "./layouts/AuthLayout.jsx";
 
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
-import NotFoundPage from "./pages/NotFoundPage.jsx";
+
+// NotFoundPage - Lazy loaded
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage.jsx"));
 
 import "./index.css";
 
@@ -95,30 +137,50 @@ export default function App() {
         },
         {
           path: "/verify-otp",
-          element: <OTPVerificationFormPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <OTPVerificationFormPage />
+            </Suspense>
+          ),
           action: otpAction,
           loader: verifyOtpPageLoader,
         },
         {
           path: "/forgot-password",
-          element: <ForgotPasswordPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <ForgotPasswordPage />
+            </Suspense>
+          ),
           action: forgotPasswordAction,
         },
         {
           path: "/reset-password",
-          element: <ResetPasswordPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <ResetPasswordPage />
+            </Suspense>
+          ),
           action: resetPasswordAction,
           loader: resetPasswordLoader,
         },
         {
           path: "/two-factor",
-          element: <TwoFactorPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <TwoFactorPage />
+            </Suspense>
+          ),
           action: verifyTwoFactorLoginAction,
           loader: twoFactorSessionLoader,
         },
         {
           path: "/complete-profile",
-          element: <CompleteProfile />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <CompleteProfile />
+            </Suspense>
+          ),
           action: completeProfileAction,
           loader: completeProfileLoader,
         },
@@ -136,14 +198,39 @@ export default function App() {
           element: <HomePage />,
           loader: homePageLoader,
         },
-        { path: "about", element: <AboutPage /> },
+        {
+          path: "about",
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <AboutPage />
+            </Suspense>
+          ),
+        },
         {
           path: "contact",
-          element: <ContactPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <ContactPage />
+            </Suspense>
+          ),
           action: submitContactAction,
         },
-        { path: "privacy", element: <PrivacyPage /> },
-        { path: "terms", element: <TermsPage /> },
+        {
+          path: "privacy",
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <PrivacyPage />
+            </Suspense>
+          ),
+        },
+        {
+          path: "terms",
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <TermsPage />
+            </Suspense>
+          ),
+        },
         {
           path: "articles/:id",
           element: <ArticleDetailPage />,
@@ -161,7 +248,11 @@ export default function App() {
       children: [
         {
           path: "dashboard",
-          element: <UserDashBoardPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <UserDashBoardPage />
+            </Suspense>
+          ),
           loader: myArticlesLoader,
         },
         {
@@ -169,18 +260,30 @@ export default function App() {
           children: [
             {
               index: true,
-              element: <ExploreArticlesPage />,
+              element: (
+                <Suspense fallback={<PageLoader />}>
+                  <ExploreArticlesPage />
+                </Suspense>
+              ),
               loader: publicArticlesLoader,
             },
             {
               path: "new",
-              element: <CreateArticlePage />,
+              element: (
+                <Suspense fallback={<PageLoader />}>
+                  <CreateArticlePage />
+                </Suspense>
+              ),
               loader: createArticleLoader,
               action: createArticleAction,
             },
             {
               path: ":id/edit",
-              element: <CreateArticlePage />,
+              element: (
+                <Suspense fallback={<PageLoader />}>
+                  <CreateArticlePage />
+                </Suspense>
+              ),
               loader: editArticleLoader,
               action: createArticleAction,
             },
@@ -193,7 +296,11 @@ export default function App() {
         },
         {
           path: "profile",
-          element: <ProfilePage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <ProfilePage />
+            </Suspense>
+          ),
           loader: profileStatsLoader,
           action: updateProfileAction,
         },
@@ -209,12 +316,20 @@ export default function App() {
       children: [
         {
           path: "dashboard",
-          element: <AdminDashboardPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <AdminDashboardPage />
+            </Suspense>
+          ),
           loader: adminDashboardLoader,
         },
         {
           path: "articles",
-          element: <AdminArticlesPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <AdminArticlesPage />
+            </Suspense>
+          ),
           loader: adminArticlesLoader,
           action: adminArticlesAction,
         },
@@ -225,18 +340,30 @@ export default function App() {
         },
         {
           path: "users",
-          element: <AdminUsersPage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <AdminUsersPage />
+            </Suspense>
+          ),
           loader: adminUsersLoader,
           action: adminUsersAction,
         },
         {
           path: "users/:userId",
-          element: <AdminUserProfilePage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <AdminUserProfilePage />
+            </Suspense>
+          ),
           loader: adminUserDetailsLoader,
         },
         {
           path: "profile",
-          element: <ProfilePage />,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <ProfilePage />
+            </Suspense>
+          ),
           loader: profileStatsLoader,
           action: updateProfileAction,
         },
@@ -246,7 +373,11 @@ export default function App() {
     /* ---------- 404 ---------- */
     {
       path: "*",
-      element: <NotFoundPage />,
+      element: (
+        <Suspense fallback={<PageLoader />}>
+          <NotFoundPage />
+        </Suspense>
+      ),
     },
   ]);
 

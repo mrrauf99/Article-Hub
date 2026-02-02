@@ -146,9 +146,11 @@ export default function AdminArticlesPage() {
   // Close dialogs when fetcher completes
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
-      setConfirmDelete(null);
-      setConfirmApprove(null);
-      setConfirmReject(null);
+      queueMicrotask(() => {
+        setConfirmDelete(null);
+        setConfirmApprove(null);
+        setConfirmReject(null);
+      });
     }
   }, [fetcher.state, fetcher.data]);
 
