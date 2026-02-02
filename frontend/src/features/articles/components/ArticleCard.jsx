@@ -1,17 +1,17 @@
-import { useState, useRef, memo } from "react";
+import { useState, memo } from "react";
 import { Eye, Trash2, Edit, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import ConfirmModal from "../ui/ConfirmModal";
 import StatusBadge from "./StatusBadge";
-import LoadingOverlay from "@/components/LoadingOverlay";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { userApi } from "@/features/api/userApi";
 
 function ArticleCard({ article, mode, onDelete }) {
   const navigate = useNavigate();
-  const confirmRef = useRef(null);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
   const openArticle = () => {
     navigate(`/user/articles/${article.article_id}`);
@@ -24,11 +24,13 @@ function ArticleCard({ article, mode, onDelete }) {
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    confirmRef.current?.open();
+    setDeleteError(null);
+    setIsDeleteModalOpen(true);
   };
 
   const confirmDelete = async () => {
     setIsDeleting(true);
+    setDeleteError(null);
     try {
       await userApi.deleteArticle(article.article_id);
 
@@ -36,18 +38,27 @@ function ArticleCard({ article, mode, onDelete }) {
       if (onDelete) {
         onDelete(article.article_id);
       }
+      setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Failed to delete article:", error);
-      alert(error.response?.data?.message || "Failed to delete article");
+      setDeleteError(
+        error.response?.data?.message ||
+          "Failed to delete article. Please try again.",
+      );
     } finally {
       setIsDeleting(false);
     }
   };
 
+  const handleCancelDelete = () => {
+    if (!isDeleting) {
+      setIsDeleteModalOpen(false);
+      setDeleteError(null);
+    }
+  };
+
   return (
     <>
-      <LoadingOverlay isLoading={isDeleting} message="Deleting article..." />
-
       <article
         onClick={openArticle}
         className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden hover:-translate-y-1"
@@ -130,13 +141,18 @@ function ArticleCard({ article, mode, onDelete }) {
         </div>
       </article>
 
-      <ConfirmModal
-        ref={confirmRef}
+      <ConfirmDialog
+        isOpen={isDeleteModalOpen}
         title="Delete Article"
-        description={`Are you sure you want to delete "${article.title}"?`}
+        message={`Are you sure you want to delete "${article.title}"? This action cannot be undone.`}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+        loadingText="Deleting"
+        error={deleteError}
         onConfirm={confirmDelete}
-        confirmText={isDeleting ? "Deleting..." : "Yes, Delete"}
-        confirmDisabled={isDeleting}
+        onCancel={handleCancelDelete}
       />
     </>
   );
