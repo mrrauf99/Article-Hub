@@ -33,33 +33,72 @@ export function validateLength(value, min, max, fieldName) {
   return true;
 }
 
+// Normalize line breaks: convert Windows \r\n to Unix \n
+// This ensures consistent character counting across platforms
+const normalizeLineBreaks = (text) =>
+  typeof text === "string" ? text.replace(/\r\n/g, "\n") : text;
+
+// Industry standard limits for professional article publishing
+const ARTICLE_LIMITS = {
+  title: { min: 10, max: 150 },
+  introduction: { min: 100, max: 1000 },
+  content: { min: 300, max: 100000 },
+  summary: { min: 50, max: 500 },
+};
+
 export function validateArticleData(data) {
   const errors = [];
 
+  // Normalize all text fields for consistent validation
+  const title = normalizeLineBreaks(data.title);
+  const introduction = normalizeLineBreaks(data.introduction);
+  const content = normalizeLineBreaks(data.content);
+  const summary = normalizeLineBreaks(data.summary);
+
   try {
-    validateRequired(data.title, "Title");
-    validateLength(data.title, 5, 200, "Title");
+    validateRequired(title, "Title");
+    validateLength(
+      title,
+      ARTICLE_LIMITS.title.min,
+      ARTICLE_LIMITS.title.max,
+      "Title",
+    );
   } catch (err) {
     errors.push(err.message);
   }
 
   try {
-    validateRequired(data.introduction, "Introduction");
-    validateLength(data.introduction, 50, 500, "Introduction");
+    validateRequired(introduction, "Introduction");
+    validateLength(
+      introduction,
+      ARTICLE_LIMITS.introduction.min,
+      ARTICLE_LIMITS.introduction.max,
+      "Introduction",
+    );
   } catch (err) {
     errors.push(err.message);
   }
 
   try {
-    validateRequired(data.content, "Content");
-    validateLength(data.content, 100, 50000, "Content");
+    validateRequired(content, "Content");
+    validateLength(
+      content,
+      ARTICLE_LIMITS.content.min,
+      ARTICLE_LIMITS.content.max,
+      "Content",
+    );
   } catch (err) {
     errors.push(err.message);
   }
 
   try {
-    validateRequired(data.summary, "Summary");
-    validateLength(data.summary, 20, 300, "Summary");
+    validateRequired(summary, "Summary");
+    validateLength(
+      summary,
+      ARTICLE_LIMITS.summary.min,
+      ARTICLE_LIMITS.summary.max,
+      "Summary",
+    );
   } catch (err) {
     errors.push(err.message);
   }
@@ -104,13 +143,21 @@ export function validateProfileData(data) {
   if (data.gender !== undefined && data.gender !== null && data.gender !== "") {
     const validGenders = ["male", "female", "other", "prefer_not_to_say"];
     if (!validGenders.includes(data.gender.toLowerCase())) {
-      errors.push("Gender must be one of: male, female, other, prefer_not_to_say");
+      errors.push(
+        "Gender must be one of: male, female, other, prefer_not_to_say",
+      );
     }
   }
 
   // Validate URLs
-  const urlFields = ["portfolio_url", "x_url", "linkedin_url", "instagram_url", "facebook_url"];
-  urlFields.forEach(field => {
+  const urlFields = [
+    "portfolio_url",
+    "x_url",
+    "linkedin_url",
+    "instagram_url",
+    "facebook_url",
+  ];
+  urlFields.forEach((field) => {
     if (data[field] !== undefined && data[field]) {
       try {
         const urlRegex = /^https?:\/\/.+/i;

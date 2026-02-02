@@ -38,7 +38,6 @@ export default function TextArea({
         onBlur={onBlur}
         placeholder={placeholder}
         rows={rows}
-        maxLength={maxLength}
         className={`${styles.control} ${styles.textarea} ${
           error ? styles.errorControl : ""
         }`}

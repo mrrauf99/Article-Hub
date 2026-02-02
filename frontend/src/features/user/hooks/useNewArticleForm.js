@@ -5,6 +5,22 @@ import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 // This ensures consistent character counting between frontend and backend
 const normalizeLineBreaks = (text) => text.replace(/\r\n/g, "\n");
 
+// Max character limits matching backend validation
+// Industry standard limits for professional article publishing
+const MAX_LENGTHS = {
+  title: 150,
+  introduction: 1000,
+  summary: 500,
+  content: 100000,
+};
+
+const MIN_LENGTHS = {
+  title: 10,
+  introduction: 100,
+  summary: 50,
+  content: 300,
+};
+
 export function useNewArticleForm(article) {
   const [formData, setFormData] = useState({
     title: article?.title ?? "",
@@ -19,6 +35,7 @@ export function useNewArticleForm(article) {
   const [charCounts, setCharCounts] = useState({
     title: normalizeLineBreaks(article?.title ?? "").length,
     introduction: normalizeLineBreaks(article?.introduction ?? "").length,
+    content: normalizeLineBreaks(article?.content ?? "").length,
     summary: normalizeLineBreaks(article?.summary ?? "").length,
   });
 
@@ -26,18 +43,37 @@ export function useNewArticleForm(article) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const normalizedLength = normalizeLineBreaks(value).length;
 
+    // Always update form data - don't block input
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (name === "title" || name === "introduction" || name === "summary") {
-      // Count normalized characters for accurate limit checking
+    // Update character counts for all tracked fields
+    if (
+      name === "title" ||
+      name === "introduction" ||
+      name === "content" ||
+      name === "summary"
+    ) {
       setCharCounts((prev) => ({
         ...prev,
-        [name]: normalizeLineBreaks(value).length,
+        [name]: normalizedLength,
       }));
     }
 
-    if (errors[name]) {
+    // Show real-time error when exceeding limits
+    if (MAX_LENGTHS[name] && normalizedLength > MAX_LENGTHS[name]) {
+      const fieldLabels = {
+        title: "Title",
+        introduction: "Introduction",
+        content: "Content",
+        summary: "Summary",
+      };
+      setErrors((prev) => ({
+        ...prev,
+        [name]: `${fieldLabels[name]} exceeds maximum limit of ${MAX_LENGTHS[name].toLocaleString()} characters`,
+      }));
+    } else if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
@@ -86,29 +122,42 @@ export function useNewArticleForm(article) {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.title.trim()) newErrors.title = "Title is required";
+    const normalizedTitle = normalizeLineBreaks(formData.title);
+    if (!formData.title.trim()) {
+      newErrors.title = "Title is required";
+    } else if (normalizedTitle.length < MIN_LENGTHS.title) {
+      newErrors.title = `Title should be at least ${MIN_LENGTHS.title} characters`;
+    } else if (normalizedTitle.length > MAX_LENGTHS.title) {
+      newErrors.title = `Title must be at most ${MAX_LENGTHS.title} characters`;
+    }
 
     if (!formData.category) newErrors.category = "Please select a category";
 
     const normalizedIntro = normalizeLineBreaks(formData.introduction);
     if (!formData.introduction.trim()) {
       newErrors.introduction = "Introduction is required";
-    } else if (normalizedIntro.length < 50) {
-      newErrors.introduction = "Introduction should be at least 50 characters";
+    } else if (normalizedIntro.length < MIN_LENGTHS.introduction) {
+      newErrors.introduction = `Introduction should be at least ${MIN_LENGTHS.introduction} characters`;
+    } else if (normalizedIntro.length > MAX_LENGTHS.introduction) {
+      newErrors.introduction = `Introduction must be at most ${MAX_LENGTHS.introduction.toLocaleString()} characters`;
     }
 
     const normalizedContent = normalizeLineBreaks(formData.content);
     if (!formData.content.trim()) {
       newErrors.content = "Main content is required";
-    } else if (normalizedContent.length < 200) {
-      newErrors.content = "Main content should be at least 200 characters";
+    } else if (normalizedContent.length < MIN_LENGTHS.content) {
+      newErrors.content = `Main content should be at least ${MIN_LENGTHS.content} characters`;
+    } else if (normalizedContent.length > MAX_LENGTHS.content) {
+      newErrors.content = `Main content must be at most ${MAX_LENGTHS.content.toLocaleString()} characters`;
     }
 
     const normalizedSummary = normalizeLineBreaks(formData.summary);
     if (!formData.summary.trim()) {
       newErrors.summary = "Summary is required";
-    } else if (normalizedSummary.length < 30) {
-      newErrors.summary = "Summary should be at least 30 characters";
+    } else if (normalizedSummary.length < MIN_LENGTHS.summary) {
+      newErrors.summary = `Summary should be at least ${MIN_LENGTHS.summary} characters`;
+    } else if (normalizedSummary.length > MAX_LENGTHS.summary) {
+      newErrors.summary = `Summary must be at most ${MAX_LENGTHS.summary} characters`;
     }
 
     if (!formData.imageFile && !formData.imageUrl) {
@@ -124,7 +173,6 @@ export function useNewArticleForm(article) {
     charCounts,
     errors,
     categories: ARTICLE_CATEGORIES,
-    setFormData,
     handleChange,
     handleBlur,
     handleImageChange,
