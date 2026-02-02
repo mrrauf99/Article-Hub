@@ -121,7 +121,6 @@ export default function AdminArticlesPage() {
 
   const handleDelete = () => {
     if (!confirmDelete) return;
-    setConfirmDelete(null);
     fetcher.submit(
       { intent: "delete", articleId: confirmDelete.article_id },
       { method: "post" },
@@ -130,7 +129,6 @@ export default function AdminArticlesPage() {
 
   const handleApprove = () => {
     if (!confirmApprove) return;
-    setConfirmApprove(null);
     fetcher.submit(
       { intent: "approve", articleId: confirmApprove.article_id },
       { method: "post" },
@@ -139,12 +137,20 @@ export default function AdminArticlesPage() {
 
   const handleReject = () => {
     if (!confirmReject) return;
-    setConfirmReject(null);
     fetcher.submit(
       { intent: "reject", articleId: confirmReject.article_id },
       { method: "post" },
     );
   };
+
+  // Close dialogs when fetcher completes
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      setConfirmDelete(null);
+      setConfirmApprove(null);
+      setConfirmReject(null);
+    }
+  }, [fetcher.state, fetcher.data]);
 
   // Helper to check if an action is pending for a specific article
   const getLoadingAction = (articleId) => {
