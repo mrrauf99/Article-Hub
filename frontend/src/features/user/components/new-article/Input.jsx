@@ -11,6 +11,8 @@ export default function Input({
   error,
   placeholder,
   required,
+  maxLength,
+  charCount,
 }) {
   return (
     <div className={styles.group}>
@@ -19,6 +21,11 @@ export default function Input({
           <span>
             {label} {required && <span className={styles.required}>*</span>}
           </span>
+          {maxLength && (
+            <span className={styles.charCount}>
+              {charCount} / {maxLength}
+            </span>
+          )}
         </label>
       )}
 
@@ -30,6 +37,7 @@ export default function Input({
         onChange={onChange}
         onBlur={onBlur}
         placeholder={placeholder}
+        maxLength={maxLength}
         className={`${styles.control} ${error ? styles.errorControl : ""}`}
       />
 
