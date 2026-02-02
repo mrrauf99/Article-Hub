@@ -16,7 +16,6 @@ import {
 import Pagination from "@/features/articles/components/Pagination";
 import UsersGrid from "../components/UsersGrid";
 import RoleChangeModal from "../components/RoleChangeModal";
-import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 const ROLE_OPTIONS = [
@@ -258,6 +257,7 @@ export default function AdminUsersPage() {
           cancelText="Cancel"
           variant="info"
           isLoading={isSubmitting && pendingIntent === "changeRole"}
+          loadingText="Changing"
           onConfirm={() =>
             handleRoleChange(
               confirmRoleChange.user.id,
@@ -269,27 +269,22 @@ export default function AdminUsersPage() {
       )}
 
       {/* Delete Confirmation Modal */}
-      {confirmDelete && (
-        <ConfirmDeleteModal
-          title="Delete User"
-          message={
-            <>
-              Are you sure you want to delete{" "}
-              <strong>{confirmDelete.name}</strong>?
-            </>
-          }
-          warning={
-            <>
-              <strong>Warning:</strong> This will also delete all{" "}
-              {confirmDelete.article_count} articles by this user.
-            </>
-          }
-          isLoading={isSubmitting && pendingIntent === "delete"}
-          onConfirm={handleDelete}
-          onCancel={() => setConfirmDelete(null)}
-          confirmText="Delete User"
-        />
-      )}
+      <ConfirmDialog
+        isOpen={!!confirmDelete}
+        title="Delete User"
+        message={
+          confirmDelete
+            ? `Are you sure you want to delete ${confirmDelete.name}? This will also delete all ${confirmDelete.article_count} articles by this user.`
+            : ""
+        }
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isSubmitting && pendingIntent === "delete"}
+        loadingText="Deleting"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

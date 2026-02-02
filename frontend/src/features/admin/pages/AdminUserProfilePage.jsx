@@ -379,8 +379,9 @@ export default function AdminUserProfilePage() {
             }
             confirmText="Yes, Approve"
             cancelText="Cancel"
-            variant="info"
+            variant="success"
             isLoading={isSubmitting && pendingIntent === "approve"}
+            loadingText="Approving"
             onConfirm={handleApprove}
             onCancel={() => setConfirmApprove(null)}
           />
@@ -396,8 +397,9 @@ export default function AdminUserProfilePage() {
             }
             confirmText="Yes, Reject"
             cancelText="Cancel"
-            variant="danger"
+            variant="warning"
             isLoading={isSubmitting && pendingIntent === "reject"}
+            loadingText="Rejecting"
             onConfirm={handleReject}
             onCancel={() => setConfirmReject(null)}
           />

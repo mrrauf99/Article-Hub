@@ -10,7 +10,6 @@ import {
 import Pagination from "@/features/articles/components/Pagination";
 import ArticlesTable from "../components/ArticlesTable";
 import ArticleDetailModal from "../components/ArticleDetailModal";
-import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 const STATUS_OPTIONS = [
@@ -233,20 +232,22 @@ export default function AdminArticlesPage() {
       )}
 
       {/* Delete Confirmation Modal */}
-      {confirmDelete && (
-        <ConfirmDeleteModal
-          title="Delete Article"
-          message={
-            <>
-              Are you sure you want to delete{" "}
-              <strong>"{confirmDelete.title}"</strong>?
-            </>
-          }
-          isLoading={isSubmitting && pendingIntent === "delete"}
-          onConfirm={handleDelete}
-          onCancel={() => setConfirmDelete(null)}
-        />
-      )}
+      <ConfirmDialog
+        isOpen={!!confirmDelete}
+        title="Delete Article"
+        message={
+          confirmDelete
+            ? `Are you sure you want to delete "${confirmDelete.title}"?`
+            : ""
+        }
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isSubmitting && pendingIntent === "delete"}
+        loadingText="Deleting"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
 
       {/* Approve Confirmation Dialog */}
       <ConfirmDialog
@@ -259,7 +260,8 @@ export default function AdminArticlesPage() {
         }
         confirmText="Yes, Approve"
         cancelText="Cancel"
-        variant="info"
+        variant="success"
+        loadingText="Approving"
         isLoading={isSubmitting && pendingIntent === "approve"}
         onConfirm={handleApprove}
         onCancel={() => setConfirmApprove(null)}
@@ -276,7 +278,8 @@ export default function AdminArticlesPage() {
         }
         confirmText="Yes, Reject"
         cancelText="Cancel"
-        variant="danger"
+        variant="warning"
+        loadingText="Rejecting"
         isLoading={isSubmitting && pendingIntent === "reject"}
         onConfirm={handleReject}
         onCancel={() => setConfirmReject(null)}

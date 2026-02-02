@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { useLayoutEffect, useRef } from "react";
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, X, AlertCircle } from "lucide-react";
 
 export default function ConfirmDialog({
   isOpen,
@@ -8,8 +8,11 @@ export default function ConfirmDialog({
   message,
   confirmText = "Confirm",
   cancelText = "Cancel",
-  variant = "danger", // "danger" | "warning" | "info"
+  variant = "danger", // "danger" | "warning" | "info" | "success"
   isLoading = false,
+  loadingText = "Processing",
+  showLoadingDots = true, // Whether to show animated dots during loading
+  error = null, // Error message to display
   onConfirm,
   onCancel,
 }) {
@@ -77,6 +80,10 @@ export default function ConfirmDialog({
       icon: "bg-blue-100 text-blue-600",
       button: "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500",
     },
+    success: {
+      icon: "bg-emerald-100 text-emerald-600",
+      button: "bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500",
+    },
   };
 
   const styles = variantStyles[variant] || variantStyles.danger;
@@ -94,70 +101,112 @@ export default function ConfirmDialog({
         {/* Close button */}
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 z-10 p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+          disabled={isLoading}
+          className="absolute top-4 right-4 z-10 p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-50"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="overflow-y-auto overflow-x-auto max-h-[calc(90vh-1px)]">
           <div className="p-6">
-            {/* Icon */}
-            <div
-              className={`mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 ${styles.icon}`}
-            >
-              <AlertTriangle className="w-7 h-7" />
-            </div>
+            {error ? (
+              <>
+                {/* Error Icon */}
+                <div className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-red-100 text-red-600">
+                  <AlertCircle className="w-7 h-7" />
+                </div>
 
-            {/* Title */}
-            <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
-              {title}
-            </h3>
+                {/* Error Title */}
+                <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
+                  Error
+                </h3>
 
-            {/* Message */}
-            <p className="text-slate-600 text-center mb-6">{message}</p>
+                {/* Error Message */}
+                <p className="text-slate-600 text-center mb-6">{error}</p>
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              <button
-                onClick={onCancel}
-                disabled={isLoading}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
-              >
-                {cancelText}
-              </button>
-              <button
-                onClick={onConfirm}
-                disabled={isLoading}
-                className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 ${styles.button}`}
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg
-                      className="animate-spin h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Processing...
-                  </span>
-                ) : (
-                  confirmText
-                )}
-              </button>
-            </div>
+                {/* OK Button */}
+                <div className="flex justify-end">
+                  <button
+                    onClick={onCancel}
+                    className="px-6 py-2.5 rounded-xl bg-slate-600 text-white font-medium hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                  >
+                    OK
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Icon */}
+                <div
+                  className={`mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 ${styles.icon}`}
+                >
+                  <AlertTriangle className="w-7 h-7" />
+                </div>
+
+                {/* Title */}
+                <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
+                  {title}
+                </h3>
+
+                {/* Message */}
+                <p className="text-slate-600 text-center mb-6">{message}</p>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={onCancel}
+                    disabled={isLoading}
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {cancelText}
+                  </button>
+                  <button
+                    onClick={onConfirm}
+                    disabled={isLoading}
+                    className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-80 disabled:cursor-not-allowed ${styles.button}`}
+                  >
+                    {isLoading ? (
+                      showLoadingDots ? (
+                        <span className="inline-flex items-center justify-center gap-2">
+                          <span className="inline-flex gap-1 items-center translate-y-px">
+                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
+                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
+                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" />
+                          </span>
+                          <span>{loadingText}</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center justify-center gap-2">
+                          <svg
+                            className="animate-spin h-4 w-4 shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            style={{ marginTop: "-1px" }}
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          <span>{loadingText}</span>
+                        </span>
+                      )
+                    ) : (
+                      confirmText
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
