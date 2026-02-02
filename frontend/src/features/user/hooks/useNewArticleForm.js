@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 
+// Normalize line breaks: convert Windows \r\n to Unix \n
+// This ensures consistent character counting between frontend and backend
+const normalizeLineBreaks = (text) => text.replace(/\r\n/g, "\n");
+
 export function useNewArticleForm(article) {
   const [formData, setFormData] = useState({
     title: article?.title ?? "",
@@ -13,9 +17,9 @@ export function useNewArticleForm(article) {
   });
 
   const [charCounts, setCharCounts] = useState({
-    title: article?.title?.length ?? 0,
-    introduction: article?.introduction?.length ?? 0,
-    summary: article?.summary?.length ?? 0,
+    title: normalizeLineBreaks(article?.title ?? "").length,
+    introduction: normalizeLineBreaks(article?.introduction ?? "").length,
+    summary: normalizeLineBreaks(article?.summary ?? "").length,
   });
 
   const [errors, setErrors] = useState({});
@@ -26,7 +30,11 @@ export function useNewArticleForm(article) {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "title" || name === "introduction" || name === "summary") {
-      setCharCounts((prev) => ({ ...prev, [name]: value.length }));
+      // Count normalized characters for accurate limit checking
+      setCharCounts((prev) => ({
+        ...prev,
+        [name]: normalizeLineBreaks(value).length,
+      }));
     }
 
     if (errors[name]) {
@@ -82,21 +90,24 @@ export function useNewArticleForm(article) {
 
     if (!formData.category) newErrors.category = "Please select a category";
 
+    const normalizedIntro = normalizeLineBreaks(formData.introduction);
     if (!formData.introduction.trim()) {
       newErrors.introduction = "Introduction is required";
-    } else if (formData.introduction.length < 50) {
+    } else if (normalizedIntro.length < 50) {
       newErrors.introduction = "Introduction should be at least 50 characters";
     }
 
+    const normalizedContent = normalizeLineBreaks(formData.content);
     if (!formData.content.trim()) {
       newErrors.content = "Main content is required";
-    } else if (formData.content.length < 200) {
+    } else if (normalizedContent.length < 200) {
       newErrors.content = "Main content should be at least 200 characters";
     }
 
+    const normalizedSummary = normalizeLineBreaks(formData.summary);
     if (!formData.summary.trim()) {
       newErrors.summary = "Summary is required";
-    } else if (formData.summary.length < 30) {
+    } else if (normalizedSummary.length < 30) {
       newErrors.summary = "Summary should be at least 30 characters";
     }
 

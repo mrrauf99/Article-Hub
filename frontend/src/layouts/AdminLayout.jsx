@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useLoaderData, useRevalidator } from "react-router-dom";
 
 import ScrollToTop from "../components/ScrollToTop";
+import NavigationProgress from "../components/NavigationProgress";
 import Navbar from "../components/Navbar/Navbar.jsx";
 import Footer from "../components/Footer";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -36,6 +37,7 @@ export default function AdminLayout() {
   return (
     <>
       <ScrollToTop />
+      <NavigationProgress />
 
       <Navbar
         role={user.role}

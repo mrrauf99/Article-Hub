@@ -48,13 +48,17 @@ export default function CreateArticlePage() {
       return;
     }
 
+    // Normalize line breaks: convert Windows \r\n to Unix \n
+    // This ensures character count matches between frontend and backend
+    const normalizeText = (text) => text.replace(/\r\n/g, "\n");
+
     const submitData = new FormData();
 
-    submitData.append("title", formData.title);
+    submitData.append("title", normalizeText(formData.title));
     submitData.append("category", formData.category || "");
-    submitData.append("introduction", formData.introduction);
-    submitData.append("content", formData.content);
-    submitData.append("summary", formData.summary);
+    submitData.append("introduction", normalizeText(formData.introduction));
+    submitData.append("content", normalizeText(formData.content));
+    submitData.append("summary", normalizeText(formData.summary));
 
     if (formData.imageFile) {
       submitData.append("image", formData.imageFile);
