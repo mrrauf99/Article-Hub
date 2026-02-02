@@ -42,14 +42,14 @@ export default function CreateArticlePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const isValid = validateForm();
     if (!isValid) {
       return;
     }
 
     const submitData = new FormData();
-    
+
     submitData.append("title", formData.title);
     submitData.append("category", formData.category || "");
     submitData.append("introduction", formData.introduction);
@@ -58,10 +58,14 @@ export default function CreateArticlePage() {
 
     if (formData.imageFile) {
       submitData.append("image", formData.imageFile);
-    } else if (isEditing && formData.imageUrl && !formData.imageUrl.startsWith("blob:")) {
+    } else if (
+      isEditing &&
+      formData.imageUrl &&
+      !formData.imageUrl.startsWith("blob:")
+    ) {
       submitData.append("existingImageUrl", formData.imageUrl);
     }
-    
+
     submit(submitData, {
       method: "post",
       encType: "multipart/form-data",
@@ -98,10 +102,7 @@ export default function CreateArticlePage() {
 
           {/* Form Card */}
           <div className={styles.formCard}>
-            <form
-              className={styles.articleForm}
-              onSubmit={handleSubmit}
-            >
+            <form className={styles.articleForm} onSubmit={handleSubmit}>
               {/* Section: Basic Info */}
               <div className={styles.formSection}>
                 <div className={styles.sectionHeader}>
@@ -127,6 +128,8 @@ export default function CreateArticlePage() {
                     error={errors.title}
                     placeholder="Enter a captivating title..."
                     icon={<Type className="w-4 h-4" />}
+                    maxLength={200}
+                    charCount={charCounts.title}
                   />
 
                   <Category

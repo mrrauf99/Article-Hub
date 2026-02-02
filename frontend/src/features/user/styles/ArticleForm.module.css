@@ -113,7 +113,8 @@
 .formCard {
   background: #ffffff;
   border-radius: 1.25rem;
-  box-shadow: 0 0.25rem 0.375rem -0.0625rem rgba(0, 0, 0, 0.05),
+  box-shadow:
+    0 0.25rem 0.375rem -0.0625rem rgba(0, 0, 0, 0.05),
     0 0.625rem 1.25rem -0.3125rem rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(226, 232, 240, 0.8);
   overflow: hidden;
@@ -395,15 +396,11 @@ select option {
   transition: all 0.2s ease;
 }
 
-.submitBtn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-  box-shadow: 0 0.375rem 1.25rem rgba(14, 165, 233, 0.4);
-  transform: translateY(-0.0625rem);
-}
-
 .submitBtn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 0.1875rem #ffffff, 0 0 0 0.3125rem #0ea5e9;
+  box-shadow:
+    0 0 0 0.1875rem #ffffff,
+    0 0 0 0.3125rem #0ea5e9;
 }
 
 .submitBtn:disabled {

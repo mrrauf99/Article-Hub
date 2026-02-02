@@ -13,6 +13,7 @@ export function useNewArticleForm(article) {
   });
 
   const [charCounts, setCharCounts] = useState({
+    title: article?.title?.length ?? 0,
     introduction: article?.introduction?.length ?? 0,
     summary: article?.summary?.length ?? 0,
   });
@@ -24,7 +25,7 @@ export function useNewArticleForm(article) {
 
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (name === "introduction" || name === "summary") {
+    if (name === "title" || name === "introduction" || name === "summary") {
       setCharCounts((prev) => ({ ...prev, [name]: value.length }));
     }
 
@@ -42,7 +43,7 @@ export function useNewArticleForm(article) {
 
   const handleImageChange = (e) => {
     const file = e.croppedFile || e.target?.files?.[0];
-    
+
     if (!file) return;
 
     if (!file.type || !file.type.startsWith("image/")) {
