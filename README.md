@@ -71,8 +71,8 @@ This project is licensed under the **MIT License**.
 
 **Made with ❤️ by Abdul Rauf**
 
-[GitHub](https://github.com/itxrauf) •
-[LinkedIn](https://linkedin.com/in/itxrauf) •
+[GitHub](https://github.com/mrrauf99) •
+[LinkedIn](https://www.linkedin.com/in/abdulrauf-dev/) •
 [Email](mailto:itxrauf99@gmail.com)
 
 </div>
