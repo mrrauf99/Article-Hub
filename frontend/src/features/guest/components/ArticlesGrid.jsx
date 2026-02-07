@@ -72,7 +72,7 @@ export default function ArticlesGrid({
                   activeCategory={activeCategory}
                   onChange={onCategorySelect}
                   variant="light"
-                  className="max-w-xs w-full"
+                  className="max-w-xs w-full lg:hidden"
                 />
               }
               actionsClassName="w-full md:w-auto"
@@ -80,7 +80,7 @@ export default function ArticlesGrid({
           </div>
 
           {/* Category Pills (Desktop) */}
-          <div className="hidden lg:flex flex-wrap gap-2 mb-10">
+          <div className="hidden lg:flex flex-wrap gap-2.5 mb-10">
             {primaryCategories.map((cat) => (
               <button
                 key={cat}
