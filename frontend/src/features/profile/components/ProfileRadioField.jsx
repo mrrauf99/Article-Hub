@@ -1,4 +1,9 @@
 import { User } from "lucide-react";
+import {
+  FIELD_GROUP,
+  FIELD_LABEL,
+  FIELD_READONLY,
+} from "../styles/profileClasses";
 
 export default function ProfileRadioField({
   icon: Icon = User,
@@ -10,8 +15,8 @@ export default function ProfileRadioField({
   options = [],
 }) {
   return (
-    <div className="space-y-2">
-      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+    <div className={FIELD_GROUP}>
+      <label className={FIELD_LABEL}>
         <Icon className="w-4 h-4 text-indigo-600" />
         {label}
       </label>
@@ -37,8 +42,10 @@ export default function ProfileRadioField({
           ))}
         </div>
       ) : (
-        <div className="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-sm lg:text-base text-gray-900">
-          {value ? options.find((opt) => opt.value === value)?.label || value : "Not set"}
+        <div className={`${FIELD_READONLY} text-gray-900`}>
+          {value
+            ? options.find((opt) => opt.value === value)?.label || value
+            : "Not set"}
         </div>
       )}
     </div>

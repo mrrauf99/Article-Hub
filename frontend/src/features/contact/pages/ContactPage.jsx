@@ -2,10 +2,19 @@ import ContactHero from "../components/ContactHero";
 import ContactForm from "../components/ContactForm";
 import ContactInfo from "../components/ContactInfo";
 import ContactStats from "../components/ContactStats";
+import SEO from "@/components/SEO";
+import { useLocation } from "react-router-dom";
 
 export default function ContactPage() {
+  const location = useLocation();
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Contact"
+        description="Get in touch with the Article Hub team for support, partnerships, or general inquiries."
+        canonicalPath={location.pathname}
+      />
       {/* Hero Section */}
       <ContactHero />
 

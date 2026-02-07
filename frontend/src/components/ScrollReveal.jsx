@@ -129,5 +129,3 @@ export function StaggerReveal({
     </div>
   );
 }
-
-export default ScrollReveal;

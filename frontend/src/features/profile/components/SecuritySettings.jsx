@@ -9,6 +9,7 @@ import {
   validatePassword,
   getPasswordGenericError,
 } from "@/features/auth/util/authValidation";
+import { SECTION_DESCRIPTION } from "../styles/profileClasses";
 
 export default function SecuritySettings() {
   const { user } = useProfile();
@@ -45,22 +46,24 @@ export default function SecuritySettings() {
   const passwordRuleErrors = useMemo(
     () =>
       validatePassword(passwordForm.newPassword, passwordForm.confirmPassword),
-    [passwordForm.newPassword, passwordForm.confirmPassword]
+    [passwordForm.newPassword, passwordForm.confirmPassword],
   );
 
   const passwordEntered = useMemo(
     () => passwordForm.newPassword.length > 0,
-    [passwordForm.newPassword]
+    [passwordForm.newPassword],
   );
 
   const confirmEntered = useMemo(
     () => passwordForm.confirmPassword.length > 0,
-    [passwordForm.confirmPassword]
+    [passwordForm.confirmPassword],
   );
 
   const handlePasswordFocus = useCallback((e) => {
     const { name } = e.target;
-    setPasswordErrors((prev) => (prev[name] ? { ...prev, [name]: null } : prev));
+    setPasswordErrors((prev) =>
+      prev[name] ? { ...prev, [name]: null } : prev,
+    );
   }, []);
 
   const handlePasswordChange = useCallback((e) => {
@@ -80,8 +83,9 @@ export default function SecuritySettings() {
       return next;
     });
 
-    setPasswordErrors((prev) => (prev[name] ? { ...prev, [name]: null } : prev));
-    setPasswordMessage(null);
+    setPasswordErrors((prev) =>
+      prev[name] ? { ...prev, [name]: null } : prev,
+    );
   }, []);
 
   const handlePasswordBlur = useCallback(
@@ -106,12 +110,12 @@ export default function SecuritySettings() {
         const error = isEmpty(value)
           ? "Please fill out this field."
           : value !== passwordForm.newPassword
-          ? "Passwords do not match."
-          : null;
+            ? "Passwords do not match."
+            : null;
         setPasswordErrors((prev) => ({ ...prev, [name]: error }));
       }
     },
-    [passwordForm.newPassword, passwordRuleErrors]
+    [passwordForm.newPassword, passwordRuleErrors],
   );
 
   const validatePasswordForm = useCallback(() => {
@@ -126,7 +130,7 @@ export default function SecuritySettings() {
     } else {
       const error = getPasswordGenericError(
         passwordRuleErrors,
-        passwordForm.newPassword
+        passwordForm.newPassword,
       );
       if (error) nextErrors.newPassword = error;
     }
@@ -197,7 +201,9 @@ export default function SecuritySettings() {
     setSetupLoading(true);
 
     try {
-      const { data } = await userApi.twoFactorSetup({ password: setupPassword });
+      const { data } = await userApi.twoFactorSetup({
+        password: setupPassword,
+      });
       setSetupData({
         qrCodeDataUrl: data.qrCodeDataUrl,
         secret: data.secret,
@@ -330,8 +336,10 @@ export default function SecuritySettings() {
         {twoFactorEnabled ? "Enabled" : "Disabled"}
       </span>
     ),
-    [twoFactorEnabled]
+    [twoFactorEnabled],
   );
+
+  const panelClassName = "rounded-xl border border-slate-200 bg-slate-50 p-5";
 
   return (
     <div className="border-t border-gray-200 bg-white">
@@ -340,13 +348,13 @@ export default function SecuritySettings() {
           <h2 className="text-lg lg:text-xl font-bold text-gray-900 mb-1">
             Security
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className={SECTION_DESCRIPTION}>
             Manage your password and two-factor authentication.
           </p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <div className={panelClassName}>
             <div className="flex items-center gap-2 text-slate-900 font-semibold">
               <KeyRound className="h-5 w-5 text-indigo-600" />
               Change Password
@@ -424,7 +432,7 @@ export default function SecuritySettings() {
             </form>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <div className={panelClassName}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-slate-900 font-semibold">
                 <ShieldCheck className="h-5 w-5 text-indigo-600" />
@@ -571,7 +579,10 @@ export default function SecuritySettings() {
             )}
 
             {twoFactorEnabled && (
-              <form onSubmit={handleDisableTwoFactor} className="mt-4 space-y-3">
+              <form
+                onSubmit={handleDisableTwoFactor}
+                className="mt-4 space-y-3"
+              >
                 <input
                   type="password"
                   placeholder="Confirm password"

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useLoaderData, useSearchParams } from "react-router-dom";
+import { useLoaderData, useLocation, useSearchParams } from "react-router-dom";
 
 import HeroSection from "../components/HeroSection";
 import FeaturedArticles from "../components/FeaturedArticles";
@@ -10,10 +10,13 @@ import ArticlesGrid from "../components/ArticlesGrid";
 import NewsletterSection from "../components/NewsletterSection";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 import { normalizeCategory, getCanonicalCategory } from "@/utils/categoryUtils";
+import SEO from "@/components/SEO";
+import { SITE_CONFIG } from "@/config/site.config";
 
 export default function HomePage() {
   const { articles, pagination, meta } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   const rawCategory = searchParams.get("category");
   const pageParam = Number(searchParams.get("page")) || 1;
@@ -41,7 +44,7 @@ export default function HomePage() {
       .filter((cat) => ARTICLE_CATEGORIES.includes(cat));
 
     const remaining = ARTICLE_CATEGORIES.filter(
-      (category) => !ranked.includes(category)
+      (category) => !ranked.includes(category),
     );
 
     return ["All", ...ranked, ...remaining];
@@ -49,6 +52,22 @@ export default function HomePage() {
 
   const authorCount = meta?.authorCount ?? 0;
   const totalArticles = meta?.overallCount ?? articles.length;
+  const canonicalPath = `${location.pathname}${location.search}`;
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_CONFIG.name,
+    url: SITE_CONFIG.siteUrl,
+    logo: new URL(SITE_CONFIG.logo, SITE_CONFIG.siteUrl).toString(),
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_CONFIG.name,
+    url: SITE_CONFIG.siteUrl,
+  };
 
   function handleCategorySelect(category) {
     const params = new URLSearchParams(searchParams);
@@ -71,6 +90,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title={SITE_CONFIG.name}
+        description={SITE_CONFIG.description}
+        canonicalPath={canonicalPath}
+        schema={[organizationSchema, websiteSchema]}
+      />
       {/* Hero Section */}
       <HeroSection articleCount={totalArticles} authorCount={authorCount} />
 

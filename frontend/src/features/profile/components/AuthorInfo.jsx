@@ -1,8 +1,23 @@
-import { User, Mail, BookOpen, Globe, Calendar, FileText, Users, MapPin } from "lucide-react";
+import {
+  User,
+  Mail,
+  BookOpen,
+  Globe,
+  Calendar,
+  FileText,
+  Users,
+  MapPin,
+} from "lucide-react";
 import ProfileField from "./ProfileField";
 import ProfileRadioField from "./ProfileRadioField";
 import CountryDropdown from "@/features/auth/components/CountryDropdown";
 import { useProfile } from "../hooks/useProfile";
+import {
+  FIELD_GROUP,
+  FIELD_LABEL,
+  FIELD_READONLY,
+  SECTION_DESCRIPTION,
+} from "../styles/profileClasses";
 
 export default function AuthorInfo() {
   const { formData, isEditing, handleChange } = useProfile();
@@ -14,9 +29,7 @@ export default function AuthorInfo() {
         <h2 className="text-lg lg:text-xl font-bold text-gray-900 mb-1">
           Author Information
         </h2>
-        <p className="text-sm text-gray-600">
-          Manage your public author profile
-        </p>
+        <p className={SECTION_DESCRIPTION}>Manage your public author profile</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
@@ -74,7 +87,7 @@ export default function AuthorInfo() {
           ]}
         />
 
-        <div className="space-y-2">
+        <div className={FIELD_GROUP}>
           {isEditing ? (
             <CountryDropdown
               name="country"
@@ -84,11 +97,11 @@ export default function AuthorInfo() {
             />
           ) : (
             <>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <label className={FIELD_LABEL}>
                 <MapPin className="w-4 h-4 text-indigo-600" />
                 Country/Region
               </label>
-              <div className="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-sm lg:text-base text-gray-900">
+              <div className={`${FIELD_READONLY} text-gray-900`}>
                 {formData.country || "Not set"}
               </div>
             </>

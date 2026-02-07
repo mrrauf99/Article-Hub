@@ -1,5 +1,13 @@
-import { FileText, Clock, CheckCircle, TrendingUp, Eye, XCircle } from "lucide-react";
-import { ScrollReveal, StaggerReveal } from "@/components/ScrollReveal";
+import {
+  FileText,
+  Clock,
+  CheckCircle,
+  TrendingUp,
+  Eye,
+  XCircle,
+} from "lucide-react";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import StatsGrid from "@/components/StatsGrid";
 
 export default function DashboardStats({ articles = [], stats = {} }) {
   const total = articles.length;
@@ -74,13 +82,11 @@ export default function DashboardStats({ articles = [], stats = {} }) {
       </ScrollReveal>
 
       {/* Stats Grid */}
-      <StaggerReveal staggerDelay={100} animation="fade-up">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-          {statItems.map((stat) => (
-            <StatCard key={stat.label} {...stat} />
-          ))}
-        </div>
-      </StaggerReveal>
+      <StatsGrid
+        items={statItems}
+        gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5"
+        renderItem={(stat) => <StatCard {...stat} />}
+      />
     </section>
   );
 }

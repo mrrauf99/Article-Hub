@@ -9,6 +9,7 @@ export default function NavigationProgress() {
   const navigation = useNavigation();
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [themeColor] = useState(() => getThemeColor());
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
   const wasNavigatingRef = useRef(false);
@@ -40,6 +41,9 @@ export default function NavigationProgress() {
     }, 300);
   }, []);
 
+  const glowColor = toRgba(themeColor, 0.65);
+  const shimmerColor = toRgba(themeColor, 0.35);
+
   useEffect(() => {
     // Only trigger on state changes
     if (isNavigating && !wasNavigatingRef.current) {
@@ -64,11 +68,11 @@ export default function NavigationProgress() {
     <div className="fixed top-0 left-0 right-0 z-[9999] h-[3px] bg-transparent">
       {/* Progress bar */}
       <div
-        className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-all duration-300 ease-out"
+        className="h-full transition-all duration-300 ease-out"
         style={{
           width: `${progress}%`,
-          boxShadow:
-            "0 0 10px rgba(37, 99, 235, 0.7), 0 0 5px rgba(56, 189, 248, 0.5)",
+          backgroundColor: themeColor,
+          boxShadow: `0 0 10px ${glowColor}, 0 0 5px ${shimmerColor}`,
         }}
       />
 
@@ -77,8 +81,7 @@ export default function NavigationProgress() {
         className="absolute top-0 h-full w-24 transition-all duration-300 ease-out"
         style={{
           right: `${100 - progress}%`,
-          background:
-            "linear-gradient(to right, transparent, rgba(56, 189, 248, 0.4))",
+          background: `linear-gradient(to right, transparent, ${shimmerColor})`,
           filter: "blur(3px)",
         }}
       />
@@ -91,11 +94,48 @@ export default function NavigationProgress() {
         <div
           className="h-full w-32 animate-shimmer"
           style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
+            background: `linear-gradient(90deg, transparent, ${shimmerColor}, transparent)`,
           }}
         />
       </div>
     </div>
   );
+}
+
+function toRgba(color, alpha) {
+  if (!color) return `rgba(14, 165, 233, ${alpha})`;
+  if (color.startsWith("rgba")) return color;
+  if (color.startsWith("rgb(")) {
+    return color.replace("rgb(", "rgba(").replace(")", `, ${alpha})`);
+  }
+
+  const hex = color.replace("#", "").trim();
+  if (hex.length === 3) {
+    const r = parseInt(hex[0] + hex[0], 16);
+    const g = parseInt(hex[1] + hex[1], 16);
+    const b = parseInt(hex[2] + hex[2], 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  if (hex.length === 6) {
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  return `rgba(14, 165, 233, ${alpha})`;
+}
+
+function getThemeColor() {
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme?.content) {
+    return metaTheme.content;
+  }
+
+  const cssTheme = getComputedStyle(document.documentElement)
+    .getPropertyValue("--theme-color")
+    .trim();
+
+  return cssTheme || "#0ea5e9";
 }

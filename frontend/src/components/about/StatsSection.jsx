@@ -1,4 +1,4 @@
-import StatCard from "./StatCard";
+import StatCard from "@/components/StatCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function StatsSection() {
@@ -14,16 +14,16 @@ export default function StatsSection() {
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="w-full max-w-6xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-          {stats.map((stat, index) => (
-            <ScrollReveal
-              key={stat.label}
-              animation="fade-up"
-              delay={index * 100}
-              duration={500}
-            >
-              <StatCard {...stat} />
-            </ScrollReveal>
-          ))}
+            {stats.map((stat, index) => (
+              <ScrollReveal
+                key={stat.label}
+                animation="fade-up"
+                delay={index * 100}
+                duration={500}
+              >
+                <StatCard {...stat} />
+              </ScrollReveal>
+            ))}
           </div>
         </div>
       </div>

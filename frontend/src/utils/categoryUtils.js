@@ -28,12 +28,3 @@ export function getCanonicalCategory(category) {
   const normalized = normalizeCategory(category);
   return ARTICLE_CATEGORIES.includes(normalized) ? normalized : null;
 }
-
-/**
- * Check if a category is valid (exists in ARTICLE_CATEGORIES after normalization)
- * @param {string} category - Category name to validate
- * @returns {boolean} - True if valid
- */
-export function isValidCategory(category) {
-  return getCanonicalCategory(category) !== null;
-}
