@@ -1,4 +1,5 @@
 import { FileText, Eye, Heart } from "lucide-react";
+import formatCount from "@/utils/formatCount";
 
 const STAT_ITEMS = [
   {
@@ -46,12 +47,14 @@ export default function ProfileStats({ stats, isAdmin = false }) {
             </div>
 
             <div className="text-3xl font-bold text-gray-900">
-              {stats?.[key] ?? 0}
+              {key === "views"
+                ? formatCount(stats?.[key])
+                : (stats?.[key] ?? 0)}
             </div>
 
             <div className="text-sm text-gray-600 mt-1">{label}</div>
           </div>
-        )
+        ),
       )}
     </div>
   );

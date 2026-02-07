@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import StatusBadge from "./StatusBadge";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { userApi } from "@/features/api/userApi";
+import formatCount from "@/utils/formatCount";
 
 function ArticleCard({ article, mode, onDelete }) {
   const navigate = useNavigate();
@@ -111,7 +112,7 @@ function ArticleCard({ article, mode, onDelete }) {
 
             <div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full">
               <Eye className="w-3.5 h-3.5" />
-              <span className="font-medium">{article.views}</span>
+              <span className="font-medium">{formatCount(article.views)}</span>
             </div>
           </div>
 
