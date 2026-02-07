@@ -3,6 +3,7 @@ import SocialLinkField from "./SocialLinkField";
 import XIcon from "./XIcon";
 
 import { useProfile } from "../hooks/useProfile";
+import { SECTION_DESCRIPTION } from "../styles/profileClasses";
 
 export default function SocialLinks() {
   const { formData, isEditing, handleChange } = useProfile();
@@ -10,7 +11,7 @@ export default function SocialLinks() {
     <div className="p-4 lg:p-6 pt-0 space-y-4">
       <div>
         <h3 className="text-lg font-bold text-gray-900 mb-1">Social Links</h3>
-        <p className="text-sm text-gray-600">
+        <p className={SECTION_DESCRIPTION}>
           Connect your social media profiles
         </p>
       </div>

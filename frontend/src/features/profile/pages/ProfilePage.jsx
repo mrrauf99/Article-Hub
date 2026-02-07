@@ -23,6 +23,7 @@ import SocialLinks from "../components/SocialLinks";
 import ProfileActions from "../components/ProfileActions";
 import SecuritySettings from "../components/SecuritySettings";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import SurfaceCard from "@/components/SurfaceCard";
 
 import ProfileProvider from "../context/ProfileProvider";
 
@@ -124,7 +125,7 @@ export default function ProfilePage() {
       <ScrollReveal animation="fade-up" duration={600}>
         <div className="w-full md:px-6 lg:px-8 py-6 sm:py-8">
           <div className="w-full max-w-6xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
+            <SurfaceCard>
               <ProfileHeader />
 
               {/* FEEDBACK */}
@@ -152,7 +153,7 @@ export default function ProfilePage() {
               </form>
 
               <SecuritySettings />
-            </div>
+            </SurfaceCard>
           </div>
         </div>
       </ScrollReveal>

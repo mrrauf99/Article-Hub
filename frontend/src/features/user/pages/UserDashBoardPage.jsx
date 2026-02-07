@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo } from "react";
 import {
   useLoaderData,
   useSearchParams,
@@ -10,6 +10,7 @@ import ArticlesSection from "@/features/articles/components/ArticlesSection";
 import { calculatePagination } from "@/features/articles/utils/pagination.utils";
 import Pagination from "@/features/articles/components/Pagination";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import useScrollOnChange from "@/hooks/useScrollOnChange";
 
 export default function UserDashBoardPage() {
   const { articles, stats } = useLoaderData();
@@ -24,8 +25,11 @@ export default function UserDashBoardPage() {
     [articles, statusParam, pageParam],
   );
 
-  const prevPageRef = useRef(pageParam);
-  const prevStatusRef = useRef(statusParam);
+  useScrollOnChange({
+    deps: [pageParam, statusParam],
+    behavior: "smooth",
+    delay: 100,
+  });
 
   function handlePageChange(page) {
     const params = new URLSearchParams(searchParams);
@@ -48,28 +52,6 @@ export default function UserDashBoardPage() {
     // Revalidate to refresh the data from the loader
     revalidator.revalidate();
   };
-
-  useEffect(() => {
-    const pageChanged = prevPageRef.current !== pageParam;
-    const statusChanged = prevStatusRef.current !== statusParam;
-
-    if (pageChanged || statusChanged) {
-      const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      };
-
-      const timeoutId = setTimeout(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(scrollToTop);
-        });
-      }, 100);
-
-      if (pageChanged) prevPageRef.current = pageParam;
-      if (statusChanged) prevStatusRef.current = statusParam;
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [pageParam, statusParam]);
 
   return (
     <div className="space-y-6">

@@ -1,16 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useLoaderData, useSearchParams, useFetcher } from "react-router-dom";
 import { LayoutGrid, CheckCircle2, Clock, XCircle } from "lucide-react";
 
-import {
-  PageHeader,
-  PillFilter,
-  SearchInput,
-} from "../components/AdminFilters";
+import { PillFilter, SearchInput } from "../components/AdminFilters";
 import Pagination from "@/features/articles/components/Pagination";
 import ArticlesTable from "../components/ArticlesTable";
 import ArticleDetailModal from "../components/ArticleDetailModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import SectionHeader from "@/components/SectionHeader";
+import useScrollOnChange from "@/hooks/useScrollOnChange";
 
 const STATUS_OPTIONS = [
   {
@@ -80,10 +78,10 @@ export default function AdminArticlesPage() {
     setSearchParams(params);
   };
 
-  const prevPageRef = useRef(pagination.page);
-  const prevFiltersRef = useRef({
-    status: filters.status,
-    search: filters.search,
+  useScrollOnChange({
+    deps: [pagination.page, filters.status, filters.search],
+    behavior: "smooth",
+    delay: 100,
   });
 
   const handlePageChange = (page) => {
@@ -91,33 +89,6 @@ export default function AdminArticlesPage() {
     params.set("page", String(page));
     setSearchParams(params, { preventScrollReset: true });
   };
-
-  useEffect(() => {
-    const pageChanged = prevPageRef.current !== pagination.page;
-    const filtersChanged =
-      prevFiltersRef.current.status !== filters.status ||
-      prevFiltersRef.current.search !== filters.search;
-
-    if (pageChanged || filtersChanged) {
-      const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      };
-
-      const timeoutId = setTimeout(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(scrollToTop);
-        });
-      }, 100);
-
-      prevPageRef.current = pagination.page;
-      prevFiltersRef.current = {
-        status: filters.status,
-        search: filters.search,
-      };
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [pagination.page, filters.status, filters.search]);
 
   const handleDelete = () => {
     if (!confirmDelete) return;
@@ -164,18 +135,23 @@ export default function AdminArticlesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
+      <SectionHeader
         title="Manage Articles"
         subtitle="Review, approve, or reject article submissions"
-      >
-        <div className="text-sm text-slate-500">
-          Total:{" "}
-          <span className="font-semibold text-slate-900">
-            {pagination.totalCount}
-          </span>{" "}
-          articles
-        </div>
-      </PageHeader>
+        titleAs="h1"
+        titleClassName="text-2xl sm:text-3xl font-bold text-slate-900"
+        subtitleClassName="text-slate-500 mt-1"
+        meta={
+          <div>
+            Total:{" "}
+            <span className="font-semibold text-slate-900">
+              {pagination.totalCount}
+            </span>{" "}
+            articles
+          </div>
+        }
+        metaClassName="text-sm text-slate-500 mt-2"
+      />
 
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4">
