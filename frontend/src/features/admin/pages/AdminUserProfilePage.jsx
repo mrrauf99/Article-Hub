@@ -20,6 +20,7 @@ import AuthorInfo from "@/features/profile/components/AuthorInfo";
 import SocialLinks from "@/features/profile/components/SocialLinks";
 import ProfileProvider from "@/features/profile/context/ProfileProvider";
 import SurfaceCard from "@/components/SurfaceCard";
+import formatCount from "@/utils/formatCount";
 
 const statusStyles = {
   approved: {
@@ -234,7 +235,7 @@ export default function AdminUserProfilePage() {
     },
     {
       label: "Total Views",
-      value: articleStats.views.toLocaleString(),
+      value: formatCount(articleStats.views),
       icon: Eye,
       gradient: "from-violet-500 to-purple-600",
       bgGradient: "from-violet-50 to-purple-50",
@@ -335,7 +336,7 @@ export default function AdminUserProfilePage() {
                                 </span>
                                 <span className="inline-flex items-center gap-1">
                                   <Eye className="h-3.5 w-3.5" />
-                                  {article.views ?? 0} views
+                                  {formatCount(article.views)} views
                                 </span>
                               </div>
                             </div>

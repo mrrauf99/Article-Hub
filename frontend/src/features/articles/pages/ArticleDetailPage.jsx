@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Calendar, User, Tag, Clock, Share2, Eye, Heart } from "lucide-react";
 import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
+import formatCount from "@/utils/formatCount";
 
 export default function ArticleDetailPage() {
   const { article } = useLoaderData();
@@ -172,7 +173,7 @@ export default function ArticleDetailPage() {
 
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
-                <span>{article.views ?? 0}</span>
+                <span>{formatCount(article.views)}</span>
               </div>
             </div>
 

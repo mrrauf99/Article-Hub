@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import StatsGrid from "@/components/StatsGrid";
+import formatCount from "@/utils/formatCount";
 
 export default function DashboardStats({ articles = [], stats = {} }) {
   const total = articles.length;
@@ -28,7 +29,7 @@ export default function DashboardStats({ articles = [], stats = {} }) {
     },
     {
       label: "Total Views",
-      value: views.toLocaleString(),
+      value: formatCount(views),
       Icon: Eye,
       gradient: "from-violet-500 to-purple-600",
       bgGradient: "from-violet-50 to-purple-50",

@@ -13,6 +13,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import formatCount from "@/utils/formatCount";
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -147,7 +148,7 @@ export default function ArticleDetailModal({
               </div>
               <div className="flex items-center gap-1.5">
                 <Eye className="w-4 h-4" />
-                {article.views || 0} views
+                {formatCount(article.views)} views
               </div>
             </div>
           </div>

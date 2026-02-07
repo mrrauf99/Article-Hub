@@ -8,6 +8,7 @@ import SectionHeader from "@/components/SectionHeader";
 import ArticlesList from "@/components/ArticlesList";
 import ArticlesEmptyState from "@/components/ArticlesEmptyState";
 import useScrollOnChange from "@/hooks/useScrollOnChange";
+import formatCount from "@/utils/formatCount";
 
 export default function ArticlesGrid({
   articles,
@@ -209,7 +210,7 @@ function ArticleCard({ article }) {
           </span>
           <span className="flex items-center gap-1 text-xs text-slate-500">
             <Eye className="w-3.5 h-3.5" />
-            {article.views}
+            {formatCount(article.views)}
           </span>
         </div>
 

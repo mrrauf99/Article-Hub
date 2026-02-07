@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Users, FileText, Eye, Clock } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import StatsGrid from "@/components/StatsGrid";
+import formatCount from "@/utils/formatCount";
 
 const STAT_CARDS = [
   {
@@ -24,7 +25,7 @@ const STAT_CARDS = [
   {
     key: "views",
     label: "Total Views",
-    getValue: (stats) => stats.total_views,
+    getValue: (stats) => formatCount(stats.total_views),
     icon: Eye,
     gradient: "from-cyan-500 to-teal-600",
     shadow: "shadow-cyan-500/25",
