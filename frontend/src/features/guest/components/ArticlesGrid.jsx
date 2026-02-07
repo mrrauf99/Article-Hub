@@ -1,9 +1,13 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Eye, Clock } from "lucide-react";
 import Pagination from "@/features/articles/components/Pagination";
 import CategoryFilter from "@/components/CategoryFilter";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import SectionHeader from "@/components/SectionHeader";
+import ArticlesList from "@/components/ArticlesList";
+import ArticlesEmptyState from "@/components/ArticlesEmptyState";
+import useScrollOnChange from "@/hooks/useScrollOnChange";
 
 export default function ArticlesGrid({
   articles,
@@ -18,165 +22,146 @@ export default function ArticlesGrid({
   const safePage = Math.min(Math.max(page, 1), totalPages || 1);
   const resolvedTotalCount = totalCount ?? articles.length;
 
-  const prevPageRef = useRef(safePage);
-  const prevCategoryRef = useRef(activeCategory);
-
-  useEffect(() => {
-    const pageChanged = prevPageRef.current !== safePage;
-    const categoryChanged = prevCategoryRef.current !== activeCategory;
-
-    if (pageChanged || categoryChanged) {
-      const scrollToArticles = () => {
-        const articlesSection = document.getElementById("articles");
-        if (articlesSection) {
-          const rect = articlesSection.getBoundingClientRect();
-          if (rect.height > 0 || categoryChanged) {
-            const offset = 20;
-            const scrollY = window.pageYOffset || window.scrollY;
-            const elementTop = rect.top + scrollY;
-            const targetY = Math.max(0, elementTop - offset);
-            window.scrollTo({ top: targetY, behavior: "smooth" });
-          }
-        }
-      };
-
-      // Wait for React Router and DOM updates before scrolling
-      const timeoutId = setTimeout(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(scrollToArticles);
-        });
-      }, 100);
-
-      prevPageRef.current = safePage;
-      prevCategoryRef.current = activeCategory;
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [safePage, activeCategory]);
+  useScrollOnChange({
+    deps: [safePage, activeCategory],
+    behavior: "smooth",
+    offset: 20,
+    delay: 100,
+    getTarget: () => document.getElementById("articles"),
+    shouldScroll: ({ prev, next }) => {
+      const [, prevCategory] = prev;
+      const [, nextCategory] = next;
+      const categoryChanged = prevCategory !== nextCategory;
+      const target = document.getElementById("articles");
+      if (!target) return false;
+      const rect = target.getBoundingClientRect();
+      return rect.height > 0 || categoryChanged;
+    },
+  });
 
   const primaryCategories = useMemo(
     () => categories.slice(0, 10),
-    [categories]
+    [categories],
   );
-  const overflowCategories = useMemo(
-    () => categories.slice(10),
-    [categories]
-  );
+  const overflowCategories = useMemo(() => categories.slice(10), [categories]);
   const overflowActive = overflowCategories.includes(activeCategory);
 
   return (
-    <section id="articles" className="py-12 sm:py-16 lg:py-24 bg-slate-50 scroll-mt-20 w-full">
+    <section
+      id="articles"
+      className="py-12 sm:py-16 lg:py-24 bg-slate-50 scroll-mt-20 w-full"
+    >
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="w-full max-w-7xl mx-auto">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-          <div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-2">
-              {activeCategory === "All"
-                ? "All Articles"
-                : `${activeCategory} Articles`}
-            </h2>
-            <p className="text-slate-600">
-              Browse {resolvedTotalCount}{" "}
-              {resolvedTotalCount === 1 ? "article" : "articles"}{" "}
-              {activeCategory !== "All" && `in ${activeCategory}`}
-            </p>
+          {/* Section Header */}
+          <div className="mb-10">
+            <SectionHeader
+              title={
+                activeCategory === "All"
+                  ? "All Articles"
+                  : `${activeCategory} Articles`
+              }
+              subtitle={`Browse ${resolvedTotalCount} ${
+                resolvedTotalCount === 1 ? "article" : "articles"
+              }${activeCategory !== "All" ? ` in ${activeCategory}` : ""}`}
+              titleClassName="text-3xl lg:text-4xl font-bold text-slate-900"
+              subtitleClassName="text-slate-600"
+              actions={
+                <CategoryFilter
+                  categories={categories}
+                  activeCategory={activeCategory}
+                  onChange={onCategorySelect}
+                  variant="light"
+                  className="max-w-xs w-full"
+                />
+              }
+              actionsClassName="w-full md:w-auto"
+            />
           </div>
 
-          {/* Category Filter Dropdown */}
-          <CategoryFilter
-            categories={categories}
-            activeCategory={activeCategory}
-            onChange={onCategorySelect}
-            variant="light"
-            className="max-w-xs w-full"
-          />
-        </div>
-
-        {/* Category Pills (Desktop) */}
-        <div className="hidden lg:flex flex-wrap gap-2 mb-10">
-          {primaryCategories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => onCategorySelect(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${
-                activeCategory === cat
-                  ? "bg-sky-600 text-white shadow-md shadow-sky-500/25"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-          {overflowCategories.length > 0 && (
-            <CategoryFilter
-              categories={overflowCategories}
-              activeCategory={activeCategory}
-              onChange={onCategorySelect}
-              variant="light"
-              triggerLabel={
-                overflowActive
-                  ? activeCategory
-                  : `+${overflowCategories.length} more`
-              }
-              moreButtonActive={overflowActive}
-            />
-          )}
-        </div>
-
-        {/* Articles Grid */}
-        {articles.length === 0 ? (
-          <ScrollReveal animation="fade-up">
-            <div className="py-20 text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-200 mb-5">
-                <svg
-                  className="w-10 h-10 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                No articles found
-              </h3>
-              <p className="text-slate-500">
-                Try selecting a different category or check back later.
-              </p>
-            </div>
-          </ScrollReveal>
-        ) : (
-          <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {articles.map((article, index) => (
-                <ScrollReveal
-                  key={`${article.article_id}-${safePage}`}
-                  animation="fade-up"
-                  delay={index * 50}
-                  duration={350}
-                >
-                  <ArticleCard article={article} />
-                </ScrollReveal>
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="mt-10">
-                <Pagination
-                  current={safePage}
-                  total={totalPages}
-                  onChange={onPageChange}
-                />
-              </div>
+          {/* Category Pills (Desktop) */}
+          <div className="hidden lg:flex flex-wrap gap-2 mb-10">
+            {primaryCategories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => onCategorySelect(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${
+                  activeCategory === cat
+                    ? "bg-sky-600 text-white shadow-md shadow-sky-500/25"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+            {overflowCategories.length > 0 && (
+              <CategoryFilter
+                categories={overflowCategories}
+                activeCategory={activeCategory}
+                onChange={onCategorySelect}
+                variant="light"
+                triggerLabel={
+                  overflowActive
+                    ? activeCategory
+                    : `+${overflowCategories.length} more`
+                }
+                moreButtonActive={overflowActive}
+              />
             )}
-          </>
-        )}
+          </div>
+
+          {/* Articles Grid */}
+          <ArticlesList
+            items={articles}
+            renderItem={(article, index) => (
+              <ScrollReveal
+                key={`${article.article_id}-${safePage}`}
+                animation="fade-up"
+                delay={index * 50}
+                duration={350}
+              >
+                <ArticleCard article={article} />
+              </ScrollReveal>
+            )}
+            emptyState={
+              <ScrollReveal animation="fade-up">
+                <ArticlesEmptyState
+                  icon={
+                    <svg
+                      className="w-10 h-10 text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                      />
+                    </svg>
+                  }
+                  title="No articles found"
+                  subtitle="Try selecting a different category or check back later."
+                  containerClassName="py-20 text-center"
+                  iconWrapperClassName="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-200 mb-5"
+                  titleClassName="text-xl font-semibold text-slate-700 mb-2"
+                  subtitleClassName="text-slate-500"
+                />
+              </ScrollReveal>
+            }
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          />
+
+          {totalPages > 1 && articles.length > 0 && (
+            <div className="mt-10">
+              <Pagination
+                current={safePage}
+                total={totalPages}
+                onChange={onPageChange}
+              />
+            </div>
+          )}
         </div>
       </div>
     </section>

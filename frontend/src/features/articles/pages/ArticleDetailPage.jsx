@@ -1,10 +1,13 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { Calendar, User, Tag, Clock, Share2, Eye, Heart } from "lucide-react";
+import SEO from "@/components/SEO";
+import { SITE_CONFIG } from "@/config/site.config";
 
 export default function ArticleDetailPage() {
   const { article } = useLoaderData();
+  const location = useLocation();
 
   const [showShareTooltip, setShowShareTooltip] = useState(false);
 
@@ -32,6 +35,50 @@ export default function ArticleDetailPage() {
     );
   }
 
+  const canonicalPath = location.pathname;
+  const metaDescription = buildDescription(article);
+  const imageUrl = article.image_url || SITE_CONFIG.ogImage;
+  const canonicalUrl = new URL(canonicalPath, SITE_CONFIG.siteUrl).toString();
+  const publisherLogo = new URL(
+    SITE_CONFIG.logo,
+    SITE_CONFIG.siteUrl,
+  ).toString();
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: metaDescription,
+    image: imageUrl
+      ? [new URL(imageUrl, SITE_CONFIG.siteUrl).toString()]
+      : undefined,
+    author: {
+      "@type": "Person",
+      name: article.author_name || SITE_CONFIG.name,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_CONFIG.name,
+      logo: {
+        "@type": "ImageObject",
+        url: publisherLogo,
+      },
+    },
+    mainEntityOfPage: canonicalUrl,
+  };
+
+  if (article.category) {
+    articleSchema.articleSection = article.category;
+  }
+
+  if (article.published_at) {
+    articleSchema.datePublished = article.published_at;
+  }
+
+  if (article.updated_at) {
+    articleSchema.dateModified = article.updated_at;
+  }
+
   /* ---------------- Utils ---------------- */
   function formatReadingTime({ content, introduction, summary }) {
     const wordsPerMinute = 200;
@@ -43,6 +90,16 @@ export default function ArticleDetailPage() {
       .trim();
     const words = cleanText ? cleanText.split(" ").length : 0;
     return `${Math.max(1, Math.ceil(words / wordsPerMinute))} min read`;
+  }
+
+  function buildDescription({ introduction, summary, content }) {
+    const preferred = introduction || summary || content || "";
+    const cleanText = preferred
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    return cleanText.slice(0, 180) || SITE_CONFIG.description;
   }
 
   async function handleShare() {
@@ -67,6 +124,14 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white w-full">
+      <SEO
+        title={article.title}
+        description={metaDescription}
+        canonicalPath={canonicalPath}
+        image={imageUrl}
+        type="article"
+        schema={[articleSchema]}
+      />
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10">
         <div className="w-full max-w-4xl mx-auto">
           {/* ================= HEADER ================= */}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, useLoaderData } from "react-router-dom";
+import { Outlet, useLoaderData, useLocation } from "react-router-dom";
 
 import ScrollToTop from "../components/ScrollToTop";
 import NavigationProgress from "../components/NavigationProgress";
@@ -7,9 +7,12 @@ import Navbar from "../components/Navbar/Navbar.jsx";
 import Footer from "../components/Footer";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useLogout } from "../hooks/useLogout";
+import SEO from "@/components/SEO";
+import MainContainer from "@/components/MainContainer";
 
 export default function UserLayout() {
   const { user } = useLoaderData();
+  const location = useLocation();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { handleLogout: logout, isLoggingOut } = useLogout();
 
@@ -20,6 +23,7 @@ export default function UserLayout() {
 
   return (
     <>
+      <SEO title="Account" canonicalPath={location.pathname} noindex nofollow />
       <ScrollToTop />
       <NavigationProgress />
 
@@ -30,11 +34,9 @@ export default function UserLayout() {
         onLogout={() => setShowLogoutConfirm(true)}
       />
 
-      <main className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 overflow-x-hidden">
-        <div className="w-full max-w-7xl mx-auto">
-          <Outlet />
-        </div>
-      </main>
+      <MainContainer>
+        <Outlet />
+      </MainContainer>
 
       <Footer />
 

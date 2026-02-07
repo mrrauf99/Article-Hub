@@ -8,15 +8,12 @@ import {
 } from "react-router-dom";
 import { Users, User, Shield } from "lucide-react";
 
-import {
-  PageHeader,
-  PillFilter,
-  SearchInput,
-} from "../components/AdminFilters";
+import { PillFilter, SearchInput } from "../components/AdminFilters";
 import Pagination from "@/features/articles/components/Pagination";
 import UsersGrid from "../components/UsersGrid";
 import RoleChangeModal from "../components/RoleChangeModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import SectionHeader from "@/components/SectionHeader";
 
 const ROLE_OPTIONS = [
   {
@@ -187,18 +184,23 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
+      <SectionHeader
         title="Manage Users"
         subtitle="View, search, and manage platform users"
-      >
-        <div className="text-sm text-slate-500">
-          Total:{" "}
-          <span className="font-semibold text-slate-900">
-            {displayTotalCount}
-          </span>{" "}
-          users
-        </div>
-      </PageHeader>
+        titleAs="h1"
+        titleClassName="text-2xl sm:text-3xl font-bold text-slate-900"
+        subtitleClassName="text-slate-500 mt-1"
+        meta={
+          <div>
+            Total:{" "}
+            <span className="font-semibold text-slate-900">
+              {displayTotalCount}
+            </span>{" "}
+            users
+          </div>
+        }
+        metaClassName="text-sm text-slate-500 mt-2"
+      />
 
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4">

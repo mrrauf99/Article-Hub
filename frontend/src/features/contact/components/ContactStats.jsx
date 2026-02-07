@@ -1,4 +1,4 @@
-import StatCard from "./StatCard";
+import StatCard from "@/components/StatCard";
 import { CONTACT_STATS } from "../data/contactStats";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
@@ -25,6 +25,7 @@ export default function ContactStats() {
             duration={500}
           >
             <StatCard
+              variant="contact"
               icon={stat.icon}
               value={stat.value}
               label={stat.label}

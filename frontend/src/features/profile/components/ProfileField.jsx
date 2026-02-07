@@ -1,3 +1,10 @@
+import {
+  FIELD_GROUP,
+  FIELD_LABEL,
+  FIELD_INPUT,
+  FIELD_READONLY,
+} from "../styles/profileClasses";
+
 export default function ProfileField({
   icon: Icon,
   label,
@@ -10,8 +17,8 @@ export default function ProfileField({
   rows,
 }) {
   return (
-    <div className="space-y-2">
-      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+    <div className={FIELD_GROUP}>
+      <label className={FIELD_LABEL}>
         <Icon className="w-4 h-4 text-indigo-600" />
         {label}
       </label>
@@ -22,7 +29,7 @@ export default function ProfileField({
             value={value || ""}
             onChange={onChange}
             rows={rows}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none text-sm lg:text-base"
+            className={`${FIELD_INPUT} resize-none`}
             placeholder={`Enter your ${label.toLowerCase()}...`}
           />
         ) : (
@@ -31,12 +38,12 @@ export default function ProfileField({
             name={name}
             value={value || ""}
             onChange={onChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-sm lg:text-base"
+            className={FIELD_INPUT}
           />
         )
       ) : (
         <div
-          className={`px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-sm lg:text-base ${
+          className={`${FIELD_READONLY} ${
             disabled ? "text-gray-500" : "text-gray-900"
           }`}
         >

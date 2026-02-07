@@ -1,3 +1,10 @@
+import {
+  FIELD_GROUP,
+  FIELD_LABEL,
+  FIELD_INPUT,
+  FIELD_READONLY,
+} from "../styles/profileClasses";
+
 export default function SocialLinkField({
   icon: Icon,
   label,
@@ -8,8 +15,8 @@ export default function SocialLinkField({
   placeholder,
 }) {
   return (
-    <div className="space-y-2">
-      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+    <div className={FIELD_GROUP}>
+      <label className={FIELD_LABEL}>
         <Icon className="w-5 h-5 text-gray-600" />
         {label}
       </label>
@@ -20,10 +27,10 @@ export default function SocialLinkField({
           value={value || ""}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-sm lg:text-base"
+          className={FIELD_INPUT}
         />
       ) : (
-        <div className="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-sm lg:text-base">
+        <div className={FIELD_READONLY}>
           {value ? (
             <a
               href={value}

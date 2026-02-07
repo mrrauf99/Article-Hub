@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Users, FileText, Eye, Clock } from "lucide-react";
-import { ScrollReveal, StaggerReveal } from "@/components/ScrollReveal";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import StatsGrid from "@/components/StatsGrid";
 
 const STAT_CARDS = [
   {
@@ -63,31 +64,30 @@ export default function DashboardStats({ stats }) {
       </ScrollReveal>
 
       {/* Stats Grid */}
-      <StaggerReveal staggerDelay={100} animation="fade-up">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {STAT_CARDS.map((card) => {
-            const Icon = card.icon;
-            return (
-              <div
-                key={card.key}
-                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-5 text-white shadow-xl ${card.shadow}`}
-              >
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between">
-                    <p className="text-white/80 text-sm font-medium">
-                      {card.label}
-                    </p>
-                    <Icon className="w-5 h-5 text-white/70" />
-                  </div>
-                  <p className="mt-2 text-3xl font-bold">
-                    {card.getValue(stats)}
+      <StatsGrid
+        items={STAT_CARDS}
+        gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        renderItem={(card) => {
+          const Icon = card.icon;
+          return (
+            <div
+              className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-5 text-white shadow-xl ${card.shadow}`}
+            >
+              <div className="relative z-10">
+                <div className="flex items-center justify-between">
+                  <p className="text-white/80 text-sm font-medium">
+                    {card.label}
                   </p>
+                  <Icon className="w-5 h-5 text-white/70" />
                 </div>
+                <p className="mt-2 text-3xl font-bold">
+                  {card.getValue(stats)}
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </StaggerReveal>
+            </div>
+          );
+        }}
+      />
     </div>
   );
 }
