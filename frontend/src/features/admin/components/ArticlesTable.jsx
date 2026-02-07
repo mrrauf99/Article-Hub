@@ -7,6 +7,7 @@ import {
   FileText,
 } from "lucide-react";
 import ActionButton from "./ActionButton";
+import formatCount from "@/utils/formatCount";
 
 function StatusBadge({ status }) {
   const config = {
@@ -125,7 +126,7 @@ export default function ArticlesTable({
                     <td className="px-4 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-slate-600 whitespace-nowrap">
                         <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                        {article.views || 0}
+                        {formatCount(article.views)}
                       </div>
                     </td>
                     <td className="px-4 sm:px-6 py-3 sm:py-4">

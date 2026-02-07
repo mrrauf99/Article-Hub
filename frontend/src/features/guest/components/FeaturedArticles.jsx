@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Eye, Clock, ArrowRight, TrendingUp } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import formatCount from "@/utils/formatCount";
 
 export default function FeaturedArticles({ articles }) {
   // Get top 3 articles by views
@@ -72,7 +73,7 @@ export default function FeaturedArticles({ articles }) {
                     </span>
                     <span className="flex items-center gap-1">
                       <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      {main.views} views
+                      {formatCount(main.views)} views
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -115,7 +116,7 @@ export default function FeaturedArticles({ articles }) {
                         <span className="truncate">{article.author_name}</span>
                         <span className="flex items-center gap-1 shrink-0">
                           <Eye className="w-3 h-3" />
-                          {article.views}
+                          {formatCount(article.views)}
                         </span>
                       </div>
                     </div>
