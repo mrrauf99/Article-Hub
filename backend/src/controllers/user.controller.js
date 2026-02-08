@@ -15,7 +15,7 @@ export async function getProfile(req, res) {
 
     const { rows } = await db.query(
       `
-      SELECT username, name, email, expertise, avatar_url,  
+      SELECT id, username, name, email, expertise, avatar_url,  
       joined_at, bio, portfolio_url, x_url, linkedin_url, 
       instagram_url, facebook_url, role, gender, country, two_factor_enabled
       FROM users WHERE id = $1

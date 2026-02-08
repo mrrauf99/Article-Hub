@@ -13,6 +13,7 @@ export const getApprovedArticles = async (req, res) => {
     let query = `
       SELECT
         a.article_id,
+        a.author_id,
         a.title,
         a.introduction,
         a.category,
@@ -44,7 +45,7 @@ export const getApprovedArticles = async (req, res) => {
       WHERE a.status = 'approved'
       ${category ? "AND a.category = $1" : ""}
       `,
-      category ? [category] : []
+      category ? [category] : [],
     );
 
     const overallCountQuery = await db.query(`
@@ -66,11 +67,7 @@ export const getApprovedArticles = async (req, res) => {
       GROUP BY category
     `);
 
-    const { rows } = await db.query(query, [
-      ...values,
-      limitNumber,
-      offset,
-    ]);
+    const { rows } = await db.query(query, [...values, limitNumber, offset]);
 
     const totalCount = totalCountQuery.rows[0]?.count || 0;
     const overallCount = overallCountQuery.rows[0]?.count || 0;
@@ -121,7 +118,7 @@ export const getMyArticles = async (req, res) => {
       WHERE a.author_id = $1
       ORDER BY a.created_at DESC
       `,
-      [req.session.userId]
+      [req.session.userId],
     );
 
     res.json({ success: true, data: rows });
@@ -166,7 +163,7 @@ export const getArticleById = async (req, res) => {
           OR a.author_id = $2
         )
       `,
-      [id, userId]
+      [id, userId],
     );
 
     if (!rows.length) {
@@ -255,7 +252,7 @@ export const createArticle = async (req, res) => {
         category,
         imageUrl,
         req.session.userId,
-      ]
+      ],
     );
 
     res.status(201).json({
@@ -327,7 +324,7 @@ export const updateArticle = async (req, res) => {
     // First, get the current article to check existing image
     const currentArticleQuery = await db.query(
       `SELECT image_url, author_id FROM articles WHERE article_id = $1`,
-      [id]
+      [id],
     );
 
     if (currentArticleQuery.rows.length === 0) {
@@ -374,7 +371,7 @@ export const updateArticle = async (req, res) => {
           } catch (deleteErr) {
             console.error(
               "Failed to delete old image from Cloudinary:",
-              deleteErr
+              deleteErr,
             );
           }
         }
@@ -392,7 +389,7 @@ export const updateArticle = async (req, res) => {
         } catch (deleteErr) {
           console.error(
             "Failed to delete old image from Cloudinary:",
-            deleteErr
+            deleteErr,
           );
         }
       }
@@ -423,7 +420,7 @@ export const updateArticle = async (req, res) => {
         imageUrl,
         id,
         req.session.userId,
-      ]
+      ],
     );
 
     if (!rowCount) {
@@ -453,7 +450,7 @@ export const deleteArticle = async (req, res) => {
     // First, get the article to check if it exists and get the image URL
     const articleQuery = await db.query(
       `SELECT image_url, author_id FROM articles WHERE article_id = $1`,
-      [id]
+      [id],
     );
 
     if (articleQuery.rows.length === 0) {
@@ -489,7 +486,7 @@ export const deleteArticle = async (req, res) => {
     const { rowCount } = await db.query(
       `DELETE FROM articles
        WHERE article_id = $1 AND author_id = $2`,
-      [id, req.session.userId]
+      [id, req.session.userId],
     );
 
     if (!rowCount) {
@@ -552,10 +549,13 @@ export const incrementArticleViews = async (req, res) => {
     if (userId) {
       const authorCheck = await db.query(
         `SELECT author_id FROM articles WHERE article_id = $1`,
-        [id]
+        [id],
       );
 
-      if (authorCheck.rows.length > 0 && authorCheck.rows[0].author_id === userId) {
+      if (
+        authorCheck.rows.length > 0 &&
+        authorCheck.rows[0].author_id === userId
+      ) {
         return res.status(200).json({
           success: true,
           message: "View not counted for article author",
@@ -567,7 +567,7 @@ export const incrementArticleViews = async (req, res) => {
       `UPDATE articles 
        SET views = COALESCE(views, 0) + 1 
        WHERE article_id = $1 AND status = 'approved'`,
-      [id]
+      [id],
     );
 
     if (!rowCount) {
