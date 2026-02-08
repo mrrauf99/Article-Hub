@@ -1,5 +1,9 @@
 import { useMemo, useEffect, useRef } from "react";
-import { useLoaderData, useSearchParams } from "react-router-dom";
+import {
+  useLoaderData,
+  useRouteLoaderData,
+  useSearchParams,
+} from "react-router-dom";
 import { Search, Sparkles, BookOpen } from "lucide-react";
 
 import ArticleCard from "@/features/articles/components/ArticleCard";
@@ -13,6 +17,8 @@ const PER_PAGE = 9;
 
 export default function ExploreArticlesPage() {
   const { articles } = useLoaderData();
+  const userLayoutData = useRouteLoaderData("user-layout");
+  const userId = userLayoutData?.user?.id ?? null;
   const [searchParams, setSearchParams] = useSearchParams();
 
   const rawCategory = searchParams.get("category");
@@ -26,15 +32,16 @@ export default function ExploreArticlesPage() {
   }, [rawCategory]);
 
   const categories = useMemo(() => ["All", ...ARTICLE_CATEGORIES], []);
-  const overflowCategories = useMemo(
-    () => categories.slice(10),
-    [categories]
-  );
+  const overflowCategories = useMemo(() => categories.slice(10), [categories]);
   const overflowActive = overflowCategories.includes(activeCategory);
 
   // Filter by category and search
   const filteredArticles = useMemo(() => {
     let result = articles;
+
+    if (userId) {
+      result = result.filter((article) => article.author_id !== userId);
+    }
 
     if (activeCategory !== "All") {
       result = result.filter((a) => {
@@ -49,12 +56,12 @@ export default function ExploreArticlesPage() {
         (a) =>
           a.title.toLowerCase().includes(query) ||
           a.summary?.toLowerCase().includes(query) ||
-          a.author_name?.toLowerCase().includes(query)
+          a.author_name?.toLowerCase().includes(query),
       );
     }
 
     return result;
-  }, [articles, activeCategory, searchQuery]);
+  }, [articles, activeCategory, searchQuery, userId]);
 
   const totalPages = Math.ceil(filteredArticles.length / PER_PAGE);
   const safePage = Math.min(Math.max(pageParam, 1), totalPages || 1);
