@@ -1,5 +1,22 @@
 import db from "../config/db.config.js";
 import { deleteImageByUrl } from "../utils/cloudinary.utils.js";
+import { sendArticleStatusEmail } from "../services/email.service.js";
+
+async function fetchArticleAuthorDetails(articleId) {
+  const { rows } = await db.query(
+    `SELECT
+      a.article_id,
+      a.title,
+      u.name AS author_name,
+      u.email AS author_email
+     FROM articles a
+     JOIN users u ON u.id = a.author_id
+     WHERE a.article_id = $1`,
+    [articleId],
+  );
+
+  return rows[0] || null;
+}
 
 async function fetchDashboardStats() {
   const statsQuery = await db.query(`
@@ -239,6 +256,30 @@ export const approveArticle = async (req, res) => {
       });
     }
 
+    const authorDetails = await fetchArticleAuthorDetails(articleId);
+
+    if (!authorDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found",
+      });
+    }
+
+    try {
+      await sendArticleStatusEmail({
+        to: authorDetails.author_email,
+        name: authorDetails.author_name,
+        articleTitle: authorDetails.title,
+        status: "approved",
+      });
+    } catch (emailErr) {
+      console.error("Failed to send approval email:", emailErr);
+      return res.status(500).json({
+        success: false,
+        message: "Article approved but email could not be sent",
+      });
+    }
+
     res.json({ success: true, message: "Article approved" });
   } catch (err) {
     console.error(err);
@@ -248,6 +289,14 @@ export const approveArticle = async (req, res) => {
 
 export const rejectArticle = async (req, res) => {
   const { articleId } = req.params;
+  const reason = req.body?.reason?.trim();
+
+  if (!reason) {
+    return res.status(400).json({
+      success: false,
+      message: "Rejection reason is required",
+    });
+  }
 
   try {
     const { rowCount } = await db.query(
@@ -265,6 +314,31 @@ export const rejectArticle = async (req, res) => {
       });
     }
 
+    const authorDetails = await fetchArticleAuthorDetails(articleId);
+
+    if (!authorDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found",
+      });
+    }
+
+    try {
+      await sendArticleStatusEmail({
+        to: authorDetails.author_email,
+        name: authorDetails.author_name,
+        articleTitle: authorDetails.title,
+        status: "rejected",
+        reason,
+      });
+    } catch (emailErr) {
+      console.error("Failed to send rejection email:", emailErr);
+      return res.status(500).json({
+        success: false,
+        message: "Article rejected but email could not be sent",
+      });
+    }
+
     res.json({ success: true, message: "Article rejected" });
   } catch (err) {
     console.error(err);
@@ -274,11 +348,26 @@ export const rejectArticle = async (req, res) => {
 
 export const deleteArticle = async (req, res) => {
   const { articleId } = req.params;
+  const reason = req.body?.reason?.trim();
+
+  if (!reason) {
+    return res.status(400).json({
+      success: false,
+      message: "Deletion reason is required",
+    });
+  }
 
   try {
     // First, get the article to fetch image URL before deletion
     const articleQuery = await db.query(
-      `SELECT image_url FROM articles WHERE article_id = $1`,
+      `SELECT
+        a.image_url,
+        a.title,
+        u.name AS author_name,
+        u.email AS author_email
+       FROM articles a
+       JOIN users u ON u.id = a.author_id
+       WHERE a.article_id = $1`,
       [articleId],
     );
 
@@ -312,6 +401,22 @@ export const deleteArticle = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Article not found",
+      });
+    }
+
+    try {
+      await sendArticleStatusEmail({
+        to: article.author_email,
+        name: article.author_name,
+        articleTitle: article.title,
+        status: "deleted",
+        reason,
+      });
+    } catch (emailErr) {
+      console.error("Failed to send deletion email:", emailErr);
+      return res.status(500).json({
+        success: false,
+        message: "Article deleted but email could not be sent",
       });
     }
 

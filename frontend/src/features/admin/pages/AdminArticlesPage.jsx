@@ -50,6 +50,8 @@ export default function AdminArticlesPage() {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [confirmApprove, setConfirmApprove] = useState(null);
   const [confirmReject, setConfirmReject] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
 
   const isSubmitting = fetcher.state !== "idle";
   const pendingArticleId = fetcher.formData?.get("articleId");
@@ -93,7 +95,11 @@ export default function AdminArticlesPage() {
   const handleDelete = () => {
     if (!confirmDelete) return;
     fetcher.submit(
-      { intent: "delete", articleId: confirmDelete.article_id },
+      {
+        intent: "delete",
+        articleId: confirmDelete.article_id,
+        reason: deleteReason,
+      },
       { method: "post" },
     );
   };
@@ -109,7 +115,11 @@ export default function AdminArticlesPage() {
   const handleReject = () => {
     if (!confirmReject) return;
     fetcher.submit(
-      { intent: "reject", articleId: confirmReject.article_id },
+      {
+        intent: "reject",
+        articleId: confirmReject.article_id,
+        reason: rejectReason,
+      },
       { method: "post" },
     );
   };
@@ -121,6 +131,8 @@ export default function AdminArticlesPage() {
         setConfirmDelete(null);
         setConfirmApprove(null);
         setConfirmReject(null);
+        setRejectReason("");
+        setDeleteReason("");
       });
     }
   }, [fetcher.state, fetcher.data]);
@@ -180,13 +192,17 @@ export default function AdminArticlesPage() {
         getLoadingAction={getLoadingAction}
         onViewArticle={setSelectedArticle}
         onApprove={(article) => setConfirmApprove(article)}
-        onReject={(article) =>
+        onReject={(article) => {
           setConfirmReject({
             article_id: article.article_id,
             title: article.title,
-          })
-        }
-        onDelete={setConfirmDelete}
+          });
+          setRejectReason("");
+        }}
+        onDelete={(article) => {
+          setConfirmDelete(article);
+          setDeleteReason("");
+        }}
       />
 
       {/* Pagination */}
@@ -209,6 +225,7 @@ export default function AdminArticlesPage() {
           }}
           onReject={(id) => {
             setConfirmReject({ article_id: id, title: selectedArticle?.title });
+            setRejectReason("");
             setSelectedArticle(null);
           }}
           showInternalConfirmations={false}
@@ -229,8 +246,16 @@ export default function AdminArticlesPage() {
         variant="danger"
         isLoading={isSubmitting && pendingIntent === "delete"}
         loadingText="Deleting"
+        reasonLabel="Reason for deletion"
+        reasonPlaceholder="Explain why the article is being removed (e.g., prohibited content, violates terms)."
+        reasonValue={deleteReason}
+        reasonRequired
+        onReasonChange={setDeleteReason}
         onConfirm={handleDelete}
-        onCancel={() => setConfirmDelete(null)}
+        onCancel={() => {
+          setConfirmDelete(null);
+          setDeleteReason("");
+        }}
       />
 
       {/* Approve Confirmation Dialog */}
@@ -265,8 +290,16 @@ export default function AdminArticlesPage() {
         variant="warning"
         loadingText="Rejecting"
         isLoading={isSubmitting && pendingIntent === "reject"}
+        reasonLabel="Reason for rejection"
+        reasonPlaceholder="Share the rejection reasons so the author can improve."
+        reasonValue={rejectReason}
+        reasonRequired
+        onReasonChange={setRejectReason}
         onConfirm={handleReject}
-        onCancel={() => setConfirmReject(null)}
+        onCancel={() => {
+          setConfirmReject(null);
+          setRejectReason("");
+        }}
       />
     </div>
   );

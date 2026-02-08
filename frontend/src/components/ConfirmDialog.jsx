@@ -13,6 +13,12 @@ export default function ConfirmDialog({
   loadingText = "Processing",
   showLoadingDots = true, // Whether to show animated dots during loading
   error = null, // Error message to display
+  reasonLabel,
+  reasonPlaceholder,
+  reasonValue,
+  reasonHelper,
+  reasonRequired = false,
+  onReasonChange,
   onConfirm,
   onCancel,
 }) {
@@ -87,6 +93,9 @@ export default function ConfirmDialog({
   };
 
   const styles = variantStyles[variant] || variantStyles.danger;
+  const showReasonField = typeof onReasonChange === "function";
+  const isReasonMissing =
+    reasonRequired && (!reasonValue || !reasonValue.trim());
 
   return createPortal(
     <div
@@ -151,6 +160,28 @@ export default function ConfirmDialog({
                 {/* Message */}
                 <p className="text-slate-600 text-center mb-6">{message}</p>
 
+                {showReasonField && (
+                  <div className="mb-6">
+                    <label className="block text-left text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                      {reasonLabel || "Reason"}
+                      {reasonRequired ? " *" : ""}
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={reasonValue || ""}
+                      onChange={(e) => onReasonChange(e.target.value)}
+                      placeholder={reasonPlaceholder || "Add a reason..."}
+                      className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400"
+                      required={reasonRequired}
+                    />
+                    {reasonHelper && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        {reasonHelper}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Actions */}
                 <div className="flex gap-3">
                   <button
@@ -162,7 +193,7 @@ export default function ConfirmDialog({
                   </button>
                   <button
                     onClick={onConfirm}
-                    disabled={isLoading}
+                    disabled={isLoading || isReasonMissing}
                     className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-80 disabled:cursor-not-allowed ${styles.button}`}
                   >
                     {isLoading ? (

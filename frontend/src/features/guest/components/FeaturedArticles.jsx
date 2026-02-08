@@ -52,7 +52,7 @@ export default function FeaturedArticles({ articles }) {
                   <img
                     src={main.image_url}
                     alt={main.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-contain sm:object-cover group-hover:scale-105 transition-transform duration-700"
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
@@ -101,7 +101,7 @@ export default function FeaturedArticles({ articles }) {
                       <img
                         src={article.image_url}
                         alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-contain sm:object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
                       />
                     </div>
