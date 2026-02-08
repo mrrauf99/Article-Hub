@@ -98,6 +98,7 @@ export default function AdminUserProfilePage() {
   const [articleLoading, setArticleLoading] = useState(false);
   const [confirmApprove, setConfirmApprove] = useState(null);
   const [confirmReject, setConfirmReject] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const isSubmitting = fetcher.state !== "idle";
   const pendingIntent = fetcher.formData?.get("intent");
@@ -144,10 +145,15 @@ export default function AdminUserProfilePage() {
   const handleReject = () => {
     if (!confirmReject) return;
     fetcher.submit(
-      { intent: "reject", articleId: confirmReject.article_id },
+      {
+        intent: "reject",
+        articleId: confirmReject.article_id,
+        reason: rejectReason,
+      },
       { method: "post", action: "/admin/articles" },
     );
     setConfirmReject(null);
+    setRejectReason("");
   };
 
   // Transform user data to match profile component expectations
@@ -364,6 +370,7 @@ export default function AdminUserProfilePage() {
               }}
               onReject={(id) => {
                 setConfirmReject({ article_id: id });
+                setRejectReason("");
                 setSelectedArticle(null);
               }}
               showInternalConfirmations={false}
@@ -402,8 +409,16 @@ export default function AdminUserProfilePage() {
             variant="warning"
             isLoading={isSubmitting && pendingIntent === "reject"}
             loadingText="Rejecting"
+            reasonLabel="Reason for rejection"
+            reasonPlaceholder="Share the rejection reasons so the author can improve."
+            reasonValue={rejectReason}
+            reasonRequired
+            onReasonChange={setRejectReason}
             onConfirm={handleReject}
-            onCancel={() => setConfirmReject(null)}
+            onCancel={() => {
+              setConfirmReject(null);
+              setRejectReason("");
+            }}
           />
         </div>
       </ScrollReveal>

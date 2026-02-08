@@ -34,6 +34,7 @@ export default function ArticleDetailModal({
   const modalRef = useRef(null);
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   useLayoutEffect(() => {
     if (!article) return;
@@ -198,11 +199,14 @@ export default function ArticleDetailModal({
             )}
             {article.status !== "rejected" && (
               <button
-                onClick={() =>
-                  showInternalConfirmations
-                    ? setShowRejectConfirm(true)
-                    : onReject(article.article_id)
-                }
+                onClick={() => {
+                  if (showInternalConfirmations) {
+                    setShowRejectConfirm(true);
+                    setRejectReason("");
+                    return;
+                  }
+                  onReject(article.article_id);
+                }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:from-rose-600 hover:to-pink-600 shadow-lg shadow-rose-500/25 transition-all hover:shadow-rose-500/40"
               >
                 <XCircle className="w-4 h-4" />
@@ -243,12 +247,21 @@ export default function ArticleDetailModal({
             confirmText="Yes, Reject"
             cancelText="Cancel"
             variant="danger"
+            reasonLabel="Reason for rejection"
+            reasonPlaceholder="Share the rejection reasons so the author can improve."
+            reasonValue={rejectReason}
+            reasonRequired
+            onReasonChange={setRejectReason}
             onConfirm={() => {
-              onReject(article.article_id);
+              onReject(article.article_id, rejectReason);
               setShowRejectConfirm(false);
+              setRejectReason("");
               onClose();
             }}
-            onCancel={() => setShowRejectConfirm(false)}
+            onCancel={() => {
+              setShowRejectConfirm(false);
+              setRejectReason("");
+            }}
           />
         </>
       )}

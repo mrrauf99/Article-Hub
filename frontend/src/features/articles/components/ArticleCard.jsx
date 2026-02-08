@@ -94,7 +94,7 @@ function ArticleCard({ article, mode, onDelete }) {
               src={article.image_url}
               alt={article.title}
               onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105
+              className={`w-full h-full object-contain sm:object-cover transition-all duration-500 group-hover:scale-105
         ${imgLoaded ? "opacity-100" : "opacity-0"}`}
             />
 

@@ -82,7 +82,7 @@ Reply directly to this email to respond to ${name}.
 
           <!-- Content -->
           <tr>
-            <td style="padding:24px">
+            <td style="padding:24px; text-align:left">
               
               <!-- Contact Details -->
               <table role="presentation" style="width:100%; max-width:100%; border-collapse:collapse; margin-bottom:24px; table-layout:fixed">
@@ -144,8 +144,8 @@ ${message || "No message provided"}
                   💡 Reply to <strong>${name}</strong>
                 </p>
                 <a href="mailto:${email}?subject=Re: ${encodeURIComponent(
-      subject || "Your inquiry"
-    )}" 
+                  subject || "Your inquiry",
+                )}" 
                    style="display:inline-block; background:#2563eb; color:#ffffff; padding:10px 24px; border-radius:6px; text-decoration:none; font-weight:600; font-size:14px; word-wrap:break-word">
                   Reply to ${name}
                 </a>
@@ -254,7 +254,7 @@ Article Hub Security
                   <td style="padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0">
                     <p style="margin:0; color:#334155; font-size:13px">
                       <strong>Time:</strong> ${timestamp.toLocaleString(
-                        "en-US"
+                        "en-US",
                       )}
                     </p>
                     <p style="margin:6px 0 0; color:#334155; font-size:13px">
@@ -278,6 +278,117 @@ Article Hub Security
             <td style="padding:18px 24px; background:#f8fafc; border-radius:0 0 12px 12px; border-top:1px solid #e2e8f0">
               <p style="margin:0; color:#64748b; font-size:11px; text-align:center; line-height:1.5">
                 This is an automated security notification from Article Hub.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `,
+  };
+
+  return mailTransporter.sendMail(mailOptions);
+}
+
+export async function sendArticleStatusEmail({
+  to,
+  name,
+  articleTitle,
+  status,
+  reason,
+}) {
+  const safeName = name || "there";
+  const safeTitle = articleTitle || "your article";
+  const normalizedStatus = status || "updated";
+  const includeReason = Boolean(reason && reason.trim());
+  const subjectMap = {
+    approved: "Your article has been approved",
+    rejected: "Your article has been rejected",
+    deleted: "Your article has been removed",
+  };
+
+  const mailOptions = {
+    from: process.env.MAIL_FROM,
+    to,
+    subject: subjectMap[normalizedStatus] || "Article status update",
+    replyTo: "no-reply@articlehub.me",
+    headers: {
+      "X-Auto-Response-Suppress": "All",
+    },
+    text: `
+Hi ${safeName},
+
+Your article "${safeTitle}" has been ${normalizedStatus}.
+${includeReason ? `\nReason: ${reason.trim()}` : ""}
+
+If you have questions, feel free to contact our support team.
+
+Thanks,
+Article Hub Team
+    `.trim(),
+    html: `
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article Status Update</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f4f6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align:left" dir="ltr">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:100%; border-collapse:collapse; table-layout:fixed" dir="ltr">
+    <tr>
+      <td align="center" style="padding:40px 20px">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); table-layout:fixed" dir="ltr">
+          <tr>
+            <td align="left" style="background:linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); padding:32px 24px; border-radius:12px 12px 0 0; text-align:left">
+              <h1 style="margin:0; color:#ffffff; font-size:22px; font-weight:600; letter-spacing:-0.5px; text-align:left">
+                Article Status Update
+              </h1>
+              <p style="margin:8px 0 0; color:#dbeafe; font-size:13px; text-align:left">
+                ${new Date().toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="padding:24px; text-align:left">
+              <p style="margin:0 0 14px; color:#0f172a; font-size:15px; text-align:left">
+                Hi ${safeName},
+              </p>
+              <p style="margin:0 0 18px; color:#475569; font-size:14px; line-height:1.6; text-align:left">
+                Your article <strong>"${safeTitle}"</strong> has been <strong>${normalizedStatus}</strong>.
+              </p>
+              ${
+                includeReason
+                  ? `
+              <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; text-align:left; margin:0 0 18px 0">
+                <p style="margin:0 0 6px; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; text-align:left">
+                  Reason
+                </p>
+                <p style="margin:0; color:#1e293b; font-size:14px; line-height:1.6; white-space:pre-wrap; word-wrap:break-word; overflow-wrap:break-word; word-break:break-word; text-align:left">
+${reason.trim()}
+                </p>
+              </div>
+              `
+                  : ""
+              }
+              <p style="margin:0; color:#475569; font-size:13px; line-height:1.6; text-align:left">
+                If you have questions, feel free to contact our support team.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:18px 24px; background:#f8fafc; border-radius:0 0 12px 12px; border-top:1px solid #e2e8f0">
+              <p style="margin:0; color:#64748b; font-size:11px; text-align:center; line-height:1.5">
+                This is an automated message from Article Hub.
               </p>
             </td>
           </tr>
