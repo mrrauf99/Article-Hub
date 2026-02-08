@@ -17,10 +17,11 @@ export const adminApi = {
   approveArticle: (articleId) =>
     apiClient.patch(`admin/articles/${articleId}/approve`),
 
-  rejectArticle: (articleId) =>
-    apiClient.patch(`admin/articles/${articleId}/reject`),
+  rejectArticle: (articleId, reason) =>
+    apiClient.patch(`admin/articles/${articleId}/reject`, { reason }),
 
-  deleteArticle: (articleId) => apiClient.delete(`admin/articles/${articleId}`),
+  deleteArticle: (articleId, reason) =>
+    apiClient.delete(`admin/articles/${articleId}`, { data: { reason } }),
 
   // Users
   getAllUsers: (params = {}) => apiClient.get("admin/users", { params }),

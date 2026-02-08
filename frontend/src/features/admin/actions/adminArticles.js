@@ -8,6 +8,7 @@ export async function adminArticlesAction({ request }) {
   const formData = await request.formData();
   const intent = formData.get("intent");
   const articleId = formData.get("articleId");
+  const reason = formData.get("reason");
 
   try {
     switch (intent) {
@@ -16,11 +17,11 @@ export async function adminArticlesAction({ request }) {
         return handleActionSuccess("Article approved successfully");
 
       case "reject":
-        await adminApi.rejectArticle(articleId);
+        await adminApi.rejectArticle(articleId, reason);
         return handleActionSuccess("Article rejected successfully");
 
       case "delete":
-        await adminApi.deleteArticle(articleId);
+        await adminApi.deleteArticle(articleId, reason);
         return handleActionSuccess("Article deleted successfully");
 
       default:
