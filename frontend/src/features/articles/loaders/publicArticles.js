@@ -4,8 +4,9 @@ import { getCanonicalCategory, normalizeCategory } from "@/utils/categoryUtils";
 const DEFAULT_LIMIT = 9;
 const MAX_LIMIT = 30;
 
-export default async function publicArticlesLoader(request) {
+export default async function publicArticlesLoader(args) {
   try {
+    const request = args?.request ?? args;
     const url = request?.url ? new URL(request.url) : null;
     const pageParam = url ? Number(url.searchParams.get("page")) || 1 : 1;
     const rawCategory = url ? url.searchParams.get("category") : null;
