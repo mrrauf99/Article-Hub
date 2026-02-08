@@ -56,6 +56,7 @@ const TermsPage = lazy(() => import("./pages/Terms.jsx"));
 import submitContactAction from "./features/contact/actions/submitContact.js";
 import publicLayoutLoader from "./loaders/publicLayout.js";
 import homePageLoader from "./features/guest/loaders/homePage.js";
+import publicArticlesLoader from "./features/articles/loaders/publicArticles.js";
 
 // User - All lazy loaded (require auth)
 const UserDashBoardPage = lazy(

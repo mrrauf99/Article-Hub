@@ -18,5 +18,5 @@ export default async function homePageLoader({ request }) {
     // Not authenticated - continue to load articles
   }
 
-  return publicArticlesLoader(request);
+  return publicArticlesLoader({ request });
 }
