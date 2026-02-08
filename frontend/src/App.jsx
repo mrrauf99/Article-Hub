@@ -54,7 +54,6 @@ const PrivacyPage = lazy(() => import("./pages/PrivacyPage.jsx"));
 const TermsPage = lazy(() => import("./pages/Terms.jsx"));
 
 import submitContactAction from "./features/contact/actions/submitContact.js";
-import publicArticlesLoader from "./features/articles/loaders/publicArticles.js";
 import publicLayoutLoader from "./loaders/publicLayout.js";
 import homePageLoader from "./features/guest/loaders/homePage.js";
 
