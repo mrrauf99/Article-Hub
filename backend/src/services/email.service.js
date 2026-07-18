@@ -1,13 +1,15 @@
-import { mailTransporter } from "../config/mailer.config.js";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendEmailVerificationOtp(email, otp) {
-  const mailOptions = {
+  const { data, error } = await resend.emails.send({
     from: process.env.MAIL_FROM,
     to: email,
     subject: "Verify your email address",
-    replyTo: "no-reply@articlehub.me", // disable replies
+    replyTo: "no-reply@articlehub.me",
     headers: {
-      "X-Auto-Response-Suppress": "All", // block auto replies
+      "X-Auto-Response-Suppress": "All",
     },
     text: `Your Article Hub verification code is ${otp}. It expires in 5 minutes.`,
     html: `
@@ -19,13 +21,18 @@ export async function sendEmailVerificationOtp(email, otp) {
         <p>If you didn't request this, please ignore this email.</p>
       </div>
     `,
-  };
+  });
 
-  await mailTransporter.sendMail(mailOptions);
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  console.log(data);
 }
 
 export async function sendContactEmail({ name, email, subject, message }) {
-  const mailOptions = {
+  const { data, error } = await resend.emails.send({
     from: process.env.MAIL_FROM,
     to: process.env.SMTP_USER,
     replyTo: email,
@@ -173,9 +180,14 @@ ${message || "No message provided"}
 </body>
 </html>
     `,
-  };
+  });
 
-  return mailTransporter.sendMail(mailOptions);
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  console.log(data);
 }
 
 export async function sendLoginNotificationEmail({
@@ -188,7 +200,7 @@ export async function sendLoginNotificationEmail({
   const safeName = name || "there";
   const timestamp = loggedInAt || new Date();
 
-  const mailOptions = {
+  const { data, error } = await resend.emails.send({
     from: process.env.MAIL_FROM,
     to,
     subject: "New login to your Article Hub account",
@@ -288,9 +300,14 @@ Article Hub Security
 </body>
 </html>
     `,
-  };
+  });
 
-  return mailTransporter.sendMail(mailOptions);
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  console.log(data);
 }
 
 export async function sendArticleStatusEmail({
@@ -310,7 +327,7 @@ export async function sendArticleStatusEmail({
     deleted: "Your article has been removed",
   };
 
-  const mailOptions = {
+  const { data, error } = await resend.emails.send({
     from: process.env.MAIL_FROM,
     to,
     subject: subjectMap[normalizedStatus] || "Article status update",
@@ -399,7 +416,12 @@ ${reason.trim()}
 </body>
 </html>
     `,
-  };
+  });
 
-  return mailTransporter.sendMail(mailOptions);
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  console.log(data);
 }

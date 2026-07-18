@@ -28,7 +28,7 @@ export default function AuthLayout({
 
         {/* Footer text - only show on larger screens */}
         <p className="hidden md:block text-center text-slate-500 text-sm mt-6 px-5">
-          © 2025 Article Hub. All rights reserved.
+          © {new Date().getFullYear()} Article Hub. All rights reserved.
         </p>
       </div>
     </div>
