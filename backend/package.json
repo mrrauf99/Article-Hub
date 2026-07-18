@@ -22,12 +22,12 @@
     "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.2",
     "multer": "^2.0.2",
-    "nodemailer": "^7.0.11",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
     "qrcode": "^1.5.4",
+    "resend": "^6.17.2",
     "speakeasy": "^2.0.0"
   },
   "devDependencies": {
