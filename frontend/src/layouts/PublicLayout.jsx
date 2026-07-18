@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import ScrollToTop from "@/components/ScrollToTop";
 import NavigationProgress from "@/components/NavigationProgress";
-import Navbar from "@/components/Navbar/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useLogout } from "@/hooks/useLogout";

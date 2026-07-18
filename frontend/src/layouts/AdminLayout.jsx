@@ -8,7 +8,7 @@ import {
 
 import ScrollToTop from "../components/ScrollToTop";
 import NavigationProgress from "../components/NavigationProgress";
-import Navbar from "../components/Navbar/Navbar.jsx";
+import Navbar from "../components/navbar/Navbar.jsx";
 import Footer from "../components/Footer";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useLogout } from "../hooks/useLogout";
