@@ -20,7 +20,7 @@ app.use(
   cors({
     origin: process.env.CLIENT_BASE_URL,
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -34,5 +34,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Endpoint not found.",
+  });
+});
 
 export default app;
