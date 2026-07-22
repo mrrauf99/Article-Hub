@@ -97,6 +97,9 @@ const AdminUserProfilePage = lazy(
   () => import("./features/admin/pages/AdminUserProfilePage.jsx"),
 );
 
+// ErrorPage - handles 404, 500 and all other errors
+const ErrorPage = lazy(() => import("./pages/ErrorPage.jsx"));
+
 import adminProfileLoader from "./features/admin/loaders/adminProfile.js";
 import adminDashboardLoader from "./features/admin/loaders/adminDashboard.js";
 import adminArticlesLoader from "./features/admin/loaders/adminArticles.js";
@@ -114,13 +117,67 @@ import AuthLayout from "./layouts/AuthLayout.jsx";
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
 
-// NotFoundPage - Lazy loaded
-const NotFoundPage = lazy(() => import("./pages/NotFoundPage.jsx"));
 
 import "./index.css";
 
 export default function App() {
   const router = createBrowserRouter([
+    /* ---------- PUBLIC ---------- */
+    {
+      id: "public-layout",
+      element: <PublicLayout />,
+      errorElement: (
+        <Suspense fallback={<PageLoader />}>
+          <ErrorPage />
+        </Suspense>
+      ),
+      loader: publicLayoutLoader,
+      children: [
+        {
+          index: true, // "/"
+          element: <HomePage />,
+          loader: homePageLoader,
+        },
+        {
+          path: "about",
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <AboutPage />
+            </Suspense>
+          ),
+        },
+        {
+          path: "contact",
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <ContactPage />
+            </Suspense>
+          ),
+          action: submitContactAction,
+        },
+        {
+          path: "privacy",
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <PrivacyPage />
+            </Suspense>
+          ),
+        },
+        {
+          path: "terms",
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <TermsPage />
+            </Suspense>
+          ),
+        },
+        {
+          path: "articles/:id",
+          element: <ArticleDetailPage />,
+          loader: articleDetailLoader,
+        },
+      ],
+    },
     /* ---------- AUTH ---------- */
     {
       element: <AuthLayout />,
@@ -186,59 +243,6 @@ export default function App() {
         },
       ],
     },
-
-    /* ---------- PUBLIC ---------- */
-    {
-      id: "public-layout",
-      element: <PublicLayout />,
-      loader: publicLayoutLoader,
-      children: [
-        {
-          index: true, // "/"
-          element: <HomePage />,
-          loader: homePageLoader,
-        },
-        {
-          path: "about",
-          element: (
-            <Suspense fallback={<PageLoader />}>
-              <AboutPage />
-            </Suspense>
-          ),
-        },
-        {
-          path: "contact",
-          element: (
-            <Suspense fallback={<PageLoader />}>
-              <ContactPage />
-            </Suspense>
-          ),
-          action: submitContactAction,
-        },
-        {
-          path: "privacy",
-          element: (
-            <Suspense fallback={<PageLoader />}>
-              <PrivacyPage />
-            </Suspense>
-          ),
-        },
-        {
-          path: "terms",
-          element: (
-            <Suspense fallback={<PageLoader />}>
-              <TermsPage />
-            </Suspense>
-          ),
-        },
-        {
-          path: "articles/:id",
-          element: <ArticleDetailPage />,
-          loader: articleDetailLoader,
-        },
-      ],
-    },
-
     /* ---------- USER ---------- */
     {
       id: "user-layout",
@@ -370,12 +374,12 @@ export default function App() {
       ],
     },
 
-    /* ---------- 404 ---------- */
+    /* ---------- Error Page---------- */
     {
       path: "*",
       element: (
         <Suspense fallback={<PageLoader />}>
-          <NotFoundPage />
+          <ErrorPage />
         </Suspense>
       ),
     },
