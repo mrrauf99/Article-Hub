@@ -3,4 +3,5 @@ export const COOKIE_NAMES = {
   SIGNUP: "signupToken",
   PASSWORD_RESET: "passwordResetToken",
   TWO_FACTOR: "twoFactorToken",
+  OAUTH: "oauthToken",
 };

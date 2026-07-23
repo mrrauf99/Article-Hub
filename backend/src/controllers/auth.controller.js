@@ -7,7 +7,7 @@ import {
   sendLoginNotificationEmail,
 } from "../services/email.service.js";
 import { generateToken } from "../utils/jwt.js";
-import { setCookie } from "../utils/cookie.js";
+import { setCookie } from "../config/cookie.js";
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
 
 const OTP_HASH_ROUNDS = 12;
@@ -535,28 +535,26 @@ export async function passwordReset(req, res) {
 
 export async function completeGoogleSignup(req, res) {
   const { username } = req.body;
-  const oauth = req.session.oauth;
-
-  if (!oauth || oauth.completed) {
-    return res.status(401).json({
-      success: false,
-      message: "OAuth session expired.",
-    });
-  }
+  const { email, name, avatar } = req.user;
 
   try {
     const { rows } = await db.query(
       `INSERT INTO users (email, name, username, avatar_url)
-       VALUES ($1, $2, $3, $4) RETURNING id`,
-      [oauth.email, oauth.name, username, oauth.avatar],
+       VALUES ($1, $2, $3, $4) RETURNING id, role`,
+      [email, name, username, avatar],
     );
+    const { id, role } = rows[0];
+    const payload = {
+      type: "access",
+      user: {
+        userId: id,
+        role,
+      },
+    };
 
-    oauth.completed = true;
-
-    req.session.userId = rows[0].id;
-
-    // destroy temp oauth data
-    delete req.session.oauth;
+    const token = generateToken(payload, "7d");
+    setCookie(res, COOKIE_NAMES.ACCESS, token);
+    res.clearCookie(COOKIE_NAMES.OAUTH);
 
     res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
   } catch (insertErr) {
