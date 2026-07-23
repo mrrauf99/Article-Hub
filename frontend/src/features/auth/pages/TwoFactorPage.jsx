@@ -81,7 +81,7 @@ export default function TwoFactorPage() {
               setMessage(null);
             }}
           >
-            <input type="hidden" name="token" value={otpForm.otp.join("")} />
+            <input type="hidden" name="code" value={otpForm.otp.join("")} />
             <Button disabled={!otpForm.isOtpComplete} isLoading={isSubmitting}>
               {isSubmitting ? (
                 "Verifying..."
