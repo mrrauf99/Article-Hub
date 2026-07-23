@@ -6,9 +6,11 @@ import {
   sendEmailVerificationOtp,
   sendLoginNotificationEmail,
 } from "../services/email.service.js";
+import { generateToken } from "../utils/jwt.js";
+import { setCookie } from "../utils/cookie.js";
+import { COOKIE_NAMES } from "../constants/cookieNames.js";
 
-const OTP_TTL_MS = 5 * 60 * 1000;
-const OTP_HASH_ROUNDS = 10;
+const OTP_HASH_ROUNDS = 12;
 const MAX_VERIFY_ATTEMPTS = 5;
 const MAX_RESEND_COUNT = 3;
 
@@ -18,21 +20,20 @@ export async function signUp(req, res) {
 
     const hashedPassword = await bcrypt.hash(
       password,
-      Number(process.env.SALT_ROUNDS)
+      Number(process.env.SALT_ROUNDS),
     );
 
     const otp = crypto.randomInt(100000, 1000000).toString();
-    const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
+    const hashedOtp = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
-    req.session.otp = {
-      flow: "signup",
-      email,
-      code: otpHash,
-      expiresAt: Date.now() + OTP_TTL_MS,
-      attempts: 0,
-      resendCount: 0,
-      verified: false,
-      payload: {
+    const payload = {
+      type: "signup",
+      auth: {
+        hashedOtp,
+        attempts: 0,
+        resendCount: 0,
+      },
+      user: {
         email,
         username,
         name,
@@ -41,7 +42,8 @@ export async function signUp(req, res) {
       },
     };
 
-    req.session.cookie.maxAge = OTP_TTL_MS;
+    const token = generateToken(payload, "5m");
+    setCookie(res, COOKIE_NAMES.SIGNUP, token);
 
     await sendEmailVerificationOtp(email, otp);
 
@@ -64,7 +66,7 @@ export async function forgetPassword(req, res) {
 
     const { rowCount } = await db.query(
       "SELECT 1 FROM users WHERE email = $1",
-      [email]
+      [email],
     );
 
     if (!rowCount) {
@@ -75,19 +77,22 @@ export async function forgetPassword(req, res) {
     }
 
     const otp = crypto.randomInt(100000, 1000000).toString();
-    const otpHash = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
+    const hashedOtp = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
-    req.session.otp = {
-      flow: "reset-password",
-      email,
-      code: otpHash,
-      expiresAt: Date.now() + OTP_TTL_MS,
-      attempts: 0,
-      resendCount: 0,
-      verified: false,
+    const payload = {
+      type: "forgot-password",
+      auth: {
+        code: hashedOtp,
+        attempts: 0,
+        resendCount: 0,
+      },
+      user: {
+        email,
+      },
     };
 
-    req.session.cookie.maxAge = OTP_TTL_MS;
+    const token = generateToken(payload, "5m");
+    setCookie(res, COOKIE_NAMES.PASSWORD_RESET, token);
 
     await sendEmailVerificationOtp(email, otp);
 
@@ -105,18 +110,10 @@ export async function forgetPassword(req, res) {
 }
 
 export async function resendOtp(req, res) {
-  const oldOtp = req.session.otp;
+  const { email } = req.user;
+  const { resendCount } = req.auth;
 
-  if (!oldOtp) {
-    return res.status(401).json({
-      success: false,
-      message: "Session expired. Please start again.",
-    });
-  }
-
-  const currentResendCount = oldOtp.resendCount || 0;
-
-  if (currentResendCount >= MAX_RESEND_COUNT) {
+  if (resendCount === MAX_RESEND_COUNT) {
     return res.status(429).json({
       success: false,
       message: "Maximum resend limit reached. Please start again.",
@@ -127,58 +124,41 @@ export async function resendOtp(req, res) {
   const otp = crypto.randomInt(100000, 1000000).toString();
   const hashedOtp = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
-  // Regenerate session to avoid stale attempts
-  req.session.regenerate(async (err) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to regenerate session.",
-      });
-    }
-
-    const newResendCount = currentResendCount + 1;
-
-    req.session.otp = {
-      flow: oldOtp.flow,
-      email: oldOtp.email,
-      payload: oldOtp.payload,
-      code: hashedOtp,
-      expiresAt: Date.now() + OTP_TTL_MS,
-      attempts: 0,
+  const newResendCount = resendCount + 1;
+  const payload = {
+    type: req.type,
+    user: req.user,
+    auth: {
+      ...req.auth,
       resendCount: newResendCount,
-      verified: false,
-    };
+      hashedOtp,
+    },
+  };
 
-    await sendEmailVerificationOtp(oldOtp.email, otp);
+  await sendEmailVerificationOtp(email, otp);
 
-    res.json({
-      success: true,
-      message: "New verification code sent.",
-      resendsRemaining: MAX_RESEND_COUNT - newResendCount,
-    });
+  const token = generateToken(payload, "5m");
+
+  let tokenName;
+  if (req.type === "signup") {
+    tokenName = COOKIE_NAMES.SIGNUP;
+  } else {
+    tokenName = COOKIE_NAMES.PASSWORD_RESET;
+  }
+
+  setCookie(res, tokenName, token);
+  res.json({
+    success: true,
+    message: "New verification code sent.",
+    resendsRemaining: MAX_RESEND_COUNT - newResendCount,
   });
 }
 
 export async function verifyOtp(req, res) {
   const { otp } = req.body;
-  const otpSession = req.session.otp;
+  let { hashedOtp, attempts } = req.auth;
 
-  if (!otpSession) {
-    return res.status(401).json({
-      success: false,
-      message: "Verification session expired.",
-    });
-  }
-
-  if (Date.now() > otpSession.expiresAt) {
-    req.session.destroy(() => {});
-    return res.status(410).json({
-      success: false,
-      message: "OTP expired. Please request a new one.",
-    });
-  }
-
-  if (otpSession.attempts >= MAX_VERIFY_ATTEMPTS) {
+  if (attempts >= MAX_VERIFY_ATTEMPTS) {
     return res.status(429).json({
       success: false,
       message: "Too many attempts. Please request a new code.",
@@ -186,11 +166,11 @@ export async function verifyOtp(req, res) {
     });
   }
 
-  const isValid = await bcrypt.compare(otp, otpSession.code);
+  const isValid = await bcrypt.compare(otp, hashedOtp);
 
   if (!isValid) {
-    otpSession.attempts += 1;
-    const remaining = MAX_VERIFY_ATTEMPTS - otpSession.attempts;
+    attempts++;
+    const remaining = MAX_VERIFY_ATTEMPTS - attempts;
     return res.status(400).json({
       success: false,
       message: `Invalid verification code. ${remaining} attempt${
@@ -200,11 +180,8 @@ export async function verifyOtp(req, res) {
     });
   }
 
-  // SUCCESS
-  otpSession.verified = true;
-
-  if (otpSession.flow === "signup") {
-    const p = otpSession.payload;
+  if (req.type === "signup") {
+    const { email, username, name, password, country } = req.user;
 
     try {
       await db.query(
@@ -212,10 +189,10 @@ export async function verifyOtp(req, res) {
         INSERT INTO users (email, username, name, password, country)
         VALUES ($1, $2, $3, $4, $5)
         `,
-        [p.email, p.username, p.name, p.password, p.country]
+        [email, username, name, password, country],
       );
 
-      req.session.destroy(() => {});
+      res.clearCookie(COOKIE_NAMES.SIGNUP);
     } catch (insertErr) {
       console.error("Error inserting user during signup:", insertErr);
 
@@ -239,12 +216,14 @@ export async function verifyOtp(req, res) {
         message: "Failed to create account. Please try again.",
       });
     }
+  } else {
+    res.clearCookie(COOKIE_NAMES.PASSWORD_RESET);
   }
 
   res.json({
     success: true,
     message: "OTP verified successfully.",
-    next: otpSession.flow === "reset-password" ? "/reset-password" : "/login",
+    next: req.type === "forgot-password" ? "/reset-password" : "/login",
   });
 }
 
@@ -253,8 +232,8 @@ export async function login(req, res) {
 
   try {
     const { rows } = await db.query(
-      "SELECT id, password, role, email, username, name, two_factor_enabled FROM users WHERE email = $1 OR username = $1",
-      [identifier]
+      "SELECT id, password, role, email, name, two_factor_enabled FROM users WHERE email = $1 OR username = $1",
+      [identifier],
     );
 
     if (!rows.length) {
@@ -274,50 +253,42 @@ export async function login(req, res) {
       });
     }
 
-    req.session.regenerate(async (err) => {
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          message: "Session error. Please try again.",
-        });
-      }
-
-      if (user.two_factor_enabled) {
-        req.session.pending2fa = {
-          userId: user.id,
-          role: user.role,
-          createdAt: Date.now(),
-        };
-        req.session.cookie.maxAge = 5 * 60 * 1000;
-
-        return res.status(200).json({
-          success: true,
-          twoFactorRequired: true,
-        });
-      }
-
-      req.session.userId = user.id;
-      req.session.userRole = user.role;
-      req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000;
-
-      const ipAddress = req.ip;
-      const userAgent = req.get("user-agent");
-
-      sendLoginNotificationEmail({
-        to: user.email,
-        name: user.name || user.username || identifier,
-        ipAddress,
-        userAgent,
-        loggedInAt: new Date(),
-      }).catch((mailErr) => {
-        console.error("Login notification email error:", mailErr);
-      });
-
-      res.status(200).json({
-        success: true,
-        message: "Logged in successfully.",
+    const payload = {
+      type: "access",
+      user: {
+        userId: user.id,
         role: user.role,
+      },
+    };
+
+    if (user.two_factor_enabled) {
+      const token = generateToken(payload, "5m");
+      setCookie(res, COOKIE_NAMES.TWO_FACTOR, token);
+
+      return res.status(200).json({
+        success: true,
+        twoFactorRequired: true,
       });
+    }
+
+    const token = generateToken(payload, "7d");
+    setCookie(res, COOKIE_NAMES.ACCESS, token);
+
+    const ipAddress = req.ip;
+    const userAgent = req.get("user-agent");
+
+    sendLoginNotificationEmail({
+      to: user.email,
+      name: user.name,
+      ipAddress,
+      userAgent,
+      loggedInAt: new Date(),
+    });
+
+    res.json({
+      success: true,
+      message: "Logged in successfully.",
+      role: user.role,
     });
   } catch {
     res.status(500).json({
@@ -329,34 +300,19 @@ export async function login(req, res) {
 
 export async function verifyTwoFactorLogin(req, res) {
   try {
-    const { token } = req.body;
-    const pending = req.session.pending2fa;
+    const { code } = req.body;
+    const { userId, role } = req.user;
 
-    if (!pending) {
-      return res.status(401).json({
-        success: false,
-        message: "2FA session expired. Please log in again.",
-      });
-    }
-
-    if (!token) {
+    if (!code) {
       return res.status(400).json({
         success: false,
         message: "Authentication code is required.",
       });
     }
 
-    if (Date.now() - pending.createdAt > 5 * 60 * 1000) {
-      delete req.session.pending2fa;
-      return res.status(401).json({
-        success: false,
-        message: "2FA session expired. Please log in again.",
-      });
-    }
-
     const { rows } = await db.query(
-      "SELECT id, role, email, username, name, two_factor_secret, two_factor_enabled FROM users WHERE id = $1",
-      [pending.userId]
+      "SELECT email, name, two_factor_secret FROM users WHERE id = $1",
+      [userId],
     );
 
     if (!rows.length) {
@@ -378,7 +334,7 @@ export async function verifyTwoFactorLogin(req, res) {
     const isValid = speakeasy.totp.verify({
       secret: user.two_factor_secret,
       encoding: "base32",
-      token,
+      code,
       window: 1,
     });
 
@@ -389,29 +345,34 @@ export async function verifyTwoFactorLogin(req, res) {
       });
     }
 
-    delete req.session.pending2fa;
-
-    req.session.userId = user.id;
-    req.session.userRole = user.role;
-    req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000;
-
     const ipAddress = req.ip;
     const userAgent = req.get("user-agent");
 
     sendLoginNotificationEmail({
       to: user.email,
-      name: user.name || user.username,
+      name: user.name,
       ipAddress,
       userAgent,
       loggedInAt: new Date(),
-    }).catch((mailErr) => {
-      console.error("Login notification email error:", mailErr);
     });
+
+    const payload = {
+      type: "access",
+      user: {
+        userId,
+        role,
+      },
+    };
+
+    const token = generateToken(payload, "7d");
+    setCookie(res, COOKIE_NAMES.ACCESS, token);
+
+    res.clearCookie(COOKIE_NAMES.TWO_FACTOR);
 
     return res.status(200).json({
       success: true,
       message: "Logged in successfully.",
-      role: user.role,
+      role: role,
     });
   } catch (err) {
     console.error("verifyTwoFactorLogin error:", err);
@@ -428,7 +389,7 @@ export async function checkEmailAvailability(req, res) {
   try {
     const { rowCount } = await db.query(
       "SELECT 1 FROM users WHERE email = $1",
-      [email]
+      [email],
     );
 
     if (rowCount > 0) {
@@ -439,7 +400,7 @@ export async function checkEmailAvailability(req, res) {
       });
     }
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       available: true,
       message: "Email is available.",
@@ -460,18 +421,18 @@ export async function checkUsernameAvailability(req, res) {
   try {
     const { rowCount } = await db.query(
       "SELECT 1 FROM users WHERE username = $1",
-      [username]
+      [username],
     );
 
     if (rowCount > 0) {
-      return res.status(200).json({
+      return res.json({
         success: true,
         available: false,
         message: "This username is already taken.",
       });
     }
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       available: true,
       message: "Username is available.",
@@ -486,32 +447,15 @@ export async function checkUsernameAvailability(req, res) {
   }
 }
 
-export async function resetPassword(req, res) {
+export async function passwordReset(req, res) {
   try {
     const { password } = req.body;
-    const otp = req.session?.otp;
+    const { email } = req.user;
 
-    // Validate OTP session
-    if (!otp) {
-      console.error("Reset password error: No OTP session found");
-      return res.status(401).json({
+    if (req.type !== "forgot-password") {
+      return res.status(403).json({
         success: false,
-        message:
-          "Your verification session has expired. Please request a new code.",
-      });
-    }
-
-    if (!otp.verified || otp.flow !== "reset-password") {
-      const errorMsg = !otp.verified
-        ? "Please verify your OTP code first."
-        : "Unauthorized reset attempt.";
-      console.error(
-        "Reset password error:",
-        !otp.verified ? "OTP not verified" : `Invalid flow: ${otp.flow}`
-      );
-      return res.status(401).json({
-        success: false,
-        message: errorMsg,
+        message: "Invalid password reset session.",
       });
     }
 
@@ -534,18 +478,18 @@ export async function resetPassword(req, res) {
     // Check if user exists and get current password
     const { rows } = await db.query(
       "SELECT password FROM users WHERE email = $1",
-      [otp.email]
+      [email],
     );
 
     if (rows.length === 0) {
-      console.error("Reset password error: User not found", otp.email);
+      console.error("Reset password error: User not found", email);
       return res.status(404).json({
         success: false,
         message: "User not found.",
       });
     }
 
-    // Check if new password is different from old password (only if user has a password)
+    // Check if new password is different from old password
     const existingPassword = rows[0].password;
     if (existingPassword) {
       const isSamePassword = await bcrypt.compare(password, existingPassword);
@@ -563,7 +507,7 @@ export async function resetPassword(req, res) {
 
     const updateResult = await db.query(
       "UPDATE users SET password = $1 WHERE email = $2",
-      [hashedPassword, otp.email]
+      [hashedPassword, email],
     );
 
     if (updateResult.rowCount === 0) {
@@ -574,10 +518,7 @@ export async function resetPassword(req, res) {
       });
     }
 
-    // Destroy session after successful update
-    req.session.destroy((err) => {
-      if (err) console.error("Error destroying session:", err);
-    });
+    res.clearCookie(COOKIE_NAMES.PASSWORD_RESET);
 
     return res.status(200).json({
       success: true,
@@ -607,7 +548,7 @@ export async function completeGoogleSignup(req, res) {
     const { rows } = await db.query(
       `INSERT INTO users (email, name, username, avatar_url)
        VALUES ($1, $2, $3, $4) RETURNING id`,
-      [oauth.email, oauth.name, username, oauth.avatar]
+      [oauth.email, oauth.name, username, oauth.avatar],
     );
 
     oauth.completed = true;
