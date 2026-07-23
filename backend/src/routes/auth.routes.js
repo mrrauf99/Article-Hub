@@ -7,7 +7,7 @@ import {
   verifyOtp,
   resendOtp,
   forgetPassword,
-  resetPassword,
+  passwordReset,
   checkEmailAvailability,
   checkUsernameAvailability,
   completeGoogleSignup,
@@ -15,42 +15,59 @@ import {
 } from "../controllers/auth.controller.js";
 
 import { requireOAuthSession } from "../middlewares/oauth.middleware.js";
-import { requireOtpSession } from "../middlewares/otp.middleware.js";
+import { authenticate } from "../middlewares/authenticate.middleware.js";
 import { loginLimiter } from "../middlewares/rateLimiters.middleware.js";
+
+import { COOKIE_NAMES } from "../constants/cookieNames.js";
 
 const authRoutes = Router();
 
-// Register new user (signup + send OTP)
+// Register new user
 authRoutes.post("/register", signUp);
 
-// Verify signup OTP (5 attempts per OTP, tracked in session)
-authRoutes.post("/verify-otp", requireOtpSession, verifyOtp);
+// Verify OTP
+authRoutes.post(
+  "/signup/verify-otp",
+  authenticate(COOKIE_NAMES.SIGNUP),
+  verifyOtp,
+);
 
-// Resend OTP (signup / reset) - no rate limit, resets attempt counter
-authRoutes.post("/resend-otp", resendOtp);
+authRoutes.post(
+  "/password-reset/verify-otp",
+  authenticate(COOKIE_NAMES.SIGNUP),
+  verifyOtp,
+);
 
-// Login with email & password
+// Resend OTP 
+authRoutes.post(
+  "/signup/resend-otp",
+  authenticate(COOKIE_NAMES.PASSWORD_RESET),
+  resendOtp,
+);
+
+authRoutes.post(
+  "/password-reset/resend-otp",
+  authenticate(COOKIE_NAMES.PASSWORD_RESET),
+  resendOtp,
+);
+
+// Login
 authRoutes.post("/login", loginLimiter, login);
 
 // Verify 2FA login
-authRoutes.post("/2fa/verify-login", verifyTwoFactorLogin);
+authRoutes.post(
+  "/2fa/verify-login",
+  authenticate(COOKIE_NAMES.TWO_FACTOR),
+  verifyTwoFactorLogin,
+);
 
-// Logout user and destroy session
+// Logout user
 authRoutes.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Logout failed",
-      });
-    }
+  res.clearCookie(COOKIE_NAMES.ACCESS);
 
-    res.clearCookie("articlehub.sid");
-
-    res.status(200).json({
-      success: true,
-      message: "Logout successful",
-    });
+  res.status(200).json({
+    success: true,
+    message: "Logout successful",
   });
 });
 
@@ -105,18 +122,26 @@ authRoutes.post("/check-email", checkEmailAvailability);
 // Check if username already exists
 authRoutes.post("/check-username", checkUsernameAvailability);
 
-// Start forgot-password flow (send OTP)
+// forgot-password
 authRoutes.post("/forgot-password", forgetPassword);
 
 // Reset password after OTP verification
-authRoutes.post("/reset-password", requireOtpSession, resetPassword);
+authRoutes.post(
+  "/password-reset",
+  authenticate(COOKIE_NAMES.PASSWORD_RESET),
+  passwordReset,
+);
 
 /* ========================= FRONTEND LOADERS ========================= */
 
 // OTP session validation
-authRoutes.get("/otp-session", requireOtpSession, (req, res) => {
-  res.status(200).json({ success: true, email: req.session.otp.email });
-});
+authRoutes.get(
+  "/otp-session",
+  authenticate("emailVerificationToken"),
+  (req, res) => {
+    res.status(200).json({ success: true, email: req.user.email });
+  },
+);
 
 // OAuth session validation
 authRoutes.get("/oauth-session", requireOAuthSession, (req, res) => {
@@ -124,21 +149,16 @@ authRoutes.get("/oauth-session", requireOAuthSession, (req, res) => {
 });
 
 // 2FA session validation
-authRoutes.get("/2fa-session", (req, res) => {
-  if (!req.session?.pending2fa) {
-    return res.status(401).json({ success: false });
-  }
-  return res.status(200).json({ success: true });
-});
+authRoutes.get(
+  "/2fa-session",
+  authenticate(COOKIE_NAMES.TWO_FACTOR),
+  (req, res) => res.status(200).json({ success: true }),
+);
 
-// Auth session validation (no DB hit)
-authRoutes.get("/session", (req, res) => {
-  if (!req.session?.userId || !req.session?.userRole) {
-    return res.status(401).json({ success: false });
-  }
-  return res.status(200).json({
+authRoutes.get("/me", authenticate(COOKIE_NAMES.ACCESS), (req, res) => {
+  res.json({
     success: true,
-    role: req.session.userRole,
+    role: req.user.role,
   });
 });
 

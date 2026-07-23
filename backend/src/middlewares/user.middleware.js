@@ -1,16 +1,16 @@
 import db from "../config/db.config.js";
 
-export async function requireAdmin(req, res, next) {
+export async function requireUser(req, res, next) {
   const userId = req.user.userId;
 
   const { rows } = await db.query("SELECT role FROM users WHERE id = $1", [
     userId,
   ]);
 
-  if (rows[0]?.role !== "admin") {
+  if (rows[0]?.role !== "user") {
     return res.status(403).json({
       success: false,
-      message: "Admin access required",
+      message: "User access required",
     });
   }
 

@@ -15,13 +15,7 @@ import {
   deleteUser,
 } from "../controllers/admin.controller.js";
 
-import { requireAuth } from "../middlewares/auth.middleware.js";
-import { requireAdmin } from "../middlewares/admin.middleware.js";
-
 const adminRoutes = Router();
-
-// All admin routes require authentication and admin role
-adminRoutes.use(requireAuth, requireAdmin);
 
 // Dashboard
 adminRoutes.get("/dashboard/stats", getDashboardStats);
