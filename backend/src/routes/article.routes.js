@@ -11,13 +11,14 @@ import {
 } from "../controllers/article.controller.js";
 
 import { uploadImage } from "../middlewares/uploadImage.middleware.js";
-import { requireAuth } from "../middlewares/auth.middleware.js";
+import { authenticate } from "../middlewares/authenticate.middleware.js";
+import { COOKIE_NAMES } from "../constants/cookieNames.js";
 
 const articleRoutes = Router();
 
 articleRoutes.get("/", getApprovedArticles);
 
-articleRoutes.get("/me", requireAuth, getMyArticles);
+articleRoutes.get("/me", authenticate(COOKIE_NAMES.ACCESS), getMyArticles);
 
 articleRoutes.get("/:id", getArticleById);
 
@@ -26,24 +27,28 @@ articleRoutes.post("/:id/view", incrementArticleViews);
 
 articleRoutes.post(
   "/",
-  requireAuth,
+  authenticate(COOKIE_NAMES.ACCESS),
   uploadImage.single("image"),
-  createArticle
+  createArticle,
 );
 
 articleRoutes.patch(
   "/:articleId",
-  requireAuth,
+  authenticate(COOKIE_NAMES.ACCESS),
   uploadImage.single("image"),
-  updateArticle
+  updateArticle,
 );
 
-articleRoutes.delete("/:articleId", requireAuth, deleteArticle);
+articleRoutes.delete(
+  "/:articleId",
+  authenticate(COOKIE_NAMES.ACCESS),
+  deleteArticle,
+);
 
 articleRoutes.post(
   "/upload-image",
   uploadImage.single("image"),
-  uploadImageToCloudinary
+  uploadImageToCloudinary,
 );
 
 export default articleRoutes;

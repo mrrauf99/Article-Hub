@@ -14,11 +14,12 @@ import {
   verifyTwoFactorLogin,
 } from "../controllers/auth.controller.js";
 
-import { requireOAuthSession } from "../middlewares/oauth.middleware.js";
 import { authenticate } from "../middlewares/authenticate.middleware.js";
 import { loginLimiter } from "../middlewares/rateLimiters.middleware.js";
 
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
+import { generateToken } from "../utils/jwt.js";
+import { setCookie } from "../config/cookie.js";
 
 const authRoutes = Router();
 
@@ -38,7 +39,7 @@ authRoutes.post(
   verifyOtp,
 );
 
-// Resend OTP 
+// Resend OTP
 authRoutes.post(
   "/signup/resend-otp",
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
@@ -72,7 +73,11 @@ authRoutes.get("/logout", (req, res) => {
 });
 
 // Complete Google signup (username / profile completion)
-authRoutes.post("/oauth/complete", requireOAuthSession, completeGoogleSignup);
+authRoutes.post(
+  "/oauth/complete",
+  authenticate(COOKIE_NAMES.OAUTH),
+  completeGoogleSignup,
+);
 
 // Redirect user to Google OAuth
 authRoutes.get(
@@ -92,25 +97,30 @@ authRoutes.get(
   (req, res) => {
     const user = req.user;
 
-    // Existing user → login directly
+    // Existing user
     if (user.id) {
-      req.session.userId = user.id;
-      if (user.role) {
-        req.session.userRole = user.role;
-      }
+      const token = generateToken({ type: "access", user }, "7d");
+      setCookie(res, COOKIE_NAMES.ACCESS, token);
+
       // Redirect based on role
       const dashboardPath =
         user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
       return res.redirect(`${process.env.CLIENT_BASE_URL}${dashboardPath}`);
     }
 
-    // New OAuth user → store temporary session
-    req.session.oauth = {
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
-      completed: false,
+    // New OAuth user, store temporary data
+    const payload = {
+      type: "oauth",
+      user: {
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+        completed: false,
+      },
     };
+
+    const token = generateToken(payload, "5min");
+    setCookie(res, COOKIE_NAMES.OAUTH, token);
 
     return res.redirect(`${process.env.CLIENT_BASE_URL}/complete-profile`);
   },
@@ -132,9 +142,9 @@ authRoutes.post(
   passwordReset,
 );
 
-/* ========================= FRONTEND LOADERS ========================= */
+/* =========== FRONTEND LOADERS =========== */
 
-// OTP session validation
+// OTP session validation (OTP page)
 authRoutes.get(
   "/otp-session",
   authenticate("emailVerificationToken"),
@@ -143,12 +153,16 @@ authRoutes.get(
   },
 );
 
-// OAuth session validation
-authRoutes.get("/oauth-session", requireOAuthSession, (req, res) => {
-  res.status(200).json({ success: true });
-});
+// OAuth session validation (complete-profile)
+authRoutes.get(
+  "/oauth-session",
+  authenticate(COOKIE_NAMES.OAUTH),
+  (req, res) => {
+    res.status(200).json({ success: true });
+  },
+);
 
-// 2FA session validation
+// 2FA session validation (2FA page)
 authRoutes.get(
   "/2fa-session",
   authenticate(COOKIE_NAMES.TWO_FACTOR),
