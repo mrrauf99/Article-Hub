@@ -6,13 +6,14 @@ import {
   deleteArticle,
   getMyArticles,
   getArticleById,
-  uploadImageToCloudinary,
   incrementArticleViews,
 } from "../controllers/article.controller.js";
 
 import { uploadImage } from "../middlewares/uploadImage.middleware.js";
 import { authenticate } from "../middlewares/authenticate.middleware.js";
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
+import { requireUser } from "../middlewares/requireRole.middleware.js";
+import { requireArticleOwner } from "../middlewares/requireArticleOwner.middleware.js";
 
 const articleRoutes = Router();
 
@@ -20,10 +21,14 @@ articleRoutes.get("/", getApprovedArticles);
 
 articleRoutes.get("/me", authenticate(COOKIE_NAMES.ACCESS), getMyArticles);
 
-articleRoutes.get("/:id", getArticleById);
+// For guest
+articleRoutes.get("/:articleId", getArticleById);
 
-// Increment views - no auth required (guest can view), but admin views don't count
-articleRoutes.post("/:id/view", incrementArticleViews);
+// For user (approved , rejected, pending article)
+articleRoutes.get("/me/:articleId", authenticate(COOKIE_NAMES.ACCESS), getArticleById);
+
+// Increment views
+articleRoutes.post("/:articleId/view", incrementArticleViews);
 
 articleRoutes.post(
   "/",
@@ -35,6 +40,8 @@ articleRoutes.post(
 articleRoutes.patch(
   "/:articleId",
   authenticate(COOKIE_NAMES.ACCESS),
+  requireUser,
+  requireArticleOwner,
   uploadImage.single("image"),
   updateArticle,
 );
@@ -42,13 +49,9 @@ articleRoutes.patch(
 articleRoutes.delete(
   "/:articleId",
   authenticate(COOKIE_NAMES.ACCESS),
+  requireUser,
+  requireArticleOwner,
   deleteArticle,
-);
-
-articleRoutes.post(
-  "/upload-image",
-  uploadImage.single("image"),
-  uploadImageToCloudinary,
 );
 
 export default articleRoutes;

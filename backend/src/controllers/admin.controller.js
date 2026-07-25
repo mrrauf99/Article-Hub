@@ -1,5 +1,5 @@
 import db from "../config/db.config.js";
-import { deleteImageByUrl } from "../utils/cloudinary.utils.js";
+import { deleteImageByUrl } from "../services/cloudinary.service.js";
 import { sendArticleStatusEmail } from "../services/email.service.js";
 
 async function fetchArticleAuthorDetails(articleId) {
