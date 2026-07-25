@@ -5,11 +5,12 @@ export default async function otpAction({ request }) {
 
   const otp = formData.get("otp");
   const intent = formData.get("intent");
+  const flow = formData.get("flow"); // "signup" | "password-reset"
 
   /* ---------------- RESEND OTP ---------------- */
   if (intent === "resend") {
     try {
-      const { data } = await authApi.resendOTP();
+      const { data } = await authApi.resendOTP(flow);
 
       return {
         success: true,
@@ -28,7 +29,7 @@ export default async function otpAction({ request }) {
   /* ---------------- VERIFY OTP ---------------- */
   if (intent === "verify") {
     try {
-      const { data } = await authApi.verifyOTP({ otp });
+      const { data } = await authApi.verifyOTP({ otp }, flow);
 
       if (!data.success) {
         return {
@@ -58,3 +59,4 @@ export default async function otpAction({ request }) {
     message: "Invalid request.",
   };
 }
+

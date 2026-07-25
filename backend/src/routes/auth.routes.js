@@ -12,14 +12,13 @@ import {
   checkUsernameAvailability,
   completeGoogleSignup,
   verifyTwoFactorLogin,
+  googleOAuthCallback,
 } from "../controllers/auth.controller.js";
 
 import { authenticate } from "../middlewares/authenticate.middleware.js";
 import { loginLimiter } from "../middlewares/rateLimiters.middleware.js";
 
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
-import { generateToken } from "../utils/jwt.js";
-import { setCookie } from "../config/cookie.js";
 
 const authRoutes = Router();
 
@@ -35,14 +34,14 @@ authRoutes.post(
 
 authRoutes.post(
   "/password-reset/verify-otp",
-  authenticate(COOKIE_NAMES.SIGNUP),
+  authenticate(COOKIE_NAMES.PASSWORD_RESET),
   verifyOtp,
 );
 
 // Resend OTP
 authRoutes.post(
   "/signup/resend-otp",
-  authenticate(COOKIE_NAMES.PASSWORD_RESET),
+  authenticate(COOKIE_NAMES.SIGNUP),
   resendOtp,
 );
 
@@ -66,7 +65,7 @@ authRoutes.post(
 authRoutes.get("/logout", (req, res) => {
   res.clearCookie(COOKIE_NAMES.ACCESS);
 
-  res.status(200).json({
+  res.json({
     success: true,
     message: "Logout successful",
   });
@@ -94,36 +93,7 @@ authRoutes.get(
     session: false,
     failureRedirect: `${process.env.CLIENT_BASE_URL}/login`,
   }),
-  (req, res) => {
-    const user = req.user;
-
-    // Existing user
-    if (user.id) {
-      const token = generateToken({ type: "access", user }, "7d");
-      setCookie(res, COOKIE_NAMES.ACCESS, token);
-
-      // Redirect based on role
-      const dashboardPath =
-        user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
-      return res.redirect(`${process.env.CLIENT_BASE_URL}${dashboardPath}`);
-    }
-
-    // New OAuth user, store temporary data
-    const payload = {
-      type: "oauth",
-      user: {
-        email: user.email,
-        name: user.name,
-        avatar: user.avatar,
-        completed: false,
-      },
-    };
-
-    const token = generateToken(payload, "5min");
-    setCookie(res, COOKIE_NAMES.OAUTH, token);
-
-    return res.redirect(`${process.env.CLIENT_BASE_URL}/complete-profile`);
-  },
+  googleOAuthCallback,
 );
 
 // Check if email already exists
@@ -135,7 +105,7 @@ authRoutes.post("/check-username", checkUsernameAvailability);
 // forgot-password
 authRoutes.post("/forgot-password", forgetPassword);
 
-// Reset password after OTP verification
+// Password reset  after OTP verification
 authRoutes.post(
   "/password-reset",
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
@@ -144,12 +114,21 @@ authRoutes.post(
 
 /* =========== FRONTEND LOADERS =========== */
 
-// OTP session validation (OTP page)
+// Signup OTP session validation
 authRoutes.get(
-  "/otp-session",
-  authenticate("emailVerificationToken"),
+  "/signup-session",
+  authenticate(COOKIE_NAMES.SIGNUP),
   (req, res) => {
-    res.status(200).json({ success: true, email: req.user.email });
+    res.json({ success: true, email: req.user.email });
+  },
+);
+
+// Password-reset OTP session validation
+authRoutes.get(
+  "/password-reset-session",
+  authenticate(COOKIE_NAMES.PASSWORD_RESET),
+  (req, res) => {
+    res.json({ success: true, email: req.user.email });
   },
 );
 
@@ -158,7 +137,7 @@ authRoutes.get(
   "/oauth-session",
   authenticate(COOKIE_NAMES.OAUTH),
   (req, res) => {
-    res.status(200).json({ success: true });
+    res.json({ success: true });
   },
 );
 
@@ -166,7 +145,7 @@ authRoutes.get(
 authRoutes.get(
   "/2fa-session",
   authenticate(COOKIE_NAMES.TWO_FACTOR),
-  (req, res) => res.status(200).json({ success: true }),
+  (req, res) => res.json({ success: true }),
 );
 
 authRoutes.get("/me", authenticate(COOKIE_NAMES.ACCESS), (req, res) => {

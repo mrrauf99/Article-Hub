@@ -19,7 +19,7 @@ import SwitchPage from "../components/SwitchPage";
 export default function OTPVerificationForm() {
   const otpForm = useOTPForm();
   const { reset } = otpForm;
-  const { email } = useLoaderData();
+  const { email, flow } = useLoaderData();
 
   const resendFetcher = useFetcher();
   const actionData = useActionData();
@@ -148,6 +148,7 @@ export default function OTPVerificationForm() {
               onSubmit={() => setMode("resend")}
             >
               <input type="hidden" name="intent" value="resend" />
+              <input type="hidden" name="flow" value={flow} />
 
               <OTPTimer
                 timer={otpForm.timer}
@@ -166,6 +167,7 @@ export default function OTPVerificationForm() {
           >
             <input type="hidden" name="otp" value={otpForm.otp.join("")} />
             <input type="hidden" name="intent" value="verify" />
+            <input type="hidden" name="flow" value={flow} />
 
             <Button
               disabled={
