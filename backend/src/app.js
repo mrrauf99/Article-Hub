@@ -11,8 +11,7 @@ import articleRoutes from "./routes/article.routes.js";
 import userRoutes from "./routes/user.routes.js";
 
 import { authenticate } from "./middlewares/authenticate.middleware.js";
-import { requireAdmin } from "./middlewares/admin.middleware.js";
-import { requireUser } from "./middlewares/user.middleware.js";
+import { requireRole } from "./middlewares/requireRole.middleware.js";
 
 import { COOKIE_NAMES } from "./constants/cookieNames.js";
 
@@ -39,19 +38,28 @@ app.use("/api/articles", articleRoutes);
 app.use(
   "/api/admin",
   authenticate(COOKIE_NAMES.ACCESS),
-  requireAdmin,
+  requireRole("admin"),
   adminRoutes,
 );
 app.use(
   "/api/user",
   authenticate(COOKIE_NAMES.ACCESS),
-  requireUser,
+  requireRole("user"),
   userRoutes,
 );
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "Endpoint not found.",
+  });
+});
+
+app.use((error, req, res, _next) => {
+  console.error(error);
+
+  return res.status(500).json({
+    success: false,
+    message: "Internal server error.",
   });
 });
 
