@@ -11,13 +11,17 @@ export const authApi = {
 
   logout: () => apiClient.get("auth/logout"),
 
-  verifyOTP: (data) => apiClient.post("auth/verify-otp", data),
+  // flow: "signup" | "password-reset"
+  verifyOTP: (data, flow) =>
+    apiClient.post(`auth/${flow}/verify-otp`, data),
 
-  resendOTP: (data) => apiClient.post("auth/resend-otp", data),
+  // flow: "signup" | "password-reset"
+  resendOTP: (flow) =>
+    apiClient.post(`auth/${flow}/resend-otp`),
 
   forgotPassword: (data) => apiClient.post("auth/forgot-password", data),
 
-  resetPassword: (data) => apiClient.post("auth/reset-password", data),
+  resetPassword: (data) => apiClient.post("auth/password-reset", data),
 
   verifyTwoFactorLogin: (data) => apiClient.post("auth/2fa/verify-login", data),
 
@@ -25,9 +29,12 @@ export const authApi = {
 
   oauthSession: () => apiClient.get("auth/oauth-session"),
 
-  otpSession: () => apiClient.get("auth/otp-session"),
+  // Separate session checkers for signup OTP and password-reset OTP pages
+  signupSession: () => apiClient.get("auth/signup-session"),
+
+  passwordResetSession: () => apiClient.get("auth/password-reset-session"),
 
   twoFactorSession: () => apiClient.get("auth/2fa-session"),
 
-  session: () => apiClient.get("auth/session"),
+  session: () => apiClient.get("auth/me"),
 };

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ImagePlus } from "lucide-react";
 import ImageCropper from "@/components/image/ImageCropper";
+import { allowedImagesTypes } from "@/utils/allowedImagesTypes";
 import styles from "../../styles/ArticleForm.module.css";
 
 export default function ImageUpload({
@@ -18,13 +19,13 @@ export default function ImageUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
+    if (!allowedImagesTypes.includes(file.type)) {
       if (onChange) {
         onChange({
           ...e,
           target: {
             ...e.target,
-            error: "Only image files are allowed",
+            error: "Only JPG, PNG, and WEBP images are allowed",
           },
         });
       }
@@ -94,7 +95,7 @@ export default function ImageUpload({
             type="file"
             id={id}
             name={name}
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             onChange={handleFileSelect}
             className={styles.fileInput}
           />
@@ -118,7 +119,7 @@ export default function ImageUpload({
             </span>
 
             <span className={styles.uploadHint}>
-              Drag and drop or click to browse • JPG, PNG, GIF (Max 5MB)
+              Drag and drop or click to browse • JPG, PNG, WEBP (Max 5MB)
             </span>
           </label>
         </div>
