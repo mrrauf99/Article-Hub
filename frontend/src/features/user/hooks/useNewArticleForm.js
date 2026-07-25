@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
+import { allowedImagesTypes } from "@/utils/allowedImagesTypes";
 
 // Normalize line breaks: convert Windows \r\n to Unix \n
 // This ensures consistent character counting between frontend and backend
@@ -90,8 +91,11 @@ export function useNewArticleForm(article) {
 
     if (!file) return;
 
-    if (!file.type || !file.type.startsWith("image/")) {
-      setErrors((prev) => ({ ...prev, image: "Only image files are allowed" }));
+    if (!file.type || !allowedImagesTypes.includes(file.type)) {
+      setErrors((prev) => ({
+        ...prev,
+        image: "Only JPG, PNG, and WEBP images are allowed",
+      }));
       return;
     }
 

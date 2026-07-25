@@ -1,6 +1,5 @@
-/**
- * Validation utility functions
- */
+export const PASSWORD_MIN = 8;
+export const PASSWORD_MAX = 64;
 
 export function validateRequired(value, fieldName) {
   if (!value || (typeof value === "string" && !value.trim())) {

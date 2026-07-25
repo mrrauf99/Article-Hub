@@ -60,12 +60,6 @@ export default function CreateArticlePage() {
 
     if (formData.imageFile) {
       submitData.append("image", formData.imageFile);
-    } else if (
-      isEditing &&
-      formData.imageUrl &&
-      !formData.imageUrl.startsWith("blob:")
-    ) {
-      submitData.append("existingImageUrl", formData.imageUrl);
     }
 
     submit(submitData, {
@@ -231,14 +225,7 @@ export default function CreateArticlePage() {
                   imageUrl={formData.imageUrl}
                 />
 
-                {/* Hidden field to preserve existing image URL during edit */}
-                {isEditing && formData.imageUrl && !formData.imageFile && (
-                  <input
-                    type="hidden"
-                    name="existingImageUrl"
-                    value={formData.imageUrl}
-                  />
-                )}
+
               </div>
 
               {/* Submit Button */}

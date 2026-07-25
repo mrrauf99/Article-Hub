@@ -3,10 +3,10 @@ import { authApi } from "../../api/authApi";
 
 export default async function resetPasswordLoader() {
   try {
-    await authApi.otpSession();
-
+    await authApi.passwordResetSession();
     return null;
   } catch {
     throw redirect("/forgot-password");
   }
 }
+
