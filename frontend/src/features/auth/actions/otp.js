@@ -27,36 +27,28 @@ export default async function otpAction({ request }) {
   }
 
   /* ---------------- VERIFY OTP ---------------- */
-  if (intent === "verify") {
-    try {
-      const { data } = await authApi.verifyOTP({ otp }, flow);
+  try {
+    const { data } = await authApi.verifyOTP({ otp }, flow);
 
-      if (!data.success) {
-        return {
-          success: false,
-          message: data.message,
-        };
-      }
-
-      return {
-        success: true,
-        message: "OTP verified successfully.",
-        next: data.next,
-      };
-    } catch (err) {
+    if (!data.success) {
       return {
         success: false,
-        message:
-          err.response?.data?.message ||
-          "Something went wrong. Please try again.",
+        message: data.message,
       };
     }
-  }
 
-  /* ---------------- FALLBACK ---------------- */
-  return {
-    success: false,
-    message: "Invalid request.",
-  };
+    return {
+      success: true,
+      message: "OTP verified successfully.",
+      next: data.next,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message:
+        err.response?.data?.message ||
+        "Something went wrong. Please try again.",
+    };
+  }
 }
 

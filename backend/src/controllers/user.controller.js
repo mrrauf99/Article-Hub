@@ -6,18 +6,11 @@ import qrcode from "qrcode";
 import {
   deleteImageFromCloudinary,
   uploadImageToCloudinary,
+  AVATAR_OPTIONS,
 } from "../services/cloudinary.service.js";
 import { validateProfileData } from "../utils/validation.utils.js";
 
 import { PASSWORD_MAX, PASSWORD_MIN } from "../utils/validation.utils.js";
-
-const AVATAR_OPTIONS = {
-  folder: "article_hub/avatars",
-  transformation: [
-    { width: 200, height: 200, crop: "fill", gravity: "face" },
-    { quality: "auto", fetch_format: "auto" },
-  ],
-};
 
 export async function getProfile(req, res) {
   const { userId } = req.user;

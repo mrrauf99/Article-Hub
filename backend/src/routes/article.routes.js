@@ -12,7 +12,7 @@ import {
 import { uploadImage } from "../middlewares/uploadImage.middleware.js";
 import { authenticate } from "../middlewares/authenticate.middleware.js";
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
-import { requireUser } from "../middlewares/requireRole.middleware.js";
+import { requireRole } from "../middlewares/requireRole.middleware.js";
 import { requireArticleOwner } from "../middlewares/requireArticleOwner.middleware.js";
 
 const articleRoutes = Router();
@@ -40,7 +40,7 @@ articleRoutes.post(
 articleRoutes.patch(
   "/:articleId",
   authenticate(COOKIE_NAMES.ACCESS),
-  requireUser,
+  requireRole("user"),
   requireArticleOwner,
   uploadImage.single("image"),
   updateArticle,
@@ -49,7 +49,7 @@ articleRoutes.patch(
 articleRoutes.delete(
   "/:articleId",
   authenticate(COOKIE_NAMES.ACCESS),
-  requireUser,
+  requireRole("user"),
   requireArticleOwner,
   deleteArticle,
 );

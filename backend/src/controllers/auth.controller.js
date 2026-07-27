@@ -9,7 +9,11 @@ import {
 import { generateToken } from "../utils/jwt.js";
 import { setCookie } from "../config/cookie.js";
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
-import { PASSWORD_MAX, PASSWORD_MIN } from "../utils/validation.utils.js";
+import {
+  PASSWORD_MAX,
+  PASSWORD_MIN,
+  validateSignupData,
+} from "../utils/validation.utils.js";
 
 const OTP_HASH_ROUNDS = process.env.SALT_ROUNDS;
 const MAX_VERIFY_ATTEMPTS = 5;
@@ -17,6 +21,32 @@ const MAX_RESEND_COUNT = 3;
 
 export async function signUp(req, res) {
   const { email, username, name, password, country } = req.body;
+
+  const errors = validateSignupData({
+    email,
+    username,
+    name,
+    country,
+    password,
+  });
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: errors,
+    });
+  }
+
+  const { rowCount } = await db.query(
+    "SELECT 1 FROM users WHERE email = $1 OR username = $2",
+    [email, username],
+  );
+
+  if (rowCount > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Email or username already exists.",
+    });
+  }
 
   const hashedPassword = await bcrypt.hash(
     password,
@@ -43,7 +73,7 @@ export async function signUp(req, res) {
   };
 
   const token = generateToken(payload, "5m");
-  setCookie(res, COOKIE_NAMES.SIGNUP, token);
+  setCookie(res, COOKIE_NAMES.SIGNUP, token, 5 * 60 * 1000);
 
   await sendEmailVerificationOtp(email, otp);
 
@@ -73,7 +103,7 @@ export async function forgetPassword(req, res) {
   const payload = {
     type: "forgot-password",
     auth: {
-      code: hashedOtp,
+      hashedOtp,
       attempts: 0,
       resendCount: 0,
     },
@@ -83,7 +113,7 @@ export async function forgetPassword(req, res) {
   };
 
   const token = generateToken(payload, "5m");
-  setCookie(res, COOKIE_NAMES.PASSWORD_RESET, token);
+  setCookie(res, COOKIE_NAMES.PASSWORD_RESET, token, 5 * 60 * 1000);
 
   await sendEmailVerificationOtp(email, otp);
 
@@ -130,7 +160,7 @@ export async function resendOtp(req, res) {
     tokenName = COOKIE_NAMES.PASSWORD_RESET;
   }
 
-  setCookie(res, tokenName, token);
+  setCookie(res, tokenName, token, 5 * 60 * 1000);
   res.json({
     success: true,
     message: "New verification code sent.",
@@ -153,13 +183,20 @@ export async function verifyOtp(req, res) {
   const isValid = await bcrypt.compare(otp, hashedOtp);
 
   if (!isValid) {
-    attempts++;
-    const remaining = MAX_VERIFY_ATTEMPTS - attempts;
+    const newAttempts = attempts + 1;
+    const remaining = MAX_VERIFY_ATTEMPTS - newAttempts;
+    const updatedPayload = {
+      type: req.type,
+      user: req.user,
+      auth: { ...req.auth, attempts: newAttempts, hashedOtp },
+    };
+    const newToken = generateToken(updatedPayload, "5m");
+    const cookieName =
+      req.type === "signup" ? COOKIE_NAMES.SIGNUP : COOKIE_NAMES.PASSWORD_RESET;
+    setCookie(res, cookieName, newToken, 5 * 60 * 1000);
     return res.status(400).json({
       success: false,
-      message: `Invalid verification code. ${remaining} attempt${
-        remaining !== 1 ? "s" : ""
-      } remaining.`,
+      message: `Invalid code. ${remaining} attempt(s) remaining.`,
       attemptsRemaining: remaining,
     });
   }
@@ -167,28 +204,14 @@ export async function verifyOtp(req, res) {
   if (req.type === "signup") {
     const { email, username, name, password, country } = req.user;
 
-    try {
-      await db.query(
-        `
-        INSERT INTO users (email, username, name, password, country)
-        VALUES ($1, $2, $3, $4, $5)
+    await db.query(
+      `
+        INSERT INTO users (email, username, name, password, country, auth_provider)
+        VALUES ($1, $2, $3, $4, $5, $6)
         `,
-        [email, username, name, password, country],
-      );
-
-      res.clearCookie(COOKIE_NAMES.SIGNUP);
-    } catch (insertErr) {
-      if (insertErr.code === "23505") {
-        console.error("Error inserting user during signup:", insertErr);
-
-        return res.status(400).json({
-          success: false,
-          message: "Email or username already exists.",
-        });
-      }
-
-      throw insertErr;
-    }
+      [email, username, name, password, country, "local"],
+    );
+    res.clearCookie(COOKIE_NAMES.SIGNUP);
   } else {
     res.clearCookie(COOKIE_NAMES.PASSWORD_RESET);
   }
@@ -235,7 +258,7 @@ export async function login(req, res) {
 
   if (user.two_factor_enabled) {
     const token = generateToken(payload, "5m");
-    setCookie(res, COOKIE_NAMES.TWO_FACTOR, token);
+    setCookie(res, COOKIE_NAMES.TWO_FACTOR, token, 5 * 60 * 1000);
 
     return res.status(200).json({
       success: true,
@@ -244,7 +267,7 @@ export async function login(req, res) {
   }
 
   const token = generateToken(payload, "7d");
-  setCookie(res, COOKIE_NAMES.ACCESS, token);
+  setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
 
   const ipAddress = req.ip;
   const userAgent = req.get("user-agent");
@@ -254,7 +277,6 @@ export async function login(req, res) {
     name: user.name,
     ipAddress,
     userAgent,
-    loggedInAt: new Date(),
   });
 
   res.json({
@@ -304,7 +326,6 @@ export async function verifyTwoFactorLogin(req, res) {
     name: user.name,
     ipAddress,
     userAgent,
-    loggedInAt: new Date(),
   });
 
   const payload = {
@@ -316,7 +337,7 @@ export async function verifyTwoFactorLogin(req, res) {
   };
 
   const token = generateToken(payload, "7d");
-  setCookie(res, COOKIE_NAMES.ACCESS, token);
+  setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
 
   res.clearCookie(COOKIE_NAMES.TWO_FACTOR);
 
@@ -431,38 +452,44 @@ export async function completeGoogleSignup(req, res) {
   const { username } = req.body;
   const { email, name, avatar } = req.user;
 
-  try {
-    const { rows } = await db.query(
-      `INSERT INTO users (email, name, username, avatar_url)
-       VALUES ($1, $2, $3, $4) RETURNING id, role`,
-      [email, name, username, avatar],
-    );
-    const { id, role } = rows[0];
-    const payload = {
-      type: "access",
-      user: {
-        userId: id,
-        role,
-      },
-    };
+  // Check if username is already taken
+  const { rowCount } = await db.query(
+    "SELECT 1 FROM users WHERE username = $1",
+    [username],
+  );
 
-    const token = generateToken(payload, "7d");
-    setCookie(res, COOKIE_NAMES.ACCESS, token);
-    res.clearCookie(COOKIE_NAMES.OAUTH);
-
-    res.redirect(`${process.env.CLIENT_BASE_URL}/user/dashboard`);
-  } catch (insertErr) {
-    if (insertErr.code === "23505") {
-      console.error("Error inserting user during Google signup:", insertErr);
-
-      return res.status(400).json({
-        success: false,
-        message: "Username already taken. Please choose a different username.",
-      });
-    }
-
-    throw insertErr;
+  if (rowCount > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Username is already taken.",
+    });
   }
+
+  const randomPassword = crypto.randomBytes(32).toString("hex");
+  const hashedPassword = await bcrypt.hash(
+    randomPassword,
+    Number(process.env.SALT_ROUNDS),
+  );
+
+  const { rows } = await db.query(
+    `INSERT INTO users (email, name, username, avatar_url, password, auth_provider)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, role`,
+    [email, name, username, avatar, hashedPassword, "google"],
+  );
+  const { id, role } = rows[0];
+  const payload = {
+    type: "access",
+    user: {
+      userId: id,
+      role,
+    },
+  };
+
+  const token = generateToken(payload, "7d");
+  setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
+  res.clearCookie(COOKIE_NAMES.OAUTH);
+
+  return res.status(200).json({ success: true, redirectTo: "/user/dashboard" });
 }
 
 export async function googleOAuthCallback(req, res) {
@@ -471,7 +498,7 @@ export async function googleOAuthCallback(req, res) {
   // Existing user
   if (user.id) {
     const token = generateToken({ type: "access", user }, "7d");
-    setCookie(res, COOKIE_NAMES.ACCESS, token);
+    setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
 
     // Redirect based on role
     const dashboardPath =
@@ -491,7 +518,7 @@ export async function googleOAuthCallback(req, res) {
   };
 
   const token = generateToken(payload, "5min");
-  setCookie(res, COOKIE_NAMES.OAUTH, token);
+  setCookie(res, COOKIE_NAMES.OAUTH, token, 5 * 60 * 1000);
 
   return res.redirect(`${process.env.CLIENT_BASE_URL}/complete-profile`);
 }
