@@ -217,7 +217,7 @@ export default function AdminUsersPage() {
               value={searchValue}
               onChange={setSearchValue}
               onSubmit={handleSearch}
-              placeholder="Search by name or email..."
+              placeholder="Search by name, username or email..."
             />
           </div>
         </div>

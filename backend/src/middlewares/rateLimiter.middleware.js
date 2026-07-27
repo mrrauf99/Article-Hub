@@ -7,16 +7,16 @@ function getRetryAfterSeconds(req) {
   );
 }
 
-export const loginLimiter = rateLimit({
+export const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      type: "LOGIN_LIMIT",
-      message: "Too many login attempts. Please try again later.",
+      type: "RATE_LIMIT",
+      message: "Too many requests. Please try again later.",
       retryAfterSeconds: getRetryAfterSeconds(req),
     });
   },

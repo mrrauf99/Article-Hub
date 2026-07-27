@@ -4,7 +4,7 @@ import {
   useRouteLoaderData,
   useSearchParams,
 } from "react-router-dom";
-import { Search, Sparkles, BookOpen } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 
 import ArticleCard from "@/features/articles/components/ArticleCard";
 import Pagination from "@/features/articles/components/Pagination";
@@ -152,38 +152,33 @@ export default function ExploreArticlesPage() {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-sky-500/8 to-cyan-500/8 rounded-full blur-3xl" />
 
           <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl shadow-lg shadow-sky-500/30">
-                <BookOpen className="w-7 h-7 text-white" />
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-3xl lg:text-4xl font-bold text-white">
+                  {activeCategory === "All"
+                    ? "Explore Articles"
+                    : activeCategory}
+                </h2>
+                <Sparkles className="w-6 h-6 text-amber-400" />
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-3xl lg:text-4xl font-bold text-white">
-                    {activeCategory === "All"
-                      ? "Explore Articles"
-                      : activeCategory}
-                  </h2>
-                  <Sparkles className="w-6 h-6 text-amber-400" />
-                </div>
-                <p className="text-slate-300 text-lg">
-                  Discover{" "}
-                  <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-400">
-                    {filteredArticles.length}
-                  </span>{" "}
-                  {filteredArticles.length === 1
-                    ? "article"
-                    : "amazing articles"}
-                  {activeCategory !== "All" && (
-                    <span className="text-slate-400">
-                      {" "}
-                      in{" "}
-                      <span className="text-white font-medium">
-                        {activeCategory}
-                      </span>
+              <p className="text-slate-300 text-lg">
+                Discover{" "}
+                <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-400">
+                  {filteredArticles.length}
+                </span>{" "}
+                {filteredArticles.length === 1
+                  ? "article"
+                  : "amazing articles"}
+                {activeCategory !== "All" && (
+                  <span className="text-slate-400">
+                    {" "}
+                    in{" "}
+                    <span className="text-white font-medium">
+                      {activeCategory}
                     </span>
-                  )}
-                </p>
-              </div>
+                  </span>
+                )}
+              </p>
             </div>
 
             {/* Search & Filter */}
@@ -217,11 +212,10 @@ export default function ExploreArticlesPage() {
               <button
                 key={category}
                 onClick={() => handleCategoryChange(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${
-                  activeCategory === category
-                    ? "bg-sky-500 text-white shadow-lg shadow-sky-500/25"
-                    : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white"
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${activeCategory === category
+                  ? "bg-sky-500 text-white shadow-lg shadow-sky-500/25"
+                  : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white"
+                  }`}
               >
                 {category}
               </button>

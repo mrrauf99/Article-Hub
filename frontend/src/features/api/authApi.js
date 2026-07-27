@@ -9,15 +9,13 @@ export const authApi = {
 
   checkUsername: (data) => apiClient.post("auth/check-username", data),
 
-  logout: () => apiClient.get("auth/logout"),
+  logout: () => apiClient.post("auth/logout"),
 
   // flow: "signup" | "password-reset"
-  verifyOTP: (data, flow) =>
-    apiClient.post(`auth/${flow}/verify-otp`, data),
+  verifyOTP: (data, flow) => apiClient.post(`auth/${flow}/verify-otp`, data),
 
   // flow: "signup" | "password-reset"
-  resendOTP: (flow) =>
-    apiClient.post(`auth/${flow}/resend-otp`),
+  resendOTP: (flow) => apiClient.post(`auth/${flow}/resend-otp`),
 
   forgotPassword: (data) => apiClient.post("auth/forgot-password", data),
 
@@ -29,7 +27,7 @@ export const authApi = {
 
   oauthSession: () => apiClient.get("auth/oauth-session"),
 
-  // Separate session checkers for signup OTP and password-reset OTP pages
+  // Check if the signup or password reset flow is still active
   signupSession: () => apiClient.get("auth/signup-session"),
 
   passwordResetSession: () => apiClient.get("auth/password-reset-session"),

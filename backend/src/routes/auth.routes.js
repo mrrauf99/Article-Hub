@@ -16,24 +16,26 @@ import {
 } from "../controllers/auth.controller.js";
 
 import { authenticate } from "../middlewares/authenticate.middleware.js";
-import { loginLimiter } from "../middlewares/rateLimiters.middleware.js";
+import { rateLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
 
 const authRoutes = Router();
 
 // Register new user
-authRoutes.post("/register", signUp);
+authRoutes.post("/register", rateLimiter, signUp);
 
 // Verify OTP
 authRoutes.post(
   "/signup/verify-otp",
+  rateLimiter,
   authenticate(COOKIE_NAMES.SIGNUP),
   verifyOtp,
 );
 
 authRoutes.post(
   "/password-reset/verify-otp",
+  rateLimiter,
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
   verifyOtp,
 );
@@ -41,18 +43,20 @@ authRoutes.post(
 // Resend OTP
 authRoutes.post(
   "/signup/resend-otp",
+  rateLimiter,
   authenticate(COOKIE_NAMES.SIGNUP),
   resendOtp,
 );
 
 authRoutes.post(
   "/password-reset/resend-otp",
+  rateLimiter,
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
   resendOtp,
 );
 
 // Login
-authRoutes.post("/login", loginLimiter, login);
+authRoutes.post("/login", rateLimiter, login);
 
 // Verify 2FA login
 authRoutes.post(
@@ -62,7 +66,7 @@ authRoutes.post(
 );
 
 // Logout user
-authRoutes.get("/logout", (req, res) => {
+authRoutes.post("/logout", (req, res) => {
   res.clearCookie(COOKIE_NAMES.ACCESS);
 
   res.json({
@@ -103,7 +107,7 @@ authRoutes.post("/check-email", checkEmailAvailability);
 authRoutes.post("/check-username", checkUsernameAvailability);
 
 // forgot-password
-authRoutes.post("/forgot-password", forgetPassword);
+authRoutes.post("/forgot-password", rateLimiter, forgetPassword);
 
 // Password reset  after OTP verification
 authRoutes.post(

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ImagePlus } from "lucide-react";
 import ImageCropper from "@/components/image/ImageCropper";
-import { allowedImagesTypes } from "@/utils/allowedImagesTypes";
+import { allowedImageTypes } from "@/utils/allowedImagesTypes";
 import styles from "../../styles/ArticleForm.module.css";
 
 export default function ImageUpload({
@@ -19,7 +19,7 @@ export default function ImageUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!allowedImagesTypes.includes(file.type)) {
+    if (!allowedImageTypes.includes(file.type)) {
       if (onChange) {
         onChange({
           ...e,

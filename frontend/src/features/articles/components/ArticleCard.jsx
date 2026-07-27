@@ -62,6 +62,12 @@ function ArticleCard({ article, mode, onDelete }) {
     <>
       <article
         onClick={openArticle}
+        draggable
+        onDragStart={(e) => {
+          const url = `${window.location.origin}/user/articles/${article.article_id}`;
+          e.dataTransfer.setData("text/uri-list", url);
+          e.dataTransfer.setData("text/plain", url);
+        }}
         className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden hover:-translate-y-1"
       >
         {/* status */}

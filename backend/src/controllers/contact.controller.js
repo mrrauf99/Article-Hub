@@ -1,59 +1,51 @@
 import { sendContactEmail } from "../services/email.service.js";
-import { validateRequired, validateEmail, validateLength } from "../utils/validation.utils.js";
+import {
+  validateEmail,
+  validateLength,
+  CONTACT_LIMITS,
+} from "../utils/validation.utils.js";
 
 export async function submitContact(req, res) {
-  try {
-    const { name, email, subject, message } = req.body;
+  const { name, email, subject, message } = req.body;
 
-    // Validate required fields
-    const errors = [];
+  const errors = [
+    validateLength(
+      name,
+      CONTACT_LIMITS.name.min,
+      CONTACT_LIMITS.name.max,
+      "Name",
+    ),
+    validateEmail(email),
+    validateLength(
+      subject,
+      CONTACT_LIMITS.subject.min,
+      CONTACT_LIMITS.subject.max,
+      "Subject",
+    ),
+    validateLength(
+      message,
+      CONTACT_LIMITS.message.min,
+      CONTACT_LIMITS.message.max,
+      "Message",
+    ),
+  ].filter(Boolean);
 
-    try {
-      validateRequired(name, "Name");
-      validateLength(name, 2, 100, "Name");
-    } catch (err) {
-      errors.push(err.message);
-    }
-
-    try {
-      validateEmail(email);
-    } catch (err) {
-      errors.push(err.message);
-    }
-
-    try {
-      validateRequired(subject, "Subject");
-      validateLength(subject, 5, 200, "Subject");
-    } catch (err) {
-      errors.push(err.message);
-    }
-
-    try {
-      validateRequired(message, "Message");
-      validateLength(message, 10, 2000, "Message");
-    } catch (err) {
-      errors.push(err.message);
-    }
-
-    if (errors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: errors.join(", "),
-      });
-    }
-
-    await sendContactEmail({ name, email, subject, message });
-
-    return res.status(201).json({
-      success: true,
-      message: "Message sent successfully.",
-    });
-  } catch (err) {
-    console.error("Contact error:", err);
-
-    return res.status(500).json({
+  if (errors.length > 0) {
+    return res.status(400).json({
       success: false,
-      message: "Failed to send message. Please try again later.",
+      errors,
     });
   }
+
+  await sendContactEmail({
+    name: name.trim(),
+    email: email.trim(),
+    subject: subject.trim(),
+    message: message.trim(),
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Message sent successfully.",
+  });
 }

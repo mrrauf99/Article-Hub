@@ -6,7 +6,10 @@ export default async function completeProfileAction({ request }) {
   const username = formData.get("username");
 
   try {
-    await authApi.oauthComplete({ username });
+    const { data } = await authApi.oauthComplete({ username });
+    if (data.success) {
+      return redirect(data.redirectTo);
+    }
     return redirect("/user/dashboard");
   } catch (err) {
     return {

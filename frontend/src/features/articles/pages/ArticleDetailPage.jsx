@@ -1,7 +1,7 @@
 import { useLoaderData, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-import { Calendar, User, Tag, Clock, Share2, Eye, Heart } from "lucide-react";
+import { Calendar, User, Tag, Share2, Eye } from "lucide-react";
 import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
 import formatCount from "@/utils/formatCount";
@@ -81,18 +81,6 @@ export default function ArticleDetailPage() {
   }
 
   /* ---------------- Utils ---------------- */
-  function formatReadingTime({ content, introduction, summary }) {
-    const wordsPerMinute = 200;
-    const rawText = `${content} ${introduction} ${summary}`;
-    const cleanText = rawText
-      .replace(/<[^>]*>/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-    const words = cleanText ? cleanText.split(" ").length : 0;
-    return `${Math.max(1, Math.ceil(words / wordsPerMinute))} min read`;
-  }
-
   function buildDescription({ introduction, summary, content }) {
     const preferred = introduction || summary || content || "";
     const cleanText = preferred
@@ -165,11 +153,6 @@ export default function ArticleDetailPage() {
                   </span>
                 </div>
               )}
-
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>{formatReadingTime(article)}</span>
-              </div>
 
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
