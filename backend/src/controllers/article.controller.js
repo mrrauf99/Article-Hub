@@ -2,14 +2,9 @@ import db from "../config/db.config.js";
 import {
   deleteImageFromCloudinary,
   uploadImageToCloudinary,
+  ARTICLE_IMAGE_OPTIONS,
 } from "../services/cloudinary.service.js";
 import { validateArticleData } from "../utils/validation.utils.js";
-
-const ARTICLE_IMAGE_OPTIONS = {
-  folder: "article_hub/articles",
-  resource_type: "image",
-  transformation: [{ quality: "auto", fetch_format: "auto" }],
-};
 
 export const getApprovedArticles = async (req, res) => {
   const { category, page = "1", limit = "9" } = req.query || {};
@@ -312,13 +307,13 @@ export const deleteArticle = async (req, res) => {
     [articleId],
   );
 
-  const publicId = article.image_public_id;
+  const imagePublicId = article.image_public_id;
 
   // Delete image from Cloudinary
 
-  if (publicId) {
+  if (imagePublicId) {
     try {
-      await deleteImageFromCloudinary(publicId);
+      await deleteImageFromCloudinary(imagePublicId);
     } catch (error) {
       console.error("Failed to delete old Cloudinary image:", error);
     }
