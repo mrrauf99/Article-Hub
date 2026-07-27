@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "passport";
+import helmet from "helmet";
+
 import setupPassport from "./config/passport.config.js";
 
 import contactRoutes from "./routes/contact.routes.js";
@@ -17,6 +19,7 @@ import { COOKIE_NAMES } from "./constants/cookieNames.js";
 
 const app = express();
 
+app.use(helmet());
 app.set("trust proxy", 1);
 
 app.use(

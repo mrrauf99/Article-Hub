@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendEmailVerificationOtp(email, otp) {
-  const { data, error } = await resend.emails.send({
+  await resend.emails.send({
     from: process.env.MAIL_FROM,
     to: email,
     subject: "Verify your email address",
@@ -22,17 +22,10 @@ export async function sendEmailVerificationOtp(email, otp) {
       </div>
     `,
   });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  console.log(data);
 }
 
 export async function sendContactEmail({ name, email, subject, message }) {
-  const { data, error } = await resend.emails.send({
+  await resend.emails.send({
     from: process.env.MAIL_FROM,
     to: process.env.SMTP_USER,
     replyTo: email,
@@ -181,13 +174,6 @@ ${message || "No message provided"}
 </html>
     `,
   });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  console.log(data);
 }
 
 export async function sendLoginNotificationEmail({
@@ -195,12 +181,10 @@ export async function sendLoginNotificationEmail({
   name,
   ipAddress,
   userAgent,
-  loggedInAt,
 }) {
-  const safeName = name || "there";
-  const timestamp = loggedInAt || new Date();
+  const timestamp = new Date();
 
-  const { data, error } = await resend.emails.send({
+  await resend.emails.send({
     from: process.env.MAIL_FROM,
     to,
     subject: "New login to your Article Hub account",
@@ -209,7 +193,7 @@ export async function sendLoginNotificationEmail({
       "X-Auto-Response-Suppress": "All",
     },
     text: `
-Hi ${safeName},
+Hi ${name},
 
 We noticed a new login to your Article Hub account.
 
@@ -255,7 +239,7 @@ Article Hub Security
           <tr>
             <td style="padding:24px">
               <p style="margin:0 0 14px; color:#0f172a; font-size:15px">
-                Hi ${safeName},
+                Hi ${name},
               </p>
               <p style="margin:0 0 20px; color:#475569; font-size:14px; line-height:1.6">
                 We noticed a new login to your Article Hub account.
@@ -301,13 +285,6 @@ Article Hub Security
 </html>
     `,
   });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  console.log(data);
 }
 
 export async function sendArticleStatusEmail({
@@ -317,8 +294,6 @@ export async function sendArticleStatusEmail({
   status,
   reason,
 }) {
-  const safeName = name || "there";
-  const safeTitle = articleTitle || "your article";
   const normalizedStatus = status || "updated";
   const includeReason = Boolean(reason && reason.trim());
   const subjectMap = {
@@ -327,7 +302,7 @@ export async function sendArticleStatusEmail({
     deleted: "Your article has been removed",
   };
 
-  const { data, error } = await resend.emails.send({
+  await resend.emails.send({
     from: process.env.MAIL_FROM,
     to,
     subject: subjectMap[normalizedStatus] || "Article status update",
@@ -336,9 +311,9 @@ export async function sendArticleStatusEmail({
       "X-Auto-Response-Suppress": "All",
     },
     text: `
-Hi ${safeName},
+Hi ${name},
 
-Your article "${safeTitle}" has been ${normalizedStatus}.
+Your article "${articleTitle}" has been ${normalizedStatus}.
 ${includeReason ? `\nReason: ${reason.trim()}` : ""}
 
 If you have questions, feel free to contact our support team.
@@ -378,10 +353,10 @@ Article Hub Team
           <tr>
             <td align="left" style="padding:24px; text-align:left">
               <p style="margin:0 0 14px; color:#0f172a; font-size:15px; text-align:left">
-                Hi ${safeName},
+                Hi ${name},
               </p>
               <p style="margin:0 0 18px; color:#475569; font-size:14px; line-height:1.6; text-align:left">
-                Your article <strong>"${safeTitle}"</strong> has been <strong>${normalizedStatus}</strong>.
+                Your article <strong>"${articleTitle}"</strong> has been <strong>${normalizedStatus}</strong>.
               </p>
               ${
                 includeReason
@@ -417,11 +392,4 @@ ${reason.trim()}
 </html>
     `,
   });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  console.log(data);
 }
