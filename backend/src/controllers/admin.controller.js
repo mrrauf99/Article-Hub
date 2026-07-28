@@ -94,7 +94,11 @@ export const getDashboardRecentActivity = async (req, res) => {
 };
 
 export const getArticles = async (req, res) => {
-  const { status = "all", search = "", page = 1, limit = 10 } = req.query;
+  const { status = "all", search = "" } = req.query;
+
+  const page = Math.max(parseInt(req.body.page) || 1, 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit) || 9, 9), 45);
+
   const offset = (page - 1) * limit;
 
   let whereClause = "WHERE 1=1";
@@ -432,7 +436,7 @@ export const updateUserRole = async (req, res) => {
   }
 
   // Prevent admin from changing their own role
-  if (String(userId) === String(adminId)) {
+  if (userId === adminId) {
     return res.status(400).json({
       success: false,
       message: "Cannot change your own role.",
@@ -457,7 +461,7 @@ export const deleteUser = async (req, res) => {
   const adminId = req.user.userId;
 
   // Prevent admin from deleting themselves
-  if (String(userId) === String(adminId)) {
+  if (userId === adminId) {
     return res.status(400).json({
       success: false,
       message: "Cannot delete your own account.",

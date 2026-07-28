@@ -64,7 +64,7 @@ export function validateLength(value, min, max, fieldName) {
     return `${fieldName} must be at least ${min} characters.`;
   }
 
-  if (max !== undefined && text.length > max) {
+  if (text.length > max) {
     return `${fieldName} must be at most ${max} characters.`;
   }
 

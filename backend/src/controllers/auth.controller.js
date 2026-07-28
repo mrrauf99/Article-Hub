@@ -12,6 +12,7 @@ import { COOKIE_NAMES } from "../constants/cookieNames.js";
 import {
   PASSWORD_MAX,
   PASSWORD_MIN,
+  validateLength,
   validateSignupData,
 } from "../utils/validation.utils.js";
 
@@ -54,12 +55,11 @@ export async function signUp(req, res) {
   );
 
   const otp = crypto.randomInt(100000, 1000000).toString();
-  const hashedOtp = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
   const payload = {
     type: "signup",
     auth: {
-      hashedOtp,
+      otp,
       attempts: 0,
       resendCount: 0,
     },
@@ -98,12 +98,11 @@ export async function forgetPassword(req, res) {
   }
 
   const otp = crypto.randomInt(100000, 1000000).toString();
-  const hashedOtp = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
   const payload = {
     type: "forgot-password",
     auth: {
-      hashedOtp,
+      otp,
       attempts: 0,
       resendCount: 0,
     },
@@ -136,7 +135,6 @@ export async function resendOtp(req, res) {
   }
 
   const otp = crypto.randomInt(100000, 1000000).toString();
-  const hashedOtp = await bcrypt.hash(otp, OTP_HASH_ROUNDS);
 
   const newResendCount = resendCount + 1;
   const payload = {
@@ -145,7 +143,7 @@ export async function resendOtp(req, res) {
     auth: {
       ...req.auth,
       resendCount: newResendCount,
-      hashedOtp,
+      otp,
     },
   };
 
@@ -170,7 +168,7 @@ export async function resendOtp(req, res) {
 
 export async function verifyOtp(req, res) {
   const { otp } = req.body;
-  let { hashedOtp, attempts } = req.auth;
+  let { otp: originalOtp, attempts } = req.auth;
 
   if (attempts >= MAX_VERIFY_ATTEMPTS) {
     return res.status(429).json({
@@ -180,7 +178,7 @@ export async function verifyOtp(req, res) {
     });
   }
 
-  const isValid = await bcrypt.compare(otp, hashedOtp);
+  const isValid = otp === originalOtp;
 
   if (!isValid) {
     const newAttempts = attempts + 1;
@@ -188,7 +186,7 @@ export async function verifyOtp(req, res) {
     const updatedPayload = {
       type: req.type,
       user: req.user,
-      auth: { ...req.auth, attempts: newAttempts, hashedOtp },
+      auth: { ...req.auth, attempts: newAttempts, originalOtp },
     };
     const newToken = generateToken(updatedPayload, "5m");
     const cookieName =
@@ -397,20 +395,15 @@ export async function passwordReset(req, res) {
   const { password } = req.body;
   const { email } = req.user;
 
-  // Validate password input
-  if (!password || typeof password !== "string" || password.trim() === "") {
-    return res.status(400).json({
-      success: false,
-      message: "Password is required.",
-    });
-  }
+  const passwordError = validateLength(
+    password,
+    PASSWORD_MIN,
+    PASSWORD_MAX,
+    "Password",
+  );
 
-  const passwordLength = password.length;
-  if (passwordLength < PASSWORD_MIN || passwordLength > PASSWORD_MAX) {
-    return res.status(400).json({
-      success: false,
-      message: "Password must be between 8 and 64 characters.",
-    });
+  if (passwordError) {
+    res.status(400).json({ success: false, message: passwordError });
   }
 
   // Get current password
@@ -451,19 +444,6 @@ export async function passwordReset(req, res) {
 export async function completeGoogleSignup(req, res) {
   const { username } = req.body;
   const { email, name, avatar } = req.user;
-
-  // Check if username is already taken
-  const { rowCount } = await db.query(
-    "SELECT 1 FROM users WHERE username = $1",
-    [username],
-  );
-
-  if (rowCount > 0) {
-    return res.status(400).json({
-      success: false,
-      message: "Username is already taken.",
-    });
-  }
 
   const randomPassword = crypto.randomBytes(32).toString("hex");
   const hashedPassword = await bcrypt.hash(
