@@ -7,9 +7,9 @@ import {
 import { validateArticleData } from "../utils/validation.utils.js";
 
 export const getApprovedArticles = async (req, res) => {
-  const { category, page = "1", limit = "9" } = req.query || {};
-  const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
-  const limitNumber = Math.min(Math.max(parseInt(limit, 10) || 9, 1), 30);
+  const { category } = req.query;
+  const pageNumber = Math.max(parseInt(req.query.page) || 1, 1);
+  const limitNumber = Math.min(Math.max(parseInt(req.query.limit) || 9, 1), 45);
   const offset = (pageNumber - 1) * limitNumber;
 
   let query = `
