@@ -8,9 +8,9 @@ export async function requireArticleOwner(req, res, next) {
 
   const { rows, rowCount } = await db.query(
     `
-      SELECT article_id, author_id, image_url, image_public_id
+      SELECT author_id, image_url, image_public_id
       FROM articles
-      WHERE article_id = $1
+      WHERE id = $1
     `,
     [articleId],
   );

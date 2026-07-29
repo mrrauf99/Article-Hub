@@ -71,7 +71,7 @@ authRoutes.post("/logout", (req, res) => {
 
   res.json({
     success: true,
-    message: "Logout successful",
+    message: "Logout successful.",
   });
 });
 

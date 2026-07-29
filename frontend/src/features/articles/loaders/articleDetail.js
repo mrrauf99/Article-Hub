@@ -1,8 +1,8 @@
 import { apiClient } from "../../api/apiClient";
 
 export default async function articleDetailLoader({ params, request }) {
-  const { id, article_id } = params;
-  const articleId = id || article_id;
+  const { id } = params;
+  const articleId = id;
 
   const url = new URL(request?.url || window.location.href);
   const isAdminRoute = url.pathname.startsWith("/admin/");
