@@ -120,9 +120,8 @@ import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
 
 import "./index.css";
 
-export default function App() {
-  const router = createBrowserRouter([
-    /* ---------- PUBLIC ---------- */
+const router = createBrowserRouter([
+  /* ---------- PUBLIC ---------- */
     {
       id: "public-layout",
       element: <PublicLayout />,
@@ -385,5 +384,6 @@ export default function App() {
     },
   ]);
 
+export default function App() {
   return <RouterProvider router={router} />;
 }

@@ -82,7 +82,7 @@ export default function ArticlesTable({
               ) : (
                 articles.map((article) => (
                   <tr
-                    key={article.article_id}
+                    key={article.id}
                     className="hover:bg-slate-50 transition-colors"
                   >
                     <td className="px-4 sm:px-6 py-3 sm:py-4 max-w-[300px]">
@@ -137,7 +137,7 @@ export default function ArticlesTable({
                             tooltip="Approve"
                             onClick={() => onApprove(article)}
                             disabled={getLoadingAction(
-                              article.article_id,
+                              article.id,
                             )?.startsWith("approve")}
                             variant="emerald"
                           />

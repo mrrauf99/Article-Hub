@@ -11,29 +11,21 @@ export default async function updateProfileAction({ request }) {
   if (hasAvatar) {
     const multipartData = new FormData();
     multipartData.append("avatar", avatarFile);
-      multipartData.append("name", formData.get("name") || "");
-      multipartData.append("expertise", formData.get("expertise") || "");
-      multipartData.append("bio", formData.get("bio") || "");
-      multipartData.append("gender", formData.get("gender") || "");
-      multipartData.append("country", formData.get("country") || "");
-      multipartData.append(
-        "portfolio_url",
-        formData.get("portfolio_url") || ""
-      );
-      multipartData.append("x_url", formData.get("x_url") || "");
-      multipartData.append("linkedin_url", formData.get("linkedin_url") || "");
-      multipartData.append("facebook_url", formData.get("facebook_url") || "");
-      multipartData.append(
-        "instagram_url",
-        formData.get("instagram_url") || ""
-      );
+    multipartData.append("name", formData.get("name") || "");
+    multipartData.append("expertise", formData.get("expertise") || "");
+    multipartData.append("bio", formData.get("bio") || "");
+    multipartData.append("gender", formData.get("gender") || "");
+    multipartData.append("country", formData.get("country") || "");
+    multipartData.append("portfolio_url", formData.get("portfolio_url") || "");
+    multipartData.append("x_url", formData.get("x_url") || "");
+    multipartData.append("linkedin_url", formData.get("linkedin_url") || "");
+    multipartData.append("facebook_url", formData.get("facebook_url") || "");
+    multipartData.append("instagram_url", formData.get("instagram_url") || "");
 
     try {
-      const res = await apiClient.patch("user/profile", multipartData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // Do NOT set Content-Type manually — Axios auto-sets multipart/form-data
+      // with the correct boundary when a FormData body is provided.
+      const res = await apiClient.patch("user/profile", multipartData);
 
       return {
         success: true,

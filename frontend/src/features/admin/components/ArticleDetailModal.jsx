@@ -174,7 +174,7 @@ export default function ArticleDetailModal({
         {/* Modal Footer */}
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
           <a
-            href={`/admin/articles/${article.article_id}`}
+            href={`/admin/articles/${article.id}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 shadow-lg shadow-indigo-500/25 transition-all hover:shadow-indigo-500/40"
@@ -205,7 +205,7 @@ export default function ArticleDetailModal({
                     setRejectReason("");
                     return;
                   }
-                  onReject(article.article_id);
+                  onReject(article.id);
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:from-rose-600 hover:to-pink-600 shadow-lg shadow-rose-500/25 transition-all hover:shadow-rose-500/40"
               >
@@ -253,7 +253,7 @@ export default function ArticleDetailModal({
             reasonRequired
             onReasonChange={setRejectReason}
             onConfirm={() => {
-              onReject(article.article_id, rejectReason);
+              onReject(article.id, rejectReason);
               setShowRejectConfirm(false);
               setRejectReason("");
               onClose();

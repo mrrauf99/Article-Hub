@@ -14,7 +14,7 @@ export const getApprovedArticles = async (req, res) => {
 
   let query = `
       SELECT
-        a.article_id,
+        a.id,
         a.author_id,
         a.title,
         a.introduction,
@@ -40,7 +40,7 @@ export const getApprovedArticles = async (req, res) => {
     values.length + 2
   }`;
 
-  const totalCountQuery = await db.query(
+  const totalCountQuery = db.query(
     `
       SELECT COUNT(*)::int AS count
       FROM articles a
@@ -50,35 +50,49 @@ export const getApprovedArticles = async (req, res) => {
     category ? [category] : [],
   );
 
-  const overallCountQuery = await db.query(`
+  const overallCountQuery = db.query(`
       SELECT COUNT(*)::int AS count
       FROM articles
       WHERE status = 'approved'
     `);
 
-  const authorCountQuery = await db.query(`
+  const authorCountQuery = db.query(`
       SELECT COUNT(DISTINCT author_id)::int AS count
       FROM articles
       WHERE status = 'approved'
     `);
 
-  const categoryCountsQuery = await db.query(`
+  const categoryCountsQuery = db.query(`
       SELECT category, COUNT(*)::int AS count
       FROM articles
       WHERE status = 'approved'
       GROUP BY category
     `);
 
-  const { rows } = await db.query(query, [...values, limitNumber, offset]);
+  const articlesQuery = db.query(query, [...values, limitNumber, offset]);
 
-  const totalCount = totalCountQuery.rows[0]?.count || 0;
-  const overallCount = overallCountQuery.rows[0]?.count || 0;
-  const authorCount = authorCountQuery.rows[0]?.count || 0;
+  const [
+    totalCountResult,
+    overallCountResult,
+    authorCountResult,
+    categoryCountResult,
+    articlesResult,
+  ] = await Promise.all([
+    totalCountQuery,
+    overallCountQuery,
+    authorCountQuery,
+    categoryCountsQuery,
+    articlesQuery,
+  ]);
+
+  const totalCount = totalCountResult.rows[0]?.count || 0;
+  const overallCount = overallCountResult.rows[0]?.count || 0;
+  const authorCount = authorCountResult.rows[0]?.count || 0;
 
   return res.status(200).json({
     success: true,
     data: {
-      articles: rows,
+      articles: articlesResult.rows,
       pagination: {
         page: pageNumber,
         limit: limitNumber,
@@ -88,7 +102,7 @@ export const getApprovedArticles = async (req, res) => {
       meta: {
         overallCount,
         authorCount,
-        categoryCounts: categoryCountsQuery.rows,
+        categoryCounts: categoryCountResult.rows,
       },
     },
   });
@@ -98,7 +112,7 @@ export const getMyArticles = async (req, res) => {
   const { rows } = await db.query(
     `
       SELECT
-        a.article_id,
+        a.id,
         a.title,
         a.summary,
         a.category,
@@ -124,7 +138,7 @@ export const getArticleById = async (req, res) => {
   const { rows } = await db.query(
     `
       SELECT
-        a.article_id,
+        a.id,
         a.title,
         a.introduction,
         a.content,
@@ -132,12 +146,12 @@ export const getArticleById = async (req, res) => {
         a.category,
         a.status,
         a.published_at,
-        a.image_url as "imageUrl",
+        a.image_url,
         a.views,
         u.name AS author_name
       FROM articles a
       JOIN users u ON u.id = a.author_id
-      WHERE a.article_id = $1
+      WHERE a.id = $1
         AND (
           a.status = 'approved'
           OR a.author_id = $2
@@ -174,7 +188,7 @@ export const createArticle = async (req, res) => {
   if (validationErrors.length > 0) {
     return res.status(422).json({
       success: false,
-      message: validationErrors.join(", "),
+      errors: validationErrors,
     });
   }
 
@@ -197,7 +211,7 @@ export const createArticle = async (req, res) => {
       INSERT INTO articles
       (title, introduction, content, summary, category, image_url, image_public_id, author_id)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING article_id
+      RETURNING id
       `,
     [
       title,
@@ -214,7 +228,7 @@ export const createArticle = async (req, res) => {
   res.status(201).json({
     success: true,
     message: "Article submitted for approval.",
-    articleId: rows[0].article_id,
+    articleId: rows[0].id,
   });
 };
 
@@ -235,7 +249,7 @@ export const updateArticle = async (req, res) => {
   if (validationErrors.length > 0) {
     return res.status(422).json({
       success: false,
-      message: validationErrors.join(", "),
+      errors: validationErrors,
     });
   }
 
@@ -254,12 +268,10 @@ export const updateArticle = async (req, res) => {
     const oldImagePublicId = article.image_public_id;
 
     // Delete old image after successful update
-    if (oldImagePublicId) {
-      try {
-        await deleteImageFromCloudinary(oldImagePublicId);
-      } catch (error) {
-        console.error("Failed to delete old Cloudinary image:", error);
-      }
+    try {
+      await deleteImageFromCloudinary(oldImagePublicId);
+    } catch (error) {
+      console.error("Failed to delete old Cloudinary image:", error);
     }
   }
 
@@ -276,7 +288,7 @@ export const updateArticle = async (req, res) => {
         image_public_id = $7,
         status = 'pending',
         published_at = NULL
-      WHERE article_id = $8
+      WHERE id = $8
       `,
     [
       title,
@@ -303,7 +315,7 @@ export const deleteArticle = async (req, res) => {
   // Delete the article from database
   await db.query(
     `DELETE FROM articles
-       WHERE article_id = $1`,
+       WHERE id = $1`,
     [articleId],
   );
 
@@ -311,12 +323,10 @@ export const deleteArticle = async (req, res) => {
 
   // Delete image from Cloudinary
 
-  if (imagePublicId) {
-    try {
-      await deleteImageFromCloudinary(imagePublicId);
-    } catch (error) {
-      console.error("Failed to delete old Cloudinary image:", error);
-    }
+  try {
+    await deleteImageFromCloudinary(imagePublicId);
+  } catch (error) {
+    console.error("Failed to delete old Cloudinary image:", error);
   }
 
   res.json({ success: true, message: "Article deleted." });
@@ -326,39 +336,20 @@ export const incrementArticleViews = async (req, res) => {
   const { articleId } = req.params;
   const userId = req.user?.userId;
 
-  const { rows, rowCount } = await db.query(
+  const { rowCount } = await db.query(
     `
-      SELECT author_id
-      FROM articles
-      WHERE article_id = $1
-      AND status = 'approved'
+    UPDATE articles SET views = views + 1 WHERE id = $1 
+    AND status = 'approved' AND author_id != $2 RETURNING id
     `,
-    [articleId],
+    [articleId, userId],
   );
 
   if (rowCount === 0) {
     return res.status(404).json({
       success: false,
-      message: "Article not found.",
+      message: "Article not found or view not counted.",
     });
   }
-
-  // Don't count the author's own view
-  if (userId && rows[0].author_id === userId) {
-    return res.json({
-      success: true,
-      message: "View not counted for article author.",
-    });
-  }
-
-  await db.query(
-    `
-      UPDATE articles
-      SET views = COALESCE(views, 0) + 1
-      WHERE article_id = $1
-    `,
-    [articleId],
-  );
 
   return res.json({
     success: true,

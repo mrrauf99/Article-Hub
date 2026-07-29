@@ -116,7 +116,7 @@ export default function ArticlesGrid({
             items={articles}
             renderItem={(article, index) => (
               <ScrollReveal
-                key={`${article.article_id}-${safePage}`}
+                key={`${article.id}-${safePage}`}
                 animation="fade-up"
                 delay={index * 50}
                 duration={350}
@@ -172,10 +172,10 @@ export default function ArticlesGrid({
 function ArticleCard({ article }) {
   return (
     <Link
-      to={`/articles/${article.article_id}`}
+      to={`/articles/${article.id}`}
       draggable
       onDragStart={(e) => {
-        const url = `${window.location.origin}/articles/${article.article_id}`;
+        const url = `${window.location.origin}/articles/${article.id}`;
         e.dataTransfer.setData("text/uri-list", url);
         e.dataTransfer.setData("text/plain", url);
       }}

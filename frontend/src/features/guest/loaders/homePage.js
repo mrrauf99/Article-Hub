@@ -9,14 +9,18 @@ import { authApi } from "@/features/api/authApi.js";
  * forcing them to login again with new role
  */
 export default async function homePageLoader({ request }) {
-  try {
-    const { data } = await authApi.session();
-    if (data.success && data.role) {
-      return redirectToDashboard(data.role);
-    }
-  } catch {
-    // Not authenticated - continue to load articles
+  const [sessionResult, articlesResult] = await Promise.allSettled([
+    authApi.session(),
+    publicArticlesLoader({ request }),
+  ]);
+
+  if (sessionResult.status === "fulfilled" && sessionResult.value?.data?.success && sessionResult.value?.data?.role) {
+    return redirectToDashboard(sessionResult.value.data.role);
   }
 
-  return publicArticlesLoader({ request });
+  if (articlesResult.status === "fulfilled") {
+    return articlesResult.value;
+  }
+
+  throw new Response("Failed to load articles", { status: 500 });
 }

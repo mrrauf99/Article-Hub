@@ -45,7 +45,7 @@ export default function FeaturedArticles({ articles }) {
             {/* Main Featured Article */}
             <ScrollReveal animation="fade-right" delay={100} duration={700}>
               <Link
-                to={`/articles/${main.article_id}`}
+                to={`/articles/${main.id}`}
                 className="group relative rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-500 block"
               >
                 <div className="aspect-[16/10] overflow-hidden">
@@ -88,13 +88,13 @@ export default function FeaturedArticles({ articles }) {
             <div className="flex flex-col gap-4 sm:gap-6">
               {rest.map((article, index) => (
                 <ScrollReveal
-                  key={article.article_id}
+                  key={article.id}
                   animation="fade-left"
                   delay={200 + index * 150}
                   duration={600}
                 >
                   <Link
-                    to={`/articles/${article.article_id}`}
+                    to={`/articles/${article.id}`}
                     className="group flex gap-4 sm:gap-5 bg-white rounded-xl p-3 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300"
                   >
                     <div className="w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-lg overflow-hidden">

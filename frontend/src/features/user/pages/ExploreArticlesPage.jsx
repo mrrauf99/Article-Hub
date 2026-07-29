@@ -290,7 +290,7 @@ export default function ExploreArticlesPage() {
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {paginatedArticles.map((article) => (
               <ArticleCard
-                key={article.article_id}
+                key={article.id}
                 article={article}
                 mode="guest"
               />

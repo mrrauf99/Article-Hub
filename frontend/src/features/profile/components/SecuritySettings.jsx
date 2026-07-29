@@ -164,7 +164,6 @@ export default function SecuritySettings() {
       const { data } = await userApi.changePassword({
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
-        confirmPassword: passwordForm.confirmPassword,
       });
 
       setPasswordMessage({ success: data.success, message: data.message });
@@ -241,7 +240,7 @@ export default function SecuritySettings() {
     setVerifyLoading(true);
 
     try {
-      const { data } = await userApi.twoFactorVerify({ token: setupToken });
+      const { data } = await userApi.twoFactorVerify({ code: setupToken });
       setSetupMessage({ success: data.success, message: data.message });
       if (data.success) {
         setTwoFactorEnabled(true);
@@ -283,7 +282,7 @@ export default function SecuritySettings() {
     try {
       const { data } = await userApi.twoFactorDisable({
         password: disablePassword,
-        token: disableToken,
+        code: disableToken,
       });
       setDisableMessage({ success: data.success, message: data.message });
       if (data.success) {

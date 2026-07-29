@@ -156,7 +156,7 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
               ) : (
                 recentArticles.map((article) => (
                   <div
-                    key={article.article_id}
+                    key={article.id}
                     className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-slate-50 transition-colors"
                   >
                     <div className="flex items-start gap-2 sm:gap-3">
