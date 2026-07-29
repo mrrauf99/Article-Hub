@@ -16,7 +16,6 @@ import {
   validateSignupData,
 } from "../utils/validation.utils.js";
 
-const OTP_HASH_ROUNDS = process.env.SALT_ROUNDS;
 const MAX_VERIFY_ATTEMPTS = 5;
 const MAX_RESEND_COUNT = 3;
 
@@ -188,10 +187,12 @@ export async function verifyOtp(req, res) {
       user: req.user,
       auth: { ...req.auth, attempts: newAttempts, originalOtp },
     };
+
     const newToken = generateToken(updatedPayload, "5m");
     const cookieName =
       req.type === "signup" ? COOKIE_NAMES.SIGNUP : COOKIE_NAMES.PASSWORD_RESET;
     setCookie(res, cookieName, newToken, 5 * 60 * 1000);
+
     return res.status(400).json({
       success: false,
       message: `Invalid code. ${remaining} attempt(s) remaining.`,
@@ -477,7 +478,10 @@ export async function googleOAuthCallback(req, res) {
 
   // Existing user
   if (user.id) {
-    const token = generateToken({ type: "access", user }, "7d");
+    const token = generateToken(
+      { type: "access", user: { userId: user.id, role: user.role } },
+      "7d",
+    );
     setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
 
     // Redirect based on role

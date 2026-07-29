@@ -37,7 +37,7 @@ export async function getUserStats(req, res) {
 
   const { rows } = await db.query(
     `
-      SELECT COUNT(article_id)::int AS articles,
+      SELECT COUNT(id)::int AS articles,
       COALESCE(SUM(views), 0)::int AS views
       FROM articles WHERE author_id = $1
     `,
@@ -162,14 +162,16 @@ export async function updateUserProfile(req, res) {
   UPDATE users
   SET ${fields.join(",\n      ")}
   WHERE id = $${values.length}
-  RETURNING id;
+  RETURNING id, name, expertise, bio, avatar_url, portfolio_url, x_url,
+            linkedin_url, facebook_url, instagram_url, gender, country;
 `;
 
-  await db.query(query, values);
+  const { rows: updated } = await db.query(query, values);
 
   return res.json({
     success: true,
     message: "Profile updated successfully.",
+    data: updated[0],
   });
 }
 
@@ -264,7 +266,7 @@ export async function startTwoFactorSetup(req, res) {
 
   const qrCodeDataUrl = await qrcode.toDataURL(secret.otpauth_url);
 
-  await db.query("UPDATE USERS SET two_factor_secret = $1 WHERE id = $2", [
+  await db.query("UPDATE users SET two_factor_secret = $1 WHERE id = $2", [
     secret.base32,
     userId,
   ]);

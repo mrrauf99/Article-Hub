@@ -1,4 +1,4 @@
-import { useNavigation, useLoaderData, useSubmit } from "react-router-dom";
+import { useNavigation, useLoaderData, useSubmit, useActionData } from "react-router-dom";
 import { useNewArticleForm } from "../hooks/useNewArticleForm.js";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import {
@@ -34,6 +34,22 @@ export default function CreateArticlePage() {
     validateForm,
   } = useNewArticleForm(data?.article);
 
+  const actionData = useActionData();
+  const serverErrors = {};
+  if (actionData?.errors) {
+    actionData.errors.forEach(err => {
+      const lower = err.toLowerCase();
+      if (lower.includes("title")) serverErrors.title = err;
+      else if (lower.includes("introduction")) serverErrors.introduction = err;
+      else if (lower.includes("content")) serverErrors.content = err;
+      else if (lower.includes("summary")) serverErrors.summary = err;
+      else if (lower.includes("category")) serverErrors.category = err;
+      else if (lower.includes("image")) serverErrors.image = err;
+    });
+  }
+  
+  const displayErrors = { ...errors, ...serverErrors };
+
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const isEditing = !!data?.article;
@@ -63,7 +79,7 @@ export default function CreateArticlePage() {
     }
 
     submit(submitData, {
-      method: "post",
+      method: isEditing ? "patch" : "post",
       encType: "multipart/form-data",
     });
   };
@@ -120,7 +136,7 @@ export default function CreateArticlePage() {
                     value={formData.title}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={errors.title}
+                    error={displayErrors.title}
                     placeholder="Enter a captivating title..."
                     icon={<Type className="w-4 h-4" />}
                     maxLength={150}
@@ -134,7 +150,7 @@ export default function CreateArticlePage() {
                     value={formData.category}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={errors.category}
+                    error={displayErrors.category}
                     options={categories}
                     placeholder="Select a category"
                     icon={<FolderOpen className="w-4 h-4" />}
@@ -163,7 +179,7 @@ export default function CreateArticlePage() {
                   value={formData.introduction}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={errors.introduction}
+                  error={displayErrors.introduction}
                   placeholder="Hook your readers with an engaging introduction..."
                   maxLength={1000}
                   charCount={charCounts.introduction}
@@ -178,7 +194,7 @@ export default function CreateArticlePage() {
                   value={formData.content}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={errors.content}
+                  error={displayErrors.content}
                   placeholder="Share your insights, ideas, and knowledge..."
                   maxLength={100000}
                   charCount={charCounts.content}
@@ -193,7 +209,7 @@ export default function CreateArticlePage() {
                   value={formData.summary}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={errors.summary}
+                  error={displayErrors.summary}
                   placeholder="Wrap up with key takeaways..."
                   maxLength={500}
                   charCount={charCounts.summary}
@@ -220,7 +236,7 @@ export default function CreateArticlePage() {
                   id="image"
                   name="image"
                   onChange={handleImageChange}
-                  error={errors.image}
+                  error={displayErrors.image}
                   imageFile={formData.imageFile}
                   imageUrl={formData.imageUrl}
                 />
