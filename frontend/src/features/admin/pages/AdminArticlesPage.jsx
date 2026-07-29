@@ -97,7 +97,7 @@ export default function AdminArticlesPage() {
     fetcher.submit(
       {
         intent: "delete",
-        articleId: confirmDelete.article_id,
+        articleId: confirmDelete.id,
         reason: deleteReason,
       },
       { method: "post" },
@@ -107,7 +107,7 @@ export default function AdminArticlesPage() {
   const handleApprove = () => {
     if (!confirmApprove) return;
     fetcher.submit(
-      { intent: "approve", articleId: confirmApprove.article_id },
+      { intent: "approve", articleId: confirmApprove.id },
       { method: "post" },
     );
   };
@@ -117,7 +117,7 @@ export default function AdminArticlesPage() {
     fetcher.submit(
       {
         intent: "reject",
-        articleId: confirmReject.article_id,
+        articleId: confirmReject.id,
         reason: rejectReason,
       },
       { method: "post" },
@@ -194,7 +194,7 @@ export default function AdminArticlesPage() {
         onApprove={(article) => setConfirmApprove(article)}
         onReject={(article) => {
           setConfirmReject({
-            article_id: article.article_id,
+            id: article.id,
             title: article.title,
           });
           setRejectReason("");
@@ -224,7 +224,7 @@ export default function AdminArticlesPage() {
             setSelectedArticle(null);
           }}
           onReject={(id) => {
-            setConfirmReject({ article_id: id, title: selectedArticle?.title });
+            setConfirmReject({ id, title: selectedArticle?.title });
             setRejectReason("");
             setSelectedArticle(null);
           }}

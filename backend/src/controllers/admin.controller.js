@@ -5,13 +5,13 @@ import { sendArticleStatusEmail } from "../services/email.service.js";
 async function fetchArticleAuthorDetails(articleId) {
   const { rows } = await db.query(
     `SELECT
-      a.article_id,
+      a.id,
       a.title,
       u.name AS author_name,
       u.email AS author_email
      FROM articles a
      JOIN users u ON u.id = a.author_id
-     WHERE a.article_id = $1`,
+     WHERE a.id = $1`,
     [articleId],
   );
 
@@ -19,7 +19,7 @@ async function fetchArticleAuthorDetails(articleId) {
 }
 
 async function fetchDashboardStats() {
-  const statsQuery = await db.query(`
+  const { rows } = await db.query(`
     SELECT
       (SELECT COUNT(*) FROM users WHERE role = 'user') AS total_users,
       (SELECT COUNT(*) FROM users WHERE role = 'admin') AS total_admins,
@@ -30,13 +30,13 @@ async function fetchDashboardStats() {
       (SELECT COALESCE(SUM(views), 0) FROM articles) AS total_views
   `);
 
-  return statsQuery.rows[0];
+  return rows[0];
 }
 
 async function fetchRecentActivity() {
   const recentArticles = await db.query(`
     SELECT
-      a.article_id,
+      a.id,
       a.title,
       a.status,
       a.created_at,
@@ -125,7 +125,7 @@ export const getArticles = async (req, res) => {
 
   const articlesQuery = await db.query(
     `SELECT
-        a.article_id,
+        a.id,
         a.title,
         a.summary,
         a.category,
@@ -170,14 +170,14 @@ export const getArticleDetails = async (req, res) => {
         u.avatar_url AS author_avatar
        FROM articles a
        JOIN users u ON u.id = a.author_id
-       WHERE a.article_id = $1`,
+       WHERE a.id = $1`,
     [articleId],
   );
 
   if (!rows.length) {
     return res
       .status(404)
-      .json({ success: false, message: "Article not found" });
+      .json({ success: false, message: "Article not found." });
   }
 
   res.json({ success: true, data: rows[0] });
@@ -186,7 +186,7 @@ export const getArticleDetails = async (req, res) => {
 export const getPendingArticles = async (req, res) => {
   const { rows } = await db.query(
     `SELECT
-        a.article_id,
+        a.id,
         a.title,
         a.created_at,
         u.name AS author_name
@@ -206,14 +206,14 @@ export const approveArticle = async (req, res) => {
     `UPDATE articles
        SET status = 'approved',
            published_at = NOW()
-       WHERE article_id = $1`,
+       WHERE id = $1 AND status != 'approved'`,
     [articleId],
   );
 
   if (!rowCount) {
     return res.status(404).json({
       success: false,
-      message: "Article not found",
+      message: "Article not found.",
     });
   }
 
@@ -222,7 +222,7 @@ export const approveArticle = async (req, res) => {
   if (!authorDetails) {
     return res.status(404).json({
       success: false,
-      message: "Article not found",
+      message: "Article not found.",
     });
   }
 
@@ -233,7 +233,7 @@ export const approveArticle = async (req, res) => {
     status: "approved",
   });
 
-  res.json({ success: true, message: "Article approved" });
+  res.json({ success: true, message: "Article approved." });
 };
 
 export const rejectArticle = async (req, res) => {
@@ -243,7 +243,7 @@ export const rejectArticle = async (req, res) => {
   if (!reason) {
     return res.status(400).json({
       success: false,
-      message: "Rejection reason is required",
+      message: "Rejection reason is required.",
     });
   }
 
@@ -251,14 +251,14 @@ export const rejectArticle = async (req, res) => {
     `UPDATE articles
        SET status = 'rejected',
            published_at = NULL
-       WHERE article_id = $1`,
+       WHERE id = $1 AND status != 'rejected'`,
     [articleId],
   );
 
   if (!rowCount) {
     return res.status(404).json({
       success: false,
-      message: "Article not found",
+      message: "Article not found.",
     });
   }
 
@@ -267,7 +267,7 @@ export const rejectArticle = async (req, res) => {
   if (!authorDetails) {
     return res.status(404).json({
       success: false,
-      message: "Article not found",
+      message: "Article not found.",
     });
   }
 
@@ -279,7 +279,7 @@ export const rejectArticle = async (req, res) => {
     reason,
   });
 
-  res.json({ success: true, message: "Article rejected" });
+  res.json({ success: true, message: "Article rejected." });
 };
 
 export const deleteArticle = async (req, res) => {
@@ -289,12 +289,12 @@ export const deleteArticle = async (req, res) => {
   if (!reason) {
     return res.status(400).json({
       success: false,
-      message: "Deletion reason is required",
+      message: "Deletion reason is required.",
     });
   }
 
-  // First, get the article to fetch image URL before deletion
-  const articleQuery = await db.query(
+  // First, get the article to fetch image_public_id
+  const { rows } = await db.query(
     `SELECT
         a.image_public_id,
         a.title,
@@ -302,32 +302,30 @@ export const deleteArticle = async (req, res) => {
         u.email AS author_email
        FROM articles a
        JOIN users u ON u.id = a.author_id
-       WHERE a.article_id = $1`,
+       WHERE a.id = $1`,
     [articleId],
   );
 
-  if (articleQuery.rows.length === 0) {
+  if (rows.length === 0) {
     return res.status(404).json({
       success: false,
-      message: "Article not found",
+      message: "Article not found.",
     });
   }
 
-  const article = articleQuery.rows[0];
+  // Delete the article from database
+  await db.query(`DELETE FROM articles WHERE id = $1`, [articleId]);
+
+  const article = rows[0];
   const imagePublicId = article.image_public_id;
 
-  // Delete image from Cloudinary if it exists (before database deletion)
-  if (imagePublicId) {
-    try {
-      await deleteImageFromCloudinary(imagePublicId);
-    } catch (deleteErr) {
-      // Log error but don't fail the request if deletion fails
-      console.error("Failed to delete image from Cloudinary:", deleteErr);
-    }
+  // Delete image from Cloudinary if it exists
+  try {
+    await deleteImageFromCloudinary(imagePublicId);
+  } catch (deleteErr) {
+    // Log error but don't fail the request if deletion fails
+    console.error("Failed to delete image from Cloudinary:", deleteErr);
   }
-
-  // Delete the article from database
-  await db.query(`DELETE FROM articles WHERE article_id = $1`, [articleId]);
 
   await sendArticleStatusEmail({
     to: article.author_email,
@@ -337,7 +335,7 @@ export const deleteArticle = async (req, res) => {
     reason,
   });
 
-  res.json({ success: true, message: "Article deleted successfully" });
+  res.json({ success: true, message: "Article deleted successfully." });
 };
 
 export const getUsers = async (req, res) => {
@@ -407,11 +405,11 @@ export const getUserDetails = async (req, res) => {
   );
 
   if (!userQuery.rows.length) {
-    return res.status(404).json({ success: false, message: "User not found" });
+    return res.status(404).json({ success: false, message: "User not found." });
   }
 
   const articlesQuery = await db.query(
-    `SELECT article_id, title, status, created_at, views
+    `SELECT id, title, status, created_at, views
        FROM articles WHERE author_id = $1
        ORDER BY created_at DESC`,
     [userId],
@@ -453,7 +451,7 @@ export const updateUserRole = async (req, res) => {
     return res.status(404).json({ success: false, message: "User not found." });
   }
 
-  res.json({ success: true, message: `User role updated to ${role}` });
+  res.json({ success: true, message: `User role updated to ${role}.` });
 };
 
 export const deleteUser = async (req, res) => {
@@ -488,18 +486,20 @@ export const deleteUser = async (req, res) => {
   );
 
   // Delete article images from Cloudinary
-  for (const article of articles) {
-    if (article.image_public_id) {
-      try {
-        await deleteImageFromCloudinary(article.image_public_id);
-      } catch (deleteErr) {
-        console.error(
-          "Failed to delete article image from Cloudinary:",
-          deleteErr,
-        );
-      }
+  const deleteResults = await Promise.allSettled(
+    articles.map((article) =>
+      deleteImageFromCloudinary(article.image_public_id),
+    ),
+  );
+
+  deleteResults.forEach((result) => {
+    if (result.status === "rejected") {
+      console.error(
+        "Failed to delete article image from Cloudinary:",
+        result.reason,
+      );
     }
-  }
+  });
 
   // delete the user
   await db.query(`DELETE FROM users WHERE id = $1`, [userId]);
@@ -515,5 +515,5 @@ export const deleteUser = async (req, res) => {
     }
   }
 
-  res.json({ success: true, message: "User deleted successfully" });
+  res.json({ success: true, message: "User deleted successfully." });
 };

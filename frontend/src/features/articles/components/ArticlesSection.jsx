@@ -89,7 +89,7 @@ export default function ArticlesSection({
           items={paginatedArticles}
           renderItem={(article) => (
             <ArticleCard
-              key={article.article_id}
+              key={article.id}
               article={article}
               mode={mode}
               onDelete={onDelete}

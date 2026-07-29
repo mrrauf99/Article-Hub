@@ -26,7 +26,7 @@ const VALID_GENDERS = ["male", "female", "other", "prefer_not_to_say"];
 // This makes character counting consistent across platforms.
 function normalizeText(value) {
   if (typeof value !== "string") {
-    return value;
+    return "";
   }
 
   return value.replace(/\r\n/g, "\n").trim();
@@ -76,13 +76,13 @@ export function validateEmail(email) {
   const value = normalizeText(email);
 
   if (!value) {
-    return "Email is required";
+    return "Email is required.";
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailRegex.test(value)) {
-    return "Invalid email format";
+    return "Invalid email format.";
   }
 
   return null;
@@ -169,7 +169,7 @@ export function validateProfileData(data) {
 
   if (data.gender !== undefined && normalizeText(data.gender) !== "") {
     if (!VALID_GENDERS.includes(data.gender.toLowerCase())) {
-      errors.push(`Gender must be one of: ${VALID_GENDERS.join(", ")}`);
+      errors.push(`Gender must be one of: ${VALID_GENDERS.join(", ")}.`);
     }
   }
 
@@ -185,7 +185,7 @@ export function validateProfileData(data) {
     const value = normalizeText(data[field]);
 
     if (value && !isValidUrl(value)) {
-      errors.push(`${field.replace(/_/g, " ")} must be a valid URL`);
+      errors.push(`${field.replace(/_/g, " ")} must be a valid URL.`);
     }
   }
 

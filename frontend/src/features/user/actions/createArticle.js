@@ -21,6 +21,7 @@ export default async function createArticleAction({ request, params }) {
     return {
       success: false,
       message: err.response?.data?.message || "Failed to save article",
+      errors: err.response?.data?.errors || [],
     };
   }
 }
