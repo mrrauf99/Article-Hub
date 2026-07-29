@@ -15,12 +15,12 @@ function ArticleCard({ article, mode, onDelete }) {
   const [deleteError, setDeleteError] = useState(null);
 
   const openArticle = () => {
-    navigate(`/user/articles/${article.article_id}`);
+    navigate(`/user/articles/${article.id}`);
   };
 
   const handleEdit = (e) => {
     e.stopPropagation();
-    navigate(`/user/articles/${article.article_id}/edit`);
+    navigate(`/user/articles/${article.id}/edit`);
   };
 
   const handleDelete = (e) => {
@@ -33,11 +33,11 @@ function ArticleCard({ article, mode, onDelete }) {
     setIsDeleting(true);
     setDeleteError(null);
     try {
-      await userApi.deleteArticle(article.article_id);
+      await userApi.deleteArticle(article.id);
 
       // Call the onDelete callback if provided
       if (onDelete) {
-        onDelete(article.article_id);
+        onDelete(article.id);
       }
       setIsDeleteModalOpen(false);
     } catch (error) {
@@ -64,7 +64,7 @@ function ArticleCard({ article, mode, onDelete }) {
         onClick={openArticle}
         draggable
         onDragStart={(e) => {
-          const url = `${window.location.origin}/user/articles/${article.article_id}`;
+          const url = `${window.location.origin}/user/articles/${article.id}`;
           e.dataTransfer.setData("text/uri-list", url);
           e.dataTransfer.setData("text/plain", url);
         }}

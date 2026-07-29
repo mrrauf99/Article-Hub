@@ -9,7 +9,7 @@ export default async function editArticleLoader({ params }) {
   }
 
   try {
-    const { data } = await apiClient.get(`articles/${id}`);
+    const { data } = await apiClient.get(`articles/me/${id}`);
 
     return {
       article: data.data,

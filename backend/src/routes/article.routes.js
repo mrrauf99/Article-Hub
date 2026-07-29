@@ -25,7 +25,7 @@ articleRoutes.get("/me", authenticate(COOKIE_NAMES.ACCESS), getMyArticles);
 articleRoutes.get("/:articleId", getArticleById);
 
 // For user (approved , rejected, pending article)
-articleRoutes.get("/me/:articleId", authenticate(COOKIE_NAMES.ACCESS), getArticleById);
+articleRoutes.get("/me/:articleId", authenticate(COOKIE_NAMES.ACCESS), requireArticleOwner, getArticleById);
 
 // Increment views
 articleRoutes.post("/:articleId/view", incrementArticleViews);

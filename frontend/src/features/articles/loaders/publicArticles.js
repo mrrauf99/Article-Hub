@@ -26,17 +26,13 @@ export default async function publicArticlesLoader(args) {
       const totalPages = firstData.pagination?.totalPages || 1;
 
       if (totalPages > 1) {
-        const pageRequests = Array.from({ length: totalPages - 1 }, (_, i) =>
-          apiClient.get("articles", {
-            params: { page: i + 2, limit: MAX_LIMIT },
-          }),
-        );
-
-        const responses = await Promise.all(pageRequests);
-        responses.forEach((response) => {
+        for (let i = 2; i <= totalPages; i++) {
+          const response = await apiClient.get("articles", {
+            params: { page: i, limit: MAX_LIMIT },
+          });
           const pageArticles = response.data?.data?.articles || [];
           articles.push(...pageArticles);
-        });
+        }
       }
 
       const normalized = articles.map((article) => ({
@@ -46,7 +42,7 @@ export default async function publicArticlesLoader(args) {
 
       const deduped = Array.from(
         new Map(
-          normalized.map((article) => [article.article_id, article]),
+          normalized.map((article) => [article.id, article]),
         ).values(),
       );
 

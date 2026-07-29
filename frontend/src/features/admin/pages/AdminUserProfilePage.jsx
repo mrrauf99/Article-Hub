@@ -120,7 +120,7 @@ export default function AdminUserProfilePage() {
   const handleArticleClick = async (article) => {
     setArticleLoading(true);
     try {
-      const response = await adminApi.getArticleDetails(article.article_id);
+      const response = await adminApi.getArticleDetails(article.id);
       setSelectedArticle(response.data.data);
     } catch (error) {
       console.error("Failed to load article details:", error);
@@ -136,7 +136,7 @@ export default function AdminUserProfilePage() {
   const handleApprove = () => {
     if (!confirmApprove) return;
     fetcher.submit(
-      { intent: "approve", articleId: confirmApprove.article_id },
+      { intent: "approve", articleId: confirmApprove.id },
       { method: "post", action: "/admin/articles" },
     );
     setConfirmApprove(null);
@@ -147,7 +147,7 @@ export default function AdminUserProfilePage() {
     fetcher.submit(
       {
         intent: "reject",
-        articleId: confirmReject.article_id,
+        articleId: confirmReject.id,
         reason: rejectReason,
       },
       { method: "post", action: "/admin/articles" },
@@ -325,7 +325,7 @@ export default function AdminUserProfilePage() {
                       <div className="space-y-3">
                         {articles.slice(0, 10).map((article) => (
                           <button
-                            key={article.article_id}
+                            key={article.id}
                             onClick={() => handleArticleClick(article)}
                             disabled={articleLoading}
                             className="w-full text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all group cursor-pointer disabled:opacity-50"
@@ -369,7 +369,7 @@ export default function AdminUserProfilePage() {
                 setSelectedArticle(null);
               }}
               onReject={(id) => {
-                setConfirmReject({ article_id: id });
+                setConfirmReject({ id });
                 setRejectReason("");
                 setSelectedArticle(null);
               }}
