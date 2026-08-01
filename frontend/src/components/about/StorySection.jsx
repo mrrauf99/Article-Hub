@@ -11,7 +11,7 @@ export default function StorySection() {
 
       <div className="prose prose-lg max-w-none">
         <p className="text-slate-700 leading-relaxed mb-6">
-          It started with a shared frustration. As developers and content
+          It started with a simple frustration. As developers and content
           creators ourselves, we were tired of platforms that prioritized
           engagement over experience, quantity over quality, and ad revenue over
           user respect. We noticed something troubling: the best writers we knew were

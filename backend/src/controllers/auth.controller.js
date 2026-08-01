@@ -205,10 +205,10 @@ export async function verifyOtp(req, res) {
 
     await db.query(
       `
-        INSERT INTO users (email, username, name, password, country, auth_provider)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO users (email, username, name, password, country)
+        VALUES ($1, $2, $3, $4, $5)
         `,
-      [email, username, name, password, country, "local"],
+      [email, username, name, password, country],
     );
     res.clearCookie(COOKIE_NAMES.SIGNUP);
   } else {

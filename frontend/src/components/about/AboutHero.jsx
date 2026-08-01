@@ -26,7 +26,7 @@ export default function AboutHero() {
           </p>
 
           <p>
-            Founded in 2025 by two developers frustrated with cluttered
+            Founded in 2025 out of frustration with cluttered
             interfaces and algorithm-driven feeds, Article Hub was born from a
             simple question:{" "}
             <em>

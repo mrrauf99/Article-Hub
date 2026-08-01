@@ -9,6 +9,7 @@ import ArticlesList from "@/components/ArticlesList";
 import ArticlesEmptyState from "@/components/ArticlesEmptyState";
 import useScrollOnChange from "@/hooks/useScrollOnChange";
 import formatCount from "@/utils/formatCount";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 export default function ArticlesGrid({
   articles,
@@ -221,7 +222,7 @@ function ArticleCard({ article }) {
         </div>
 
         <h3 className="text-lg font-bold text-slate-900 line-clamp-2 mb-2 group-hover:text-sky-600 transition-colors">
-          {article.title}
+          {capitalizeFirstLetter(article.title)}
         </h3>
 
         <p className="text-sm text-slate-600 line-clamp-2 mb-4 flex-1">

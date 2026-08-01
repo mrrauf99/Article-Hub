@@ -1,10 +1,12 @@
 import { useLoaderData, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 import { Calendar, User, Tag, Share2, Eye } from "lucide-react";
 import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
 import formatCount from "@/utils/formatCount";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 export default function ArticleDetailPage() {
   const { article } = useLoaderData();
@@ -48,7 +50,7 @@ export default function ArticleDetailPage() {
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: article.title,
+    headline: capitalizeFirstLetter(article.title),
     description: metaDescription,
     image: imageUrl
       ? [new URL(imageUrl, SITE_CONFIG.siteUrl).toString()]
@@ -135,7 +137,7 @@ export default function ArticleDetailPage() {
 
             {/* Title */}
             <h1 className="text-4xl font-bold text-gray-900 mt-6 mb-6 leading-tight">
-              {article.title}
+              {capitalizeFirstLetter(article.title)}
             </h1>
 
             {/* Meta */}
@@ -190,23 +192,29 @@ export default function ArticleDetailPage() {
 
           {/* ================= INTRO ================= */}
           {article.introduction && (
-            <p className="text-base text-gray-700 leading-relaxed mb-6">
-              {article.introduction}
-            </p>
+            <div className="prose max-w-none text-base text-gray-700 leading-relaxed mb-6">
+              <ReactMarkdown>
+                {article.introduction.replace(/\n{3,}/g, "\n\n")}
+              </ReactMarkdown>
+            </div>
           )}
 
           {/* ================= CONTENT ================= */}
           {article.content && (
-            <div className="prose max-w-none">
-              <p className="whitespace-pre-line">{article.content}</p>
+            <div className="prose max-w-none text-gray-800 leading-relaxed">
+              <ReactMarkdown>
+                {article.content.replace(/\n{3,}/g, "\n\n")}
+              </ReactMarkdown>
             </div>
           )}
 
           {/* ================= CONCLUSION ================= */}
           {article.summary && (
-            <p className="mt-8 text-base text-gray-700 leading-relaxed whitespace-pre-line">
-              {article.summary}
-            </p>
+            <div className="mt-8 prose max-w-none text-base text-gray-700 leading-relaxed">
+              <ReactMarkdown>
+                {article.summary.replace(/\n{3,}/g, "\n\n")}
+              </ReactMarkdown>
+            </div>
           )}
         </div>
       </div>

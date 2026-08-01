@@ -22,14 +22,14 @@ export const CONTACT_LIMITS = {
 
 const VALID_GENDERS = ["male", "female", "other", "prefer_not_to_say"];
 
-// Convert Windows (\r\n) to Unix (\n)
-// This makes character counting consistent across platforms.
+// Convert Windows (\r\n) to Unix (\n), collapse 3+ consecutive newlines to 2, and capitalize first letter.
 function normalizeText(value) {
   if (typeof value !== "string") {
     return "";
   }
 
-  return value.replace(/\r\n/g, "\n").trim();
+  const cleaned = value.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : "";
 }
 
 function isValidUrl(value) {

@@ -9,6 +9,7 @@ import ArticleDetailModal from "../components/ArticleDetailModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import SectionHeader from "@/components/SectionHeader";
 import useScrollOnChange from "@/hooks/useScrollOnChange";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 const STATUS_OPTIONS = [
   {
@@ -238,7 +239,7 @@ export default function AdminArticlesPage() {
         title="Delete Article"
         message={
           confirmDelete
-            ? `Are you sure you want to delete "${confirmDelete.title}"?`
+            ? `Are you sure you want to delete "${capitalizeFirstLetter(confirmDelete.title)}"?`
             : ""
         }
         confirmText="Yes, Delete"
@@ -264,7 +265,7 @@ export default function AdminArticlesPage() {
         title="Approve Article"
         message={
           confirmApprove
-            ? `Are you sure you want to approve "${confirmApprove.title}"?`
+            ? `Are you sure you want to approve "${capitalizeFirstLetter(confirmApprove.title)}"?`
             : ""
         }
         confirmText="Yes, Approve"
@@ -282,7 +283,7 @@ export default function AdminArticlesPage() {
         title="Reject Article"
         message={
           confirmReject
-            ? `Are you sure you want to reject "${confirmReject.title}"?`
+            ? `Are you sure you want to reject "${capitalizeFirstLetter(confirmReject.title)}"?`
             : ""
         }
         confirmText="Yes, Reject"
