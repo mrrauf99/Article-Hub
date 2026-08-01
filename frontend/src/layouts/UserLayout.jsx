@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Outlet, useLoaderData, useLocation } from "react-router-dom";
 
 import ScrollToTop from "../components/ScrollToTop";
@@ -9,6 +9,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { useLogout } from "../hooks/useLogout";
 import SEO from "@/components/SEO";
 import MainContainer from "@/components/MainContainer";
+import PageLoader from "@/components/PageLoader";
 
 export default function UserLayout() {
   const { user } = useLoaderData();
@@ -35,7 +36,9 @@ export default function UserLayout() {
       />
 
       <MainContainer>
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </MainContainer>
 
       <Footer />

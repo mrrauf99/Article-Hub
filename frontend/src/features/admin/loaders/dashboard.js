@@ -1,7 +1,7 @@
 import { adminApi } from "../../api/adminApi.js";
 import { handleLoaderError } from "../utils/loaderHelpers.js";
 
-export default async function adminDashboardLoader() {
+export default async function dashboardLoader() {
   try {
     const response = await adminApi.getDashboardStats();
     const { stats, recentArticles, recentUsers } = response.data.data;
