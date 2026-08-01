@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import formatCount from "@/utils/formatCount";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -129,7 +130,7 @@ export default function ArticleDetailModal({
             </span>
 
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 pr-10 leading-tight">
-              {article.title}
+              {capitalizeFirstLetter(article.title)}
             </h2>
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-sm text-slate-500">

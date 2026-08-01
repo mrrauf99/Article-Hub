@@ -1,7 +1,7 @@
 import { redirect } from "react-router-dom";
 import { apiClient } from "../../api/apiClient";
 
-export default async function userProfileLoader() {
+export default async function profileLoader() {
   try {
     const { data } = await apiClient.get("user/profile");
 

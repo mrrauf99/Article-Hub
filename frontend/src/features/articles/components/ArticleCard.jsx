@@ -6,6 +6,7 @@ import StatusBadge from "./StatusBadge";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { userApi } from "@/features/api/userApi";
 import formatCount from "@/utils/formatCount";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 function ArticleCard({ article, mode, onDelete }) {
   const navigate = useNavigate();
@@ -123,7 +124,7 @@ function ArticleCard({ article, mode, onDelete }) {
           </div>
 
           <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-indigo-600 transition-colors duration-200">
-            {article.title}
+            {capitalizeFirstLetter(article.title)}
           </h3>
 
           <p className="text-sm text-slate-600 line-clamp-2 mt-2 mb-4 leading-relaxed">

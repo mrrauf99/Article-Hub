@@ -96,8 +96,8 @@ export const getDashboardRecentActivity = async (req, res) => {
 export const getArticles = async (req, res) => {
   const { status = "all", search = "" } = req.query;
 
-  const page = Math.max(parseInt(req.body.page) || 1, 1);
-  const limit = Math.min(Math.max(parseInt(req.query.limit) || 9, 9), 45);
+  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit) || 9, 1), 45);
 
   const offset = (page - 1) * limit;
 
@@ -339,7 +339,9 @@ export const deleteArticle = async (req, res) => {
 };
 
 export const getUsers = async (req, res) => {
-  const { role = "all", search = "", page = 1, limit = 10 } = req.query;
+  const { role = "all", search = "" } = req.query;
+  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit) || 9, 1), 45);
   const offset = (page - 1) * limit; // skip rows
 
   let whereClause = "WHERE 1=1";

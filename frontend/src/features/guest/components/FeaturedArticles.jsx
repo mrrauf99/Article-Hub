@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Eye, Clock, ArrowRight, TrendingUp } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import formatCount from "@/utils/formatCount";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 export default function FeaturedArticles({ articles }) {
   // Get top 3 articles by views
@@ -62,7 +63,7 @@ export default function FeaturedArticles({ articles }) {
                     {main.category}
                   </span>
                   <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 sm:mb-3 line-clamp-2 group-hover:text-sky-200 transition-colors">
-                    {main.title}
+                    {capitalizeFirstLetter(main.title)}
                   </h3>
                   <p className="text-sm sm:text-base text-slate-300 line-clamp-2 mb-3 sm:mb-4">
                     {main.summary}
@@ -110,7 +111,7 @@ export default function FeaturedArticles({ articles }) {
                         {article.category}
                       </span>
                       <h4 className="font-bold text-sm sm:text-base text-slate-900 line-clamp-2 mb-2 group-hover:text-sky-600 transition-colors">
-                        {article.title}
+                        {capitalizeFirstLetter(article.title)}
                       </h4>
                       <div className="flex items-center gap-2 sm:gap-3 text-xs text-slate-500">
                         <span className="truncate">{article.author_name}</span>

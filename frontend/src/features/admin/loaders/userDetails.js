@@ -1,7 +1,7 @@
 import { adminApi } from "../../api/adminApi.js";
 import { handleLoaderError } from "../utils/loaderHelpers.js";
 
-export default async function adminUserDetailsLoader({ params }) {
+export default async function userDetailsLoader({ params }) {
   try {
     const response = await adminApi.getUserDetails(params.userId);
     return response.data.data;
