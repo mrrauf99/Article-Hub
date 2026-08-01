@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 const ARTICLE_STATS = [
   {
@@ -173,7 +174,7 @@ export default function RecentActivity({ stats, recentArticles, recentUsers }) {
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm sm:text-base font-medium text-slate-900 truncate">
-                          {article.title}
+                          {capitalizeFirstLetter(article.title)}
                         </p>
                         <p className="text-xs sm:text-sm text-slate-500 truncate">
                           by {article.author_name}

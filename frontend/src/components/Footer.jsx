@@ -73,7 +73,7 @@ export default function Footer() {
       {/* BOTTOM BAR */}
       <div className={styles.bottomBar}>
         <span>
-          © {new Date().getFullYear()} Article Hub. All rights reserved.
+          © 2025-{new Date().getFullYear()} Article Hub. All rights reserved.
         </span>
       </div>
     </footer>

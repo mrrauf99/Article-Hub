@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import {
   Outlet,
   useLoaderData,
@@ -14,6 +14,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { useLogout } from "../hooks/useLogout";
 import SEO from "@/components/SEO";
 import MainContainer from "@/components/MainContainer";
+import PageLoader from "@/components/PageLoader";
 
 const POLLING_INTERVAL = 45000; // 45 seconds
 
@@ -57,7 +58,9 @@ export default function AdminLayout() {
       />
 
       <MainContainer>
-        <Outlet context={{ user }} />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet context={{ user }} />
+        </Suspense>
       </MainContainer>
 
       <Footer />
