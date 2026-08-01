@@ -2,7 +2,7 @@ import { redirect } from "react-router-dom";
 import { apiClient } from "../../api/apiClient.js";
 import { adminApi } from "../../api/adminApi.js";
 
-export default async function adminProfileLoader() {
+export default async function profileLoader() {
   try {
     const [profileResponse, pendingResponse] = await Promise.all([
       apiClient.get("user/profile"),

@@ -1,5 +1,5 @@
 import { Outlet, useLoaderData } from "react-router-dom";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
 import ScrollToTop from "@/components/ScrollToTop";
 import NavigationProgress from "@/components/NavigationProgress";
@@ -7,6 +7,7 @@ import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useLogout } from "@/hooks/useLogout";
+import PageLoader from "@/components/PageLoader";
 
 /**
  * Layout for public pages (About, Contact, Terms, Privacy, etc.)
@@ -36,7 +37,9 @@ export default function PublicLayout() {
         onLogout={user ? () => setShowLogoutConfirm(true) : undefined}
       />
       <main className="w-full min-h-screen overflow-x-hidden">
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
 

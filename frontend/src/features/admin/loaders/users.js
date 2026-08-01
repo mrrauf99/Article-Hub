@@ -1,7 +1,9 @@
 import { adminApi } from "../../api/adminApi.js";
 import { handleLoaderError, getQueryParams } from "../utils/loaderHelpers.js";
 
-export default async function adminUsersLoader({ request }) {
+const DEFAULT_LIMIT = 9;
+
+export default async function usersLoader({ request }) {
   const params = getQueryParams(request, {
     role: "all",
     search: "",
@@ -11,7 +13,7 @@ export default async function adminUsersLoader({ request }) {
   try {
     const response = await adminApi.getAllUsers({
       ...params,
-      limit: 10,
+      limit: DEFAULT_LIMIT,
     });
     return {
       users: response.data.data.users,

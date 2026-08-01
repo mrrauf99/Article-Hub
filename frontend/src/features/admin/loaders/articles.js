@@ -1,7 +1,9 @@
 import { adminApi } from "../../api/adminApi.js";
 import { handleLoaderError, getQueryParams } from "../utils/loaderHelpers.js";
 
-export default async function adminArticlesLoader({ request }) {
+const DEFAULT_LIMIT = 9;
+
+export default async function articlesLoader({ request }) {
   const params = getQueryParams(request, {
     status: "all",
     search: "",
@@ -11,7 +13,7 @@ export default async function adminArticlesLoader({ request }) {
   try {
     const response = await adminApi.getAllArticles({
       ...params,
-      limit: 10,
+      limit: DEFAULT_LIMIT,
     });
     return {
       articles: response.data.data.articles,

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import ActionButton from "./ActionButton";
 import formatCount from "@/utils/formatCount";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
 function StatusBadge({ status }) {
   const config = {
@@ -91,7 +92,7 @@ export default function ArticlesTable({
                         className="text-left group w-full"
                       >
                         <p className="font-medium text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-2">
-                          {article.title}
+                          {capitalizeFirstLetter(article.title)}
                         </p>
                         <p className="text-xs sm:text-sm text-slate-500 line-clamp-1 mt-0.5">
                           {article.summary}

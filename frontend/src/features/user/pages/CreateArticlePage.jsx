@@ -62,9 +62,12 @@ export default function CreateArticlePage() {
       return;
     }
 
-    // Normalize line breaks: convert Windows \r\n to Unix \n
-    // This ensures character count matches between frontend and backend
-    const normalizeText = (text) => text.replace(/\r\n/g, "\n");
+    // Normalize line breaks and capitalize the first letter of content fields
+    const normalizeText = (text) => {
+      if (!text) return "";
+      const cleaned = text.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n");
+      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    };
 
     const submitData = new FormData();
 
