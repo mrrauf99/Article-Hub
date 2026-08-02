@@ -1,6 +1,7 @@
 import { redirect } from "react-router-dom";
 import { apiClient } from "../../api/apiClient.js";
 import { adminApi } from "../../api/adminApi.js";
+import { handleLoaderError } from "@/utils/loaderError.js";
 
 export default async function profileLoader() {
   try {
@@ -20,9 +21,9 @@ export default async function profileLoader() {
 
     return { user, pendingCount };
   } catch (error) {
-    if (error.response?.status === 401) {
-      return redirect("/login");
-    }
-    throw new Response("Failed to load profile", { status: 500 });
+    return handleLoaderError(error, {
+      forbiddenRedirect: "/user/dashboard",
+      fallbackMessage: "Failed to load profile.",
+    });
   }
 }

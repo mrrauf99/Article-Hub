@@ -13,7 +13,7 @@ export default async function completeProfileAction({ request }) {
     return redirect("/user/dashboard");
   } catch (err) {
     return {
-      message: err.response?.data?.message || "Something went wrong",
+      message: err.response?.data?.message || "Something went wrong.",
     };
   }
 }

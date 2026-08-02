@@ -19,6 +19,7 @@ import { authenticate } from "../middlewares/authenticate.middleware.js";
 import { rateLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
+import { clearCookie } from "../config/cookie.js";
 
 const authRoutes = Router();
 
@@ -67,7 +68,7 @@ authRoutes.post(
 
 // Logout user
 authRoutes.post("/logout", (req, res) => {
-  res.clearCookie(COOKIE_NAMES.ACCESS);
+  clearCookie(res, COOKIE_NAMES.ACCESS);
 
   res.json({
     success: true,

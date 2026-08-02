@@ -1,5 +1,6 @@
 import { adminApi } from "../../api/adminApi.js";
-import { handleLoaderError, getQueryParams } from "../utils/loaderHelpers.js";
+import { getQueryParams } from "../utils/loaderHelpers.js";
+import { handleLoaderError } from "@/utils/loaderError.js";
 
 const DEFAULT_LIMIT = 9;
 
@@ -21,6 +22,6 @@ export default async function articlesLoader({ request }) {
       filters: { status: params.status, search: params.search },
     };
   } catch (error) {
-    return handleLoaderError(error, "Failed to load articles");
+    return handleLoaderError(error, { fallbackMessage: "Failed to load articles.", forbiddenRedirect: "/user/dashboard" });
   }
 }

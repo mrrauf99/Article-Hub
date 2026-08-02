@@ -1,5 +1,5 @@
 import { apiClient } from "../../api/apiClient";
-import { redirect } from "react-router-dom";
+import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function profileStatsLoader() {
   try {
@@ -14,11 +14,6 @@ export default async function profileStatsLoader() {
       stats: statsRes.data.data,
     };
   } catch (err) {
-    if (err.response?.status === 401) {
-      return redirect("/login");
-    }
-    throw new Response("Failed to load profile", {
-      status: err.response?.status || 500,
-    });
+    return handleLoaderError(err, { fallbackMessage: "Failed to load profile." });
   }
 }

@@ -25,7 +25,7 @@ export async function adminArticlesAction({ request }) {
         return handleActionSuccess("Article deleted successfully");
 
       default:
-        return { success: false, message: "Unknown action" };
+        return { success: false, message: "Unknown action." };
     }
   } catch (error) {
     return handleActionError(error, intent || "operation");

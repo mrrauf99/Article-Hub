@@ -35,21 +35,30 @@ app.use(cookieParser());
 setupPassport();
 app.use(passport.initialize());
 
+app.use("/health", (req, res) => {
+  return res
+    .status(200)
+    .json({ success: true, message: "Server is up and running." });
+});
+
 app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
+
 app.use(
   "/api/admin",
   authenticate(COOKIE_NAMES.ACCESS),
   requireRole("admin"),
   adminRoutes,
 );
+
 app.use(
   "/api/user",
   authenticate(COOKIE_NAMES.ACCESS),
   requireRole("user"),
   userRoutes,
 );
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,

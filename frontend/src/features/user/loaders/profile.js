@@ -1,5 +1,5 @@
-import { redirect } from "react-router-dom";
 import { apiClient } from "../../api/apiClient";
+import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function profileLoader() {
   try {
@@ -8,7 +8,7 @@ export default async function profileLoader() {
     return {
       user: data.data,
     };
-  } catch {
-    throw redirect("/login");
+  } catch (error) {
+    return handleLoaderError(error, { fallbackMessage: "Failed to load user profile." });
   }
 }

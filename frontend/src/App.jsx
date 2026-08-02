@@ -12,7 +12,7 @@ const ForgotPasswordPage = lazy(
   () => import("./features/auth/pages/ForgotPasswordPage.jsx"),
 );
 const ResetPasswordPage = lazy(
-  () => import("./features/auth/pages/ResetPasswordPage.jsx"),
+  () => import("./features/auth/pages/PasswordResetPage.jsx"),
 );
 const TwoFactorPage = lazy(
   () => import("./features/auth/pages/TwoFactorPage.jsx"),
@@ -28,12 +28,12 @@ import loginAction from "./features/auth/actions/login";
 import signUpAction from "./features/auth/actions/signUp";
 import otpAction from "./features/auth/actions/otp";
 import forgotPasswordAction from "./features/auth/actions/forgotPassword";
-import resetPasswordAction from "./features/auth/actions/resetPassword";
+import resetPasswordAction from "./features/auth/actions/passwordReset";
 import verifyTwoFactorLoginAction from "./features/auth/actions/verifyTwoFactorLogin.js";
 import completeProfileAction from "./features/auth/actions/completeProfile.js";
 
 import completeProfileLoader from "./features/auth/loaders/completeProfile.js";
-import resetPasswordLoader from "./features/auth/loaders/resetPassword.js";
+import resetPasswordLoader from "./features/auth/loaders/passwordReset.js";
 import twoFactorSessionLoader from "./features/auth/loaders/twoFactorSession.js";
 import verifyOtpPageLoader from "./features/auth/loaders/verifyOtpPage.js";
 
@@ -115,206 +115,200 @@ import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
 import "./index.css";
 
 const router = createBrowserRouter([
-  /* ---------- PUBLIC ---------- */
   {
-    id: "public-layout",
-    element: <PublicLayout />,
+    hydrateFallbackElement: <PageLoader />,
     errorElement: (
       <Suspense fallback={<PageLoader />}>
         <ErrorPage />
       </Suspense>
     ),
-    loader: publicLayoutLoader,
     children: [
+      /* ---------- PUBLIC ---------- */
       {
-        index: true, // "/"
-        element: <HomePage />,
-        loader: homePageLoader,
-      },
-      {
-        path: "about",
-        element: <AboutPage />,
-      },
-      {
-        path: "contact",
-        element: <ContactPage />,
-        action: submitContactAction,
-      },
-      {
-        path: "privacy",
-        element: <PrivacyPage />,
-      },
-      {
-        path: "terms",
-        element: <TermsPage />,
-      },
-      {
-        path: "articles/:id",
-        element: <ArticleDetailPage />,
-        loader: articleDetailLoader,
-      },
-    ],
-  },
-
-  /* ---------- AUTH ---------- */
-  {
-    element: <AuthLayout />,
-    children: [
-      {
-        path: "/login",
-        element: <LoginPage />,
-        action: loginAction,
-      },
-      {
-        path: "/register",
-        element: <SignUpPage />,
-        action: signUpAction,
-      },
-      {
-        path: "/verify-otp",
-        element: <OTPVerificationFormPage />,
-        action: otpAction,
-        loader: verifyOtpPageLoader,
-      },
-      {
-        path: "/forgot-password",
-        element: <ForgotPasswordPage />,
-        action: forgotPasswordAction,
-      },
-      {
-        path: "/reset-password",
-        element: <ResetPasswordPage />,
-        action: resetPasswordAction,
-        loader: resetPasswordLoader,
-      },
-      {
-        path: "/two-factor",
-        element: <TwoFactorPage />,
-        action: verifyTwoFactorLoginAction,
-        loader: twoFactorSessionLoader,
-      },
-      {
-        path: "/complete-profile",
-        element: <CompleteProfile />,
-        action: completeProfileAction,
-        loader: completeProfileLoader,
-      },
-    ],
-  },
-
-  /* ---------- USER ---------- */
-  {
-    id: "user-layout",
-    path: "/user",
-    element: <UserLayout />,
-    errorElement: (
-      <Suspense fallback={<PageLoader />}>
-        <ErrorPage />
-      </Suspense>
-    ),
-    loader: userProfileLoader,
-    children: [
-      {
-        path: "dashboard",
-        element: <UserDashBoardPage />,
-        loader: myArticlesLoader,
-      },
-      {
-        path: "articles",
+        id: "public-layout",
+        element: <PublicLayout />,
+        loader: publicLayoutLoader,
         children: [
           {
-            index: true,
-            element: <ExploreArticlesPage />,
-            loader: publicArticlesLoader,
+            index: true, // "/"
+            element: <HomePage />,
+            loader: homePageLoader,
           },
           {
-            path: "new",
-            element: <CreateArticlePage />,
-            loader: createArticleLoader,
-            action: createArticleAction,
+            path: "about",
+            element: <AboutPage />,
           },
           {
-            path: ":id/edit",
-            element: <CreateArticlePage />,
-            loader: editArticleLoader,
-            action: createArticleAction,
+            path: "contact",
+            element: <ContactPage />,
+            action: submitContactAction,
           },
           {
-            path: ":id",
+            path: "privacy",
+            element: <PrivacyPage />,
+          },
+          {
+            path: "terms",
+            element: <TermsPage />,
+          },
+          {
+            path: "articles/:id",
             element: <ArticleDetailPage />,
             loader: articleDetailLoader,
           },
         ],
       },
+
+      /* ---------- AUTH ---------- */
       {
-        path: "profile",
-        element: <ProfilePage />,
-        loader: profileStatsLoader,
-        action: updateProfileAction,
+        element: <AuthLayout />,
+        children: [
+          {
+            path: "/login",
+            element: <LoginPage />,
+            action: loginAction,
+          },
+          {
+            path: "/register",
+            element: <SignUpPage />,
+            action: signUpAction,
+          },
+          {
+            path: "/verify-otp",
+            element: <OTPVerificationFormPage />,
+            action: otpAction,
+            loader: verifyOtpPageLoader,
+          },
+          {
+            path: "/forgot-password",
+            element: <ForgotPasswordPage />,
+            action: forgotPasswordAction,
+          },
+          {
+            path: "/reset-password",
+            element: <ResetPasswordPage />,
+            action: resetPasswordAction,
+            loader: resetPasswordLoader,
+          },
+          {
+            path: "/two-factor",
+            element: <TwoFactorPage />,
+            action: verifyTwoFactorLoginAction,
+            loader: twoFactorSessionLoader,
+          },
+          {
+            path: "/complete-profile",
+            element: <CompleteProfile />,
+            action: completeProfileAction,
+            loader: completeProfileLoader,
+          },
+        ],
+      },
+
+      /* ---------- USER ---------- */
+      {
+        id: "user-layout",
+        path: "/user",
+        element: <UserLayout />,
+        loader: userProfileLoader,
+        children: [
+          {
+            path: "dashboard",
+            element: <UserDashBoardPage />,
+            loader: myArticlesLoader,
+          },
+          {
+            path: "articles",
+            children: [
+              {
+                index: true,
+                element: <ExploreArticlesPage />,
+                loader: publicArticlesLoader,
+              },
+              {
+                path: "new",
+                element: <CreateArticlePage />,
+                loader: createArticleLoader,
+                action: createArticleAction,
+              },
+              {
+                path: ":id/edit",
+                element: <CreateArticlePage />,
+                loader: editArticleLoader,
+                action: createArticleAction,
+              },
+              {
+                path: ":id",
+                element: <ArticleDetailPage />,
+                loader: articleDetailLoader,
+              },
+            ],
+          },
+          {
+            path: "profile",
+            element: <ProfilePage />,
+            loader: profileStatsLoader,
+            action: updateProfileAction,
+          },
+        ],
+      },
+
+      /* ---------- ADMIN ---------- */
+      {
+        id: "admin-layout",
+        path: "/admin",
+        element: <AdminLayout />,
+        loader: adminProfileLoader,
+        children: [
+          {
+            path: "dashboard",
+            element: <AdminDashboardPage />,
+            loader: adminDashboardLoader,
+          },
+          {
+            path: "articles",
+            element: <AdminArticlesPage />,
+            loader: adminArticlesLoader,
+            action: adminArticlesAction,
+          },
+          {
+            path: "articles/:id",
+            element: <ArticleDetailPage />,
+            loader: articleDetailLoader,
+          },
+          {
+            path: "users",
+            element: <AdminUsersPage />,
+            loader: adminUsersLoader,
+            action: adminUsersAction,
+          },
+          {
+            path: "users/:userId",
+            element: <AdminUserProfilePage />,
+            loader: adminUserDetailsLoader,
+          },
+          {
+            path: "profile",
+            element: <ProfilePage />,
+            loader: profileStatsLoader,
+            action: updateProfileAction,
+          },
+        ],
+      },
+
+      /* ---------- 404 / Catch-all ---------- */
+      {
+        path: "*",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ErrorPage />
+          </Suspense>
+        ),
       },
     ],
-  },
-
-  /* ---------- ADMIN ---------- */
-  {
-    id: "admin-layout",
-    path: "/admin",
-    element: <AdminLayout />,
-    errorElement: (
-      <Suspense fallback={<PageLoader />}>
-        <ErrorPage />
-      </Suspense>
-    ),
-    loader: adminProfileLoader,
-    children: [
-      {
-        path: "dashboard",
-        element: <AdminDashboardPage />,
-        loader: adminDashboardLoader,
-      },
-      {
-        path: "articles",
-        element: <AdminArticlesPage />,
-        loader: adminArticlesLoader,
-        action: adminArticlesAction,
-      },
-      {
-        path: "articles/:id",
-        element: <ArticleDetailPage />,
-        loader: articleDetailLoader,
-      },
-      {
-        path: "users",
-        element: <AdminUsersPage />,
-        loader: adminUsersLoader,
-        action: adminUsersAction,
-      },
-      {
-        path: "users/:userId",
-        element: <AdminUserProfilePage />,
-        loader: adminUserDetailsLoader,
-      },
-      {
-        path: "profile",
-        element: <ProfilePage />,
-        loader: profileStatsLoader,
-        action: updateProfileAction,
-      },
-    ],
-  },
-
-  /* ---------- 404 / Catch-all ---------- */
-  {
-    path: "*",
-    // No layout wraps this route, so it needs its own Suspense
-    element: (
-      <Suspense fallback={<PageLoader />}>
-        <ErrorPage />
-      </Suspense>
-    ),
   },
 ]);
 
 export default function App() {
-  return <RouterProvider router={router} fallbackElement={<PageLoader />} />;
+  return <RouterProvider router={router} />;
 }
