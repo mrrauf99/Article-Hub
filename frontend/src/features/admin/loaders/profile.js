@@ -22,7 +22,6 @@ export default async function profileLoader() {
     return { user, pendingCount };
   } catch (error) {
     return handleLoaderError(error, {
-      forbiddenRedirect: "/user/dashboard",
       fallbackMessage: "Failed to load profile.",
     });
   }

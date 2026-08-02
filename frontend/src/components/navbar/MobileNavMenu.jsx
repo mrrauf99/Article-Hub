@@ -29,15 +29,14 @@ export default function MobileNavMenu({
   // Helper to check if avatar is valid
   const isValidAvatar = avatar && typeof avatar === "string" && avatar.trim();
 
-  if (!isOpen) return null;
-
   const isAdmin = role === "admin";
   const profilePath = isAdmin ? "/admin/profile" : "/user/profile";
 
   return (
-    <div className={styles.mobileMenu}>
-      <div className={styles.mobileMenuInner}>
-        {/* User info for logged-in users */}
+    <div className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}>
+      <div className={styles.mobileMenuContent}>
+        <div className={styles.mobileMenuInner}>
+          {/* User info for logged-in users */}
         {role !== "guest" && (
           <div className={styles.mobileUserHeader}>
             <div className={styles.mobileAvatarContainer}>
@@ -150,6 +149,7 @@ export default function MobileNavMenu({
             </div>
           </>
         )}
+        </div>
       </div>
     </div>
   );
