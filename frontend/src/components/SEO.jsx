@@ -60,7 +60,9 @@ export default function SEO({
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(entry).replace(/</g, "\\u003c"),
+          }}
         />
       ))}
     </Helmet>

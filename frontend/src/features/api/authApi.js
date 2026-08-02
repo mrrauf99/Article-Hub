@@ -19,7 +19,7 @@ export const authApi = {
 
   forgotPassword: (data) => apiClient.post("auth/forgot-password", data),
 
-  resetPassword: (data) => apiClient.post("auth/password-reset", data),
+  passwordReset: (data) => apiClient.post("auth/password-reset", data),
 
   verifyTwoFactorLogin: (data) => apiClient.post("auth/2fa/verify-login", data),
 

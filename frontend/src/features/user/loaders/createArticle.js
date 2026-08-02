@@ -1,21 +1,18 @@
 import { redirect } from "react-router-dom";
-import { apiClient } from "../../api/apiClient";
+import { authApi } from "../../api/authApi";
+import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function createArticleLoader() {
   try {
-    const { data } = await apiClient.get("user/profile");
+    const { data } = await authApi.session();
 
     // Redirect admins - they cannot create articles
-    if (data.data.role === "admin") {
+    if (data.role === "admin") {
       return redirect("/admin/dashboard");
     }
 
-    // Allow regular users to create articles
-    return {
-      user: data.data,
-    };
-  } catch {
-    // Not authenticated - redirect to login
-    throw redirect("/login");
+    return null;
+  } catch (error) {
+    return handleLoaderError(error, { fallbackMessage: "Authentication required." });
   }
 }

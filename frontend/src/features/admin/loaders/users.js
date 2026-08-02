@@ -1,5 +1,6 @@
 import { adminApi } from "../../api/adminApi.js";
-import { handleLoaderError, getQueryParams } from "../utils/loaderHelpers.js";
+import { getQueryParams } from "../utils/loaderHelpers.js";
+import { handleLoaderError } from "@/utils/loaderError.js";
 
 const DEFAULT_LIMIT = 9;
 
@@ -22,6 +23,6 @@ export default async function usersLoader({ request }) {
     };
   } catch (error) {
     console.error("Admin users loader error:", error);
-    return handleLoaderError(error, "Failed to load users");
+    return handleLoaderError(error, { fallbackMessage: "Failed to load users." });
   }
 }

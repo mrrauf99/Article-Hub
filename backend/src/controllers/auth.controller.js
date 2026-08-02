@@ -7,7 +7,7 @@ import {
   sendLoginNotificationEmail,
 } from "../services/email.service.js";
 import { generateToken } from "../utils/jwt.js";
-import { setCookie } from "../config/cookie.js";
+import { setCookie, clearCookie } from "../config/cookie.js";
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
 import {
   PASSWORD_MAX,
@@ -210,9 +210,9 @@ export async function verifyOtp(req, res) {
         `,
       [email, username, name, password, country],
     );
-    res.clearCookie(COOKIE_NAMES.SIGNUP);
+    clearCookie(res, COOKIE_NAMES.SIGNUP);
   } else {
-    res.clearCookie(COOKIE_NAMES.PASSWORD_RESET);
+    clearCookie(res, COOKIE_NAMES.PASSWORD_RESET);
   }
 
   res.json({
@@ -338,7 +338,7 @@ export async function verifyTwoFactorLogin(req, res) {
   const token = generateToken(payload, "7d");
   setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
 
-  res.clearCookie(COOKIE_NAMES.TWO_FACTOR);
+  clearCookie(res, COOKIE_NAMES.TWO_FACTOR);
 
   return res.status(200).json({
     success: true,
@@ -434,7 +434,7 @@ export async function passwordReset(req, res) {
     email,
   ]);
 
-  res.clearCookie(COOKIE_NAMES.PASSWORD_RESET);
+  clearCookie(res, COOKIE_NAMES.PASSWORD_RESET);
 
   return res.status(200).json({
     success: true,
@@ -468,7 +468,7 @@ export async function completeGoogleSignup(req, res) {
 
   const token = generateToken(payload, "7d");
   setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
-  res.clearCookie(COOKIE_NAMES.OAUTH);
+  clearCookie(res, COOKIE_NAMES.OAUTH);
 
   return res.status(200).json({ success: true, redirectTo: "/user/dashboard" });
 }

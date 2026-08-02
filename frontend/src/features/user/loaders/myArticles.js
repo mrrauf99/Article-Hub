@@ -1,5 +1,5 @@
 import { apiClient } from "../../api/apiClient";
-import { redirect } from "react-router-dom";
+import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function myArticlesLoader() {
   try {
@@ -14,7 +14,7 @@ export default async function myArticlesLoader() {
       articles: articlesRes.data.data,
       stats: statsRes.data.data,
     };
-  } catch {
-    throw redirect("/login");
+  } catch (error) {
+    return handleLoaderError(error, { fallbackMessage: "Failed to load articles." });
   }
 }

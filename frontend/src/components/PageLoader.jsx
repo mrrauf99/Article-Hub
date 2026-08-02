@@ -1,21 +1,24 @@
-import { memo } from "react";
+import { BookOpen } from "lucide-react";
 
 function PageLoader() {
   return (
-    <div className="w-full min-h-[60vh] flex flex-col items-center justify-center py-12 px-4 animate-in fade-in duration-300">
-      <div className="relative flex items-center justify-center">
-        {/* Outer ambient glow */}
-        <div className="absolute w-16 h-16 rounded-full bg-sky-500/20 blur-xl animate-pulse-slow" />
+    <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-4">
+      <div className="relative flex items-center justify-center w-24 h-24">
+        {/* Subtle background track */}
+        <div className="absolute inset-0 rounded-full border-4 border-slate-100" />
         
-        {/* Spinner ring */}
-        <div className="w-12 h-12 rounded-full border-3 border-slate-200 border-t-sky-600 animate-spin" />
+        {/* Minimalist spinning arc */}
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-sky-500 animate-spin" />
+
+        {/* Clean central icon */}
+        <BookOpen className="w-10 h-10 text-slate-700" strokeWidth={1.5} />
       </div>
 
-      <p className="mt-4 text-sm font-medium text-slate-600 tracking-wide">
+      <p className="text-base font-medium text-slate-600 tracking-wide animate-pulse">
         Loading...
       </p>
     </div>
   );
 }
 
-export default memo(PageLoader);
+export default PageLoader;
