@@ -45,7 +45,10 @@ export default function Navbar({
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
         >
-          {open ? <X /> : <Menu />}
+          <div className="relative flex items-center justify-center w-5 h-5">
+            <Menu className={`${styles.iconTransition} ${open ? styles.iconHidden : styles.iconVisible} absolute`} />
+            <X className={`${styles.iconTransition} ${open ? styles.iconVisible : styles.iconHidden} absolute`} />
+          </div>
         </button>
       </div>
 
