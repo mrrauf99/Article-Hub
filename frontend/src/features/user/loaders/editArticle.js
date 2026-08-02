@@ -1,11 +1,12 @@
 import { redirect } from "react-router-dom";
 import { apiClient } from "../../api/apiClient";
+import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function editArticleLoader({ params }) {
   const { id } = params;
 
   if (!id) {
-    throw redirect("/user/dashboard");
+    return redirect("/user/dashboard");
   }
 
   try {
@@ -14,8 +15,10 @@ export default async function editArticleLoader({ params }) {
     return {
       article: data.data,
     };
-  } catch {
-    // Article not found OR not owned by user
-    throw redirect("/user/dashboard");
+  } catch (error) {
+    return handleLoaderError(error, {
+      forbiddenRedirect: "/user/dashboard",
+      fallbackMessage: "Failed to load article.",
+    });
   }
 }

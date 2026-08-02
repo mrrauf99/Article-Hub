@@ -24,4 +24,3 @@ export const SITE_CONFIG = {
   },
 };
 
-export default SITE_CONFIG;
