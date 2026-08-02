@@ -11,7 +11,7 @@ const FIELD_NAMES = {
   CONFIRM_PASSWORD: "confirmPassword",
 };
 
-export function useResetPasswordForm() {
+export function usePasswordResetForm() {
   const [values, setValues] = useState(INITIAL_VALUES);
   const [errors, setErrors] = useState({});
 

@@ -16,7 +16,7 @@ import PasswordRequirements from "../components/PasswordRequirements";
 import SwitchPage from "../components/SwitchPage";
 import Button from "../components/Button";
 
-import { useResetPasswordForm } from "../hooks/useResetPasswordForm";
+import { usePasswordResetForm } from "../hooks/usePasswordResetForm";
 
 const SUBTITLE_STYLE = {
   fontSize: "1rem",
@@ -24,8 +24,8 @@ const SUBTITLE_STYLE = {
   lineHeight: "1.5",
 };
 
-export default function ResetPassword() {
-  const form = useResetPasswordForm();
+export default function PasswordReset() {
+  const form = usePasswordResetForm();
   const actionData = useActionData();
   const navigation = useNavigation();
   const isSubmitting = useMemo(

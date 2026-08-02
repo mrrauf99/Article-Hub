@@ -15,12 +15,12 @@ export default async function submitContactAction({ request }) {
 
     return {
       success: true,
-      message: "Message sent successfully",
+      message: "Message sent successfully.",
     };
   } catch (err) {
     return {
       success: false,
-      message: err.response?.data?.message || "Something went wrong",
+      message: err.response?.data?.message || "Something went wrong.",
     };
   }
 }

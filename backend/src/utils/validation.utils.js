@@ -1,14 +1,14 @@
 export const PASSWORD_MIN = 8;
 export const PASSWORD_MAX = 64;
 
-export const ARTICLE_LIMITS = {
+const ARTICLE_LIMITS = {
   title: { min: 10, max: 150 },
   introduction: { min: 100, max: 1000 },
   content: { min: 300, max: 100000 },
   summary: { min: 50, max: 500 },
 };
 
-export const PROFILE_LIMITS = {
+const PROFILE_LIMITS = {
   name: { min: 2, max: 100 },
   bio: { max: 500 },
   expertise: { max: 100 },
@@ -42,7 +42,7 @@ function isValidUrl(value) {
   }
 }
 
-export function validateRequired(value, fieldName) {
+function validateRequired(value, fieldName) {
   const text = normalizeText(value);
 
   if (!text) {
@@ -88,7 +88,7 @@ export function validateEmail(email) {
   return null;
 }
 
-export function validateUsername(username) {
+function validateUsername(username) {
   if (!username) return "Username is required.";
   const str = String(username);
   if (str.length < 3) return "Username must be at least 3 characters.";
