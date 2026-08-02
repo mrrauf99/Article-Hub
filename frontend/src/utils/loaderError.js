@@ -9,7 +9,7 @@ import { redirect } from "react-router-dom";
 export function handleLoaderError(
   error,
   {
-    forbiddenRedirect = "/",
+    forbiddenRedirect = null,
     fallbackMessage = "Something went wrong. Please try again.",
     fallbackStatus,
   } = {},
@@ -20,7 +20,7 @@ export function handleLoaderError(
     return redirect("/login");
   }
 
-  if (status === 403) {
+  if (status === 403 && forbiddenRedirect) {
     return redirect(forbiddenRedirect);
   }
 

@@ -55,7 +55,6 @@ app.use(
 app.use(
   "/api/user",
   authenticate(COOKIE_NAMES.ACCESS),
-  requireRole("user"),
   userRoutes,
 );
 
