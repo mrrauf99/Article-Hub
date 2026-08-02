@@ -34,7 +34,7 @@ export default async function updateProfileAction({ request }) {
     } catch (err) {
       return {
         success: false,
-        message: err.response?.data?.message || "Failed to update profile",
+        message: err.response?.data?.message || "Failed to update profile.",
       };
     }
   }
@@ -63,7 +63,7 @@ export default async function updateProfileAction({ request }) {
   } catch (err) {
     return {
       success: false,
-      message: err.response?.data?.message || "Failed to update profile",
+      message: err.response?.data?.message || "Failed to update profile.",
     };
   }
 }

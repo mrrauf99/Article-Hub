@@ -5,7 +5,7 @@ export function handleActionError(error, action = "operation") {
   console.error(`Failed to ${action}:`, error);
   return {
     success: false,
-    message: error.response?.data?.message || `Failed to ${action}`,
+    message: error.response?.data?.message || `Failed to ${action}.`,
   };
 }
 

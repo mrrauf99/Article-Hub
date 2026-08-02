@@ -22,7 +22,7 @@ export async function adminUsersAction({ request }) {
         return handleActionSuccess("User deleted successfully");
 
       default:
-        return { success: false, message: "Unknown action" };
+        return { success: false, message: "Unknown action." };
     }
   } catch (error) {
     return handleActionError(error, intent || "operation");

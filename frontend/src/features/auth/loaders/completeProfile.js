@@ -1,11 +1,11 @@
-import { redirect } from "react-router-dom";
 import { authApi } from "../../api/authApi";
+import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function completeProfileLoader() {
   try {
     await authApi.oauthSession();
     return null;
-  } catch {
-    throw redirect("/login");
+  } catch (error) {
+    return handleLoaderError(error, { fallbackMessage: "Failed to load OAuth session." });
   }
 }

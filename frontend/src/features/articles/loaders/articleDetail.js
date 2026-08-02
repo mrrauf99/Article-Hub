@@ -1,39 +1,30 @@
 import { apiClient } from "../../api/apiClient";
+import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function articleDetailLoader({ params, request }) {
   const { id } = params;
-  const articleId = id;
-
-  const url = new URL(request?.url || window.location.href);
-  const isAdminRoute = url.pathname.startsWith("/admin/");
+  const isAdminRoute = new URL(request.url).pathname.startsWith("/admin");
 
   try {
-    const endpoint = isAdminRoute
-      ? `admin/articles/${articleId}`
-      : `articles/${articleId}`;
-
+    const endpoint = isAdminRoute ? `admin/articles/${id}` : `articles/${id}`;
     const { data } = await apiClient.get(endpoint);
 
-    if (!data?.success) {
-      return { article: null };
+    if (!data?.success || !data?.data) {
+      throw new Response("Article not found", { status: 404 });
     }
 
-    const raw = data.data || {};
-    const article = {
-      id: articleId,
-      ...raw,
-      image_url: raw.imageUrl || raw.image_url,
-    };
+    const article = data.data;
 
     // Only increment views on public/user routes
     if (!isAdminRoute) {
-      apiClient.post(`articles/${articleId}/view`).catch(() => {});
+      apiClient.post(`articles/${id}/view`).catch(() => {});
     }
 
     return { article };
   } catch (error) {
-    throw new Response(error.response?.data?.message || "Article not found", {
-      status: error.response?.status || 500,
+    return handleLoaderError(error, {
+      forbiddenRedirect: "/",
+      fallbackMessage: error?.response?.data?.message || "Article not found.",
     });
   }
 }
