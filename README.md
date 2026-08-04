@@ -83,13 +83,17 @@ npm install
 Create a `.env` file in the `backend` directory with required parameters:
 ```env
 PORT=5000
+CLIENT_BASE_URL=http://localhost:5173
 DATABASE_URL=your_postgresql_connection_string
 JWT_SECRET=your_jwt_secret
-COOKIE_SECRET=your_cookie_secret
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 RESEND_API_KEY=your_resend_api_key
+MAIL_FROM=your_sender_email
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CALLBACK_URL=your_google_callback_url
 ```
 Start backend dev server:
 ```bash
@@ -100,6 +104,13 @@ npm run dev
 ```bash
 cd ../frontend
 npm install
+```
+Create a `.env` file in the `frontend` directory with required parameters:
+```env
+VITE_API_BASE_URL=http://localhost:5000
+```
+Start frontend dev server:
+```bash
 npm run dev
 ```
 
