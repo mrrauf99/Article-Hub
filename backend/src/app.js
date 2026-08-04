@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import helmet from "helmet";
+import compression from "compression";
 
 import setupPassport from "./config/passport.config.js";
 
@@ -19,8 +20,10 @@ import { COOKIE_NAMES } from "./constants/cookieNames.js";
 
 const app = express();
 
-app.use(helmet());
 app.set("trust proxy", 1);
+
+app.use(helmet());
+app.use(compression());
 
 app.use(
   cors({
@@ -52,11 +55,7 @@ app.use(
   adminRoutes,
 );
 
-app.use(
-  "/api/user",
-  authenticate(COOKIE_NAMES.ACCESS),
-  userRoutes,
-);
+app.use("/api/user", authenticate(COOKIE_NAMES.ACCESS), userRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

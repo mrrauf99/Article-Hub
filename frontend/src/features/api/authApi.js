@@ -25,14 +25,14 @@ export const authApi = {
 
   oauthComplete: (data) => apiClient.post("auth/oauth/complete", data),
 
-  oauthSession: () => apiClient.get("auth/oauth-session"),
+  oauthStatus: () => apiClient.get("auth/oauth-status"),
 
   // Check if the signup or password reset flow is still active
-  signupSession: () => apiClient.get("auth/signup-session"),
+  checkSignupStatus: () => apiClient.get("auth/signup-status"),
 
-  passwordResetSession: () => apiClient.get("auth/password-reset-session"),
+  checkPasswordResetStatus: () => apiClient.get("auth/password-reset-status"),
 
-  twoFactorSession: () => apiClient.get("auth/2fa-session"),
+  checkTwoFactorStatus: () => apiClient.get("auth/2fa-status"),
 
-  session: () => apiClient.get("auth/me"),
+  checkAuth: () => apiClient.get("auth/status"),
 };
