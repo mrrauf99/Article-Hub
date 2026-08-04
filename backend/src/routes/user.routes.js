@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
   getProfile,
+  getUserSummary,
   getUserStats,
   updateUserProfile,
   changePassword,
@@ -14,6 +15,8 @@ import { uploadImage } from "../middlewares/uploadImage.middleware.js";
 const userRoutes = Router();
 
 userRoutes.get("/profile", getProfile);
+
+userRoutes.get("/summary", getUserSummary);
 
 userRoutes.get("/stats", getUserStats);
 

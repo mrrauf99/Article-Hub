@@ -32,6 +32,23 @@ export async function getProfile(req, res) {
   });
 }
 
+export async function getUserSummary(req, res) {
+  const { userId } = req.user;
+
+  const { rows } = await db.query(
+    `
+      SELECT id, username, name, avatar_url, role
+      FROM users WHERE id = $1
+      `,
+    [userId],
+  );
+
+  return res.json({
+    success: true,
+    message: "User summary retrieved successfully.",
+    data: rows[0],
+  });
+}
 export async function getUserStats(req, res) {
   const { userId } = req.user;
 

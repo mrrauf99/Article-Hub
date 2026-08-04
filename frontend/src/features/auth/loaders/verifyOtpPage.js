@@ -4,7 +4,7 @@ import { handleLoaderError } from "@/utils/loaderError";
 export default async function verifyOtpPageLoader() {
   // Try signup flow first
   try {
-    const res = await authApi.signupSession();
+    const res = await authApi.checkSignupStatus();
     if (res.data.success) {
       return { email: res.data.email, flow: "signup" };
     }
@@ -16,7 +16,7 @@ export default async function verifyOtpPageLoader() {
 
     // Not in signup flow — try password-reset flow
     try {
-      const res = await authApi.passwordResetSession();
+      const res = await authApi.checkPasswordResetStatus();
       if (res.data.success) {
         return { email: res.data.email, flow: "password-reset" };
       }

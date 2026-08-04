@@ -1,13 +1,13 @@
-import { redirect } from "react-router-dom";
 import { apiClient } from "../../api/apiClient";
 import { handleLoaderError } from "@/utils/loaderError";
+import { redirectToDashboard } from "@/utils/authUtils";
 
 export default async function profileLoader() {
   try {
-    const { data } = await apiClient.get("user/profile");
+    const { data } = await apiClient.get("user/summary");
 
     if (data.data.role === "admin") {
-      return redirect("/admin/dashboard");
+      return redirectToDashboard(data.data.role);
     }
 
     return {

@@ -3,7 +3,7 @@ import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function twoFactorSessionLoader() {
   try {
-    await authApi.twoFactorSession();
+    await authApi.checkTwoFactorStatus();
     return null;
   } catch (error) {
     return handleLoaderError(error, {

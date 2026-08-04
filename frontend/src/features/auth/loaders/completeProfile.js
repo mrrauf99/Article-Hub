@@ -3,7 +3,7 @@ import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function completeProfileLoader() {
   try {
-    await authApi.oauthSession();
+    await authApi.oauthStatus();
     return null;
   } catch (error) {
     return handleLoaderError(error, { fallbackMessage: "Failed to load OAuth session." });
