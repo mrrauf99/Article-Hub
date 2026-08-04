@@ -1,5 +1,9 @@
 import { lazy, Suspense } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 
 import PageLoader from "./components/PageLoader.jsx";
 
@@ -67,7 +71,6 @@ const ExploreArticlesPage = lazy(
 import editArticleLoader from "./features/user/loaders/editArticle.js";
 import myArticlesLoader from "./features/user/loaders/myArticles.js";
 import userProfileLoader from "./features/user/loaders/profile.js";
-import createArticleLoader from "./features/user/loaders/createArticle.js";
 
 import createArticleAction from "./features/user/actions/createArticle.js";
 
@@ -116,7 +119,6 @@ import "./index.css";
 
 const router = createBrowserRouter([
   {
-    hydrateFallbackElement: <PageLoader />,
     errorElement: (
       <Suspense fallback={<PageLoader />}>
         <ErrorPage />
@@ -213,6 +215,10 @@ const router = createBrowserRouter([
         loader: userProfileLoader,
         children: [
           {
+            index: true,
+            element: <Navigate to="dashboard" replace />,
+          },
+          {
             path: "dashboard",
             element: <UserDashBoardPage />,
             loader: myArticlesLoader,
@@ -228,7 +234,6 @@ const router = createBrowserRouter([
               {
                 path: "new",
                 element: <CreateArticlePage />,
-                loader: createArticleLoader,
                 action: createArticleAction,
               },
               {
@@ -260,6 +265,10 @@ const router = createBrowserRouter([
         element: <AdminLayout />,
         loader: adminProfileLoader,
         children: [
+          {
+            index: true,
+            element: <Navigate to="dashboard" replace />,
+          },
           {
             path: "dashboard",
             element: <AdminDashboardPage />,

@@ -3,7 +3,7 @@ import { redirect } from "react-router-dom";
 /**
  * Get dashboard path for a user role
  */
-function getDashboardPath(role) {
+export function getDashboardPath(role) {
   if (role === "admin") return "/admin/dashboard";
   if (role === "user") return "/user/dashboard";
   return null;
@@ -12,8 +12,8 @@ function getDashboardPath(role) {
 /**
  * Redirect to role-based dashboard
  */
-export function redirectToDashboard(role, doRedirect = true) {
+export function redirectToDashboard(role) {
   const path = getDashboardPath(role);
   if (!path) return null;
-  return doRedirect ? redirect(path) : path;
+  return redirect(path);
 }
