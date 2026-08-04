@@ -26,7 +26,7 @@ const authRoutes = Router();
 // Register new user
 authRoutes.post("/register", rateLimiter, signUp);
 
-// Verify OTP
+// Verify OTP for signup
 authRoutes.post(
   "/signup/verify-otp",
   rateLimiter,
@@ -34,6 +34,7 @@ authRoutes.post(
   verifyOtp,
 );
 
+// Verify OTP for password reset
 authRoutes.post(
   "/password-reset/verify-otp",
   rateLimiter,
@@ -41,7 +42,7 @@ authRoutes.post(
   verifyOtp,
 );
 
-// Resend OTP
+// Resend OTP for signup
 authRoutes.post(
   "/signup/resend-otp",
   rateLimiter,
@@ -49,6 +50,7 @@ authRoutes.post(
   resendOtp,
 );
 
+// Resend OTP for password reset
 authRoutes.post(
   "/password-reset/resend-otp",
   rateLimiter,
@@ -56,17 +58,17 @@ authRoutes.post(
   resendOtp,
 );
 
-// Login
+// User login
 authRoutes.post("/login", rateLimiter, login);
 
-// Verify 2FA login
+// Verify 2FA code during login
 authRoutes.post(
   "/2fa/verify-login",
   authenticate(COOKIE_NAMES.TWO_FACTOR),
   verifyTwoFactorLogin,
 );
 
-// Logout user
+// Logout user (clear access token cookie)
 authRoutes.post("/logout", (req, res) => {
   clearCookie(res, COOKIE_NAMES.ACCESS);
 
@@ -76,14 +78,14 @@ authRoutes.post("/logout", (req, res) => {
   });
 });
 
-// Complete Google signup (username / profile completion)
+// Complete Google signup (username)
 authRoutes.post(
   "/oauth/complete",
   authenticate(COOKIE_NAMES.OAUTH),
   completeGoogleSignup,
 );
 
-// Redirect user to Google OAuth
+// Redirect user to Google OAuth provider
 authRoutes.get(
   "/google",
   passport.authenticate("google", {
@@ -101,59 +103,60 @@ authRoutes.get(
   googleOAuthCallback,
 );
 
-// Check if email already exists
+// Check availability of email
 authRoutes.post("/check-email", checkEmailAvailability);
 
-// Check if username already exists
+// Check availability of username
 authRoutes.post("/check-username", checkUsernameAvailability);
 
-// forgot-password
+// Initiate forgot password request
 authRoutes.post("/forgot-password", rateLimiter, forgetPassword);
 
-// Password reset  after OTP verification
+// Reset password after OTP verification
 authRoutes.post(
   "/password-reset",
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
   passwordReset,
 );
 
-/* =========== FRONTEND LOADERS =========== */
+/* =========== FRONTEND LOADERS & TOKEN VERIFICATION =========== */
 
-// Signup OTP session validation
+// Verify signup token status
 authRoutes.get(
-  "/signup-session",
+  "/signup-status",
   authenticate(COOKIE_NAMES.SIGNUP),
   (req, res) => {
     res.json({ success: true, email: req.user.email });
   },
 );
 
-// Password-reset OTP session validation
+// Verify password-reset token status
 authRoutes.get(
-  "/password-reset-session",
+  "/password-reset-status",
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
   (req, res) => {
     res.json({ success: true, email: req.user.email });
   },
 );
 
-// OAuth session validation (complete-profile)
+// Verify OAuth profile completion token status
 authRoutes.get(
-  "/oauth-session",
+  "/oauth-status",
   authenticate(COOKIE_NAMES.OAUTH),
   (req, res) => {
     res.json({ success: true });
   },
 );
 
-// 2FA session validation (2FA page)
+// Verify 2FA token status
 authRoutes.get(
-  "/2fa-session",
+  "/2fa-status",
   authenticate(COOKIE_NAMES.TWO_FACTOR),
   (req, res) => res.json({ success: true }),
 );
 
-authRoutes.get("/me", authenticate(COOKIE_NAMES.ACCESS), (req, res) => {
+// Check current user authentication status
+authRoutes.get("/status", authenticate(COOKIE_NAMES.ACCESS), (req, res) => {
   res.json({
     success: true,
     role: req.user.role,
