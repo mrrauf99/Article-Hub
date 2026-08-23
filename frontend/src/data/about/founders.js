@@ -33,7 +33,7 @@ export const FOUNDERS = [
       },
       {
         name: "Portfolio",
-        url: "",
+        url: "https://abdulrauf.dev",
         icon: Globe,
       },
     ],
