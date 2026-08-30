@@ -113,6 +113,7 @@ import AdminLayout from "./layouts/AdminLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
 
 import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
+import PublicArticleDetailPage from "./features/articles/pages/PublicArticleDetailPage.jsx";
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
 
 import "./index.css";
@@ -156,7 +157,7 @@ const router = createBrowserRouter([
           },
           {
             path: "articles/:id",
-            element: <ArticleDetailPage />,
+            element: <PublicArticleDetailPage />,
             loader: articleDetailLoader,
           },
         ],

@@ -1,58 +1,49 @@
 import { Link, useRouteError, isRouteErrorResponse } from "react-router-dom";
+import { ArrowLeft, BookOpen } from "lucide-react";
 import SEO from "@/components/SEO";
 
 function getErrorDetails(error) {
   if (!error) {
     return {
-      code: 404,
-      badge: "404 • NOT FOUND",
+      code: "404",
       headline: "This page is missing.",
-      subheadline: "We looked through our entire library but couldn't find the page you were searching for.",
-      description: "The page you're looking for doesn't exist, has been moved, or the URL is slightly off. Go back to keep reading and exploring fresh articles.",
-      errorCode: "404_NOT_FOUND",
+      description:
+        "We looked through our entire library but couldn't find the page you were searching for. It may have been moved, or the address might be slightly off.",
     };
   }
 
   if (!isRouteErrorResponse(error)) {
     return {
-      code: "ERR",
-      badge: "ERROR • UNEXPECTED",
+      code: "Error",
       headline: "Something went wrong.",
-      subheadline: "An unexpected error occurred on our end. Please refresh or go back.",
-      description: "An unexpected error occurred on our end. Please refresh the page or go back.",
-      errorCode: "UNEXPECTED_ERROR",
+      description:
+        "An unexpected error occurred on our end. Please refresh the page or go back.",
     };
   }
 
   if (error.status === 404) {
     return {
-      code: 404,
-      badge: "404 • NOT FOUND",
+      code: "404",
       headline: "This page is missing.",
-      subheadline: "We looked through our entire library but couldn't find the page you were searching for.",
-      description: "The page you're looking for doesn't exist, has been moved, or the URL is slightly off. Go back to keep reading and exploring fresh articles.",
-      errorCode: "404_NOT_FOUND",
+      description:
+        "We looked through our entire library but couldn't find the page you were searching for. It may have been moved, or the address might be slightly off.",
     };
   }
 
   if (error.status === 500) {
     return {
-      code: 500,
-      badge: "500 • SERVER ERROR",
+      code: "500",
       headline: "Something went wrong.",
-      subheadline: "We ran into a problem while loading the page you requested.",
-      description: "Our servers ran into an unexpected issue. We're working to fix it. Please try again in a few moments.",
-      errorCode: "500_INTERNAL_SERVER_ERROR",
+      description:
+        "Our servers ran into an unexpected issue. We're working to fix it, please try again in a few moments.",
     };
   }
 
   return {
-    code: error.status,
-    badge: `${error.status} • ERROR`,
+    code: String(error.status),
     headline: "Something went wrong.",
-    subheadline: "We ran into a problem while loading the page you requested.",
-    description: error.statusText || "An unexpected error occurred. Please go back and try again.",
-    errorCode: `${error.status}_ERROR`,
+    description:
+      error.statusText || "An unexpected error occurred. Please go back and try again.",
   };
 }
 
@@ -61,7 +52,7 @@ export default function ErrorPage() {
   const details = getErrorDetails(error);
 
   return (
-    <main className="min-h-screen bg-slate-950 flex items-center justify-center w-full px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12">
+    <main className="min-h-[100dvh] bg-ink-950 flex items-center justify-center w-full px-4 sm:px-6 lg:px-8 py-12 font-ui">
       <SEO
         title="Error"
         description="An error occurred while loading this page."
@@ -70,93 +61,41 @@ export default function ErrorPage() {
         nofollow
       />
 
-      <div className="w-full max-w-4xl mx-auto">
-        {/* Background glow */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 via-sky-500/10 to-emerald-500/10 blur-3xl" />
+      <div className="w-full max-w-lg mx-auto text-center">
+        <Link to="/" className="inline-flex items-center gap-2.5 mb-12">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-paper">
+            <BookOpen className="h-4.5 w-4.5 text-ink-950" strokeWidth={2} />
+          </span>
+          <span className="text-lg font-semibold text-paper tracking-tight">
+            Article Hub
+          </span>
+        </Link>
 
-        {/* Card */}
-        <div className="relative rounded-2xl border border-slate-800 bg-slate-950/80 shadow-2xl backdrop-blur-sm overflow-hidden">
-          <div className="p-6 sm:p-10 lg:p-16 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left: Error code section */}
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-3 py-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs font-medium tracking-widest uppercase text-slate-300">
-                  {details.badge}
-                </span>
-              </div>
+        <p className="font-editorial text-7xl sm:text-8xl text-paper mb-4">
+          {details.code}
+        </p>
 
-              <div>
-                <p className="text-xs font-medium tracking-widest text-slate-500 uppercase mb-3">
-                  Article Hub
-                </p>
-                <h1 className="text-7xl sm:text-8xl lg:text-9xl font-extrabold text-slate-50 leading-none">
-                  {String(details.code)
-                    .split("")
-                    .map((char, i) =>
-                      i === 1 ? (
-                        <span
-                          key={i}
-                          className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400"
-                        >
-                          {char}
-                        </span>
-                      ) : (
-                        <span key={i}>{char}</span>
-                      )
-                    )}
-                </h1>
-                <p className="mt-4 text-sm text-slate-400 max-w-md">
-                  {details.subheadline}
-                </p>
-              </div>
-            </div>
+        <h1 className="text-xl sm:text-2xl font-semibold text-paper mb-3">
+          {details.headline}
+        </h1>
+        <p className="text-paper/55 mb-10 leading-relaxed">
+          {details.description}
+        </p>
 
-            {/* Right: Message + actions */}
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-50">
-                  {details.headline}
-                </h2>
-                <p className="mt-3 text-slate-400 text-sm sm:text-base">
-                  {details.description}
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                {details.code === 404 ? (
-                  <>
-                    <Link
-                      to="/"
-                      className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 transition-colors"
-                    >
-                      Back to homepage
-                    </Link>
-                    <button
-                      onClick={() => window.history.back()}
-                      className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-900/50 px-8 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-800 hover:text-slate-50 transition-colors"
-                    >
-                      Go back
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => window.history.back()}
-                    className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 transition-colors"
-                  >
-                    Go back
-                  </button>
-                )}
-              </div>
-
-              <p className="text-xs text-slate-500">
-                Error code:{" "}
-                <span className="font-mono text-slate-400">
-                  {details.errorCode}
-                </span>
-              </p>
-            </div>
-          </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-full bg-paper px-7 py-3 text-sm font-semibold text-ink-950 hover:bg-moss-100 transition-colors"
+          >
+            Back to homepage
+          </Link>
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-paper/20 px-7 py-3 text-sm font-medium text-paper/80 hover:border-paper/40 hover:text-paper transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Go back
+          </button>
         </div>
       </div>
     </main>

@@ -10,6 +10,47 @@ export default {
         primary: "#2563EB",
         accent: "#38BDF8",
         dark: "#020617",
+
+        // Guest/Auth design tokens ("Ink & Moss") — additive only, scoped via
+        // the font-ui/font-editorial + these color utilities on guest/auth
+        // surfaces. Never used as replacements for existing slate/sky tokens
+        // that the User/Admin panels still rely on.
+        paper: {
+          DEFAULT: "#FAFAF7",
+          raised: "#FFFFFF",
+        },
+        ink: {
+          DEFAULT: "#1B1B18",
+          muted: "#5B5B54",
+          faint: "#6B6B63",
+          950: "#14140F",
+          900: "#1D1D17",
+          800: "#2A2A22",
+        },
+        hairline: {
+          DEFAULT: "#E4E1D8",
+          strong: "#D3CFC0",
+          dark: "rgba(250, 250, 247, 0.12)",
+        },
+        moss: {
+          50: "#F1F6F2",
+          100: "#E4EEE7",
+          200: "#C7DCCD",
+          300: "#A9CAB3",
+          400: "#4F8A69",
+          500: "#356B4C",
+          600: "#2C6B4F",
+          700: "#1E4B39",
+          800: "#193D2E",
+          900: "#143024",
+        },
+      },
+      fontFamily: {
+        // Guest/Auth only — applied via explicit font-editorial / font-ui
+        // classes on redesigned surfaces. The Tailwind default `sans` stays
+        // untouched so User/Admin typography is unaffected.
+        editorial: ["Newsreader", "Georgia", "serif"],
+        ui: ['"Public Sans"', "system-ui", "sans-serif"],
       },
       animation: {
         shimmer: "shimmer 2s infinite",
