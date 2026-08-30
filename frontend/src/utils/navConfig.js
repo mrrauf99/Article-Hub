@@ -1,4 +1,12 @@
-import { LayoutDashboard, Compass, Users, FileText, PenSquare } from "lucide-react";
+import {
+  LayoutDashboard,
+  Compass,
+  Users,
+  FileText,
+  PenSquare,
+  Info,
+  Mail,
+} from "lucide-react";
 
 export function getNavItemsForRole(role) {
   if (role === "user") {
@@ -14,6 +22,14 @@ export function getNavItemsForRole(role) {
       { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
       { label: "Articles", href: "/admin/articles", icon: FileText },
       { label: "Users", href: "/admin/users", icon: Users },
+    ];
+  }
+
+  if (role === "guest") {
+    return [
+      { label: "Explore", href: "/#articles", icon: Compass },
+      { label: "About", href: "/about", icon: Info },
+      { label: "Contact", href: "/contact", icon: Mail },
     ];
   }
 
