@@ -57,7 +57,7 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
           Log in
         </Link>
         <Link to="/register" className={styles.signupBtn}>
-          Sign Up
+          Sign up
         </Link>
       </div>
     );

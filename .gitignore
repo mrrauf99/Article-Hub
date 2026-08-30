@@ -1,0 +1,27 @@
+# Dependencies
+**/node_modules/
+
+# Environment
+**/.env
+**/.env.*
+!**/.env.example
+
+# Build
+frontend/dist/
+
+# Logs
+*.log
+
+# Claude local settings
+.claude/
+CLAUDE.md
+.impeccable/
+PRODUCT.md
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

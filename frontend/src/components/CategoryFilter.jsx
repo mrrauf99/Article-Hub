@@ -60,7 +60,7 @@ export default function CategoryFilter({
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      const dropdownWidth = 240;
+      const dropdownWidth = Math.min(240, window.innerWidth - 32);
       // Position dropdown to the right edge of the button, ensuring it doesn't go off screen
       let left = rect.right - dropdownWidth;
       if (left < 16) left = 16; // Minimum 16px from left edge
@@ -128,8 +128,8 @@ export default function CategoryFilter({
             className={`w-full flex items-center justify-between pl-4 pr-3 py-2.5 text-left transition-colors focus:outline-none ${
               activeCategory === category
                 ? isDark
-                  ? "bg-sky-500/20 text-sky-400"
-                  : "bg-sky-50 text-sky-600"
+                  ? "bg-moss-500/20 text-moss-200"
+                  : "bg-moss-50 text-moss-700"
                 : isDark
                 ? "text-slate-300 hover:bg-slate-700/50 hover:text-white"
                 : "text-slate-700 hover:bg-slate-50"
@@ -153,8 +153,8 @@ export default function CategoryFilter({
     : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-300";
 
   const moreButtonActiveClasses = isDark
-    ? "border-sky-400 text-sky-200 bg-slate-700/70 shadow-[0_0_0_2px_rgba(56,189,248,0.35)]"
-    : "border-sky-300 text-sky-700 bg-sky-50 shadow-[0_0_0_2px_rgba(56,189,248,0.25)]";
+    ? "border-moss-400 text-moss-200 bg-slate-700/70 shadow-[0_0_0_2px_rgba(79,138,105,0.35)]"
+    : "border-moss-300 text-moss-700 bg-moss-50 shadow-[0_0_0_2px_rgba(44,107,79,0.2)]";
 
   // Error styling classes
   // ...existing code...

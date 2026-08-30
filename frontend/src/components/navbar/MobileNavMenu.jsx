@@ -117,7 +117,7 @@ export default function MobileNavMenu({
               onClick={onClose}
               className={styles.mobileSignupBtn}
             >
-              Sign Up
+              Sign up
             </Link>
           </div>
         ) : (

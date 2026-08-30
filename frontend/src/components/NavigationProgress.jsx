@@ -65,7 +65,7 @@ export default function NavigationProgress() {
   if (!visible) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-[3px] bg-transparent">
+    <div className="fixed top-0 left-0 right-0 z-[9999] h-[2px] bg-transparent">
       {/* Progress bar */}
       <div
         className="h-full transition-all duration-300 ease-out"

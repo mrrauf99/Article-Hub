@@ -17,8 +17,8 @@ export default function SectionHeader({
     >
       <div className="flex items-center gap-3">
         {Icon && (
-          <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/25">
-            <Icon className="w-5 h-5 text-white" />
+          <div className="p-2 bg-moss-50 rounded-xl shrink-0">
+            <Icon className="w-5 h-5 text-moss-700" />
           </div>
         )}
         <div>

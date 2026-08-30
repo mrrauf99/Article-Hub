@@ -1,3 +1,17 @@
+/* Guest/Auth typography — self-hosted, loaded once, scoped via font-editorial
+   / font-ui utilities so the rest of the app (User/Admin panels) keeps its
+   existing default font stack untouched. */
+@import "@fontsource/newsreader/latin-400.css";
+@import "@fontsource/newsreader/latin-400-italic.css";
+@import "@fontsource/newsreader/latin-500.css";
+@import "@fontsource/newsreader/latin-600.css";
+@import "@fontsource/newsreader/latin-600-italic.css";
+@import "@fontsource/newsreader/latin-700.css";
+@import "@fontsource/public-sans/latin-400.css";
+@import "@fontsource/public-sans/latin-500.css";
+@import "@fontsource/public-sans/latin-600.css";
+@import "@fontsource/public-sans/latin-700.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,6 +19,15 @@
 @layer base {
   body {
     @apply overflow-x-hidden;
+  }
+}
+
+@layer utilities {
+  /* Reserve descender clearance for italic serif emphasis (y g j p q) so
+     tight leading never clips them. Used on guest/auth display headlines. */
+  .italic-clear {
+    line-height: 1.15;
+    padding-bottom: 0.15em;
   }
 }
 

@@ -6,10 +6,16 @@ import { useEffect, useRef, useState } from "react";
  * @returns {Array} [ref, isVisible] - Ref to attach to element and visibility state
  */
 export function useScrollReveal(options = {}) {
-  const [isVisible, setIsVisible] = useState(false);
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+  const [isVisible, setIsVisible] = useState(prefersReducedMotion);
   const ref = useRef(null);
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     const element = ref.current;
     if (!element) return;
 
