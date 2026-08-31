@@ -3,34 +3,25 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function ContactHero() {
   return (
-    <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white py-16 sm:py-20 w-full">
-      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 text-center">
-        <div className="w-full max-w-7xl mx-auto">
-        {/* Icon */}
-        <ScrollReveal animation="scale" duration={500}>
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-blue-600/10 rounded-full flex items-center justify-center">
-              <Mail className="w-8 h-8 text-blue-500" strokeWidth={2} />
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* Heading */}
-        <ScrollReveal animation="fade-up" delay={100} duration={600}>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Get in Touch</h1>
-        </ScrollReveal>
-
-        {/* Description */}
-        <ScrollReveal animation="fade-up" delay={200} duration={600}>
-          <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-4">
-            Have a question or want to work together? We'd love to hear from
-            you.
-          </p>
-          <p className="text-base text-slate-400 max-w-2xl mx-auto">
-            Whether you're a writer looking to share ideas or a reader with
-            feedback, we're here to help build a better content experience.
-          </p>
-        </ScrollReveal>
+    <div className="bg-ink-950 text-paper py-16 sm:py-20 w-full font-ui">
+      <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full max-w-2xl mx-auto">
+          <ScrollReveal animation="fade-up" duration={500}>
+            <span className="flex mx-auto items-center justify-center w-14 h-14 rounded-full bg-paper/10 mb-6">
+              <Mail className="w-6 h-6 text-paper" strokeWidth={1.75} />
+            </span>
+            <h1 className="font-editorial text-4xl sm:text-5xl mb-5">
+              Get in touch
+            </h1>
+            <p className="text-lg text-paper/70 mb-2">
+              Have a question or want to work together? We'd love to hear
+              from you.
+            </p>
+            <p className="text-sm text-paper/50">
+              Whether you're a writer with ideas or a reader with feedback,
+              we're here to help.
+            </p>
+          </ScrollReveal>
         </div>
       </div>
     </div>

@@ -3,14 +3,7 @@ import { useState, useEffect, useRef, startTransition } from "react";
 import { useContactForm } from "../hooks/useContactForm";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
-import {
-  Send,
-  CheckCircle,
-  User,
-  XCircle,
-  Mail,
-  MessageSquare,
-} from "lucide-react";
+import { Send, CheckCircle, User, XCircle, Mail, MessageSquare } from "lucide-react";
 import InputField from "@/components/InputField";
 
 export default function ContactForm() {
@@ -54,44 +47,42 @@ export default function ContactForm() {
   }, [fetcher.state, fetcher.data, reset]);
 
   return (
-    <ScrollReveal animation="fade-right" duration={600}>
-      <div className="bg-white rounded-2xl border border-slate-200 p-8 w-full">
-        <h2 className="text-3xl font-bold text-slate-900 mb-2">
-          Send us a Message
+    <ScrollReveal animation="fade-right" duration={500}>
+      <div className="rounded-xl border border-hairline bg-paper-raised p-6 sm:p-8 font-ui">
+        <h2 className="font-editorial text-2xl text-ink mb-1.5">
+          Send us a message
         </h2>
-
-        <p className="text-slate-600 mb-8">
-          Fill out the form below and we'll get back to you as soon as possible.
+        <p className="text-ink-muted mb-7">
+          Fill out the form below and we'll get back to you as soon as
+          possible.
         </p>
 
-        <fetcher.Form
-          method="post"
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
+        <fetcher.Form method="post" onSubmit={handleSubmit} className="space-y-5">
           <InputField
-            label="Your Name"
+            label="Your name"
             icon={User}
             name="name"
             value={values.name}
-            placeholder="John Doe"
+            placeholder="Jordan Ellis"
             onBlur={handleBlur}
             onChange={handleChange}
             maxLength={50}
             error={errors.name}
+            aria-required="true"
           />
 
           <InputField
-            label="Email Address"
+            label="Email address"
             icon={Mail}
             name="email"
             type="email"
             value={values.email}
-            placeholder="john@example.com"
+            placeholder="jordan@example.com"
             onBlur={handleBlur}
             onChange={handleChange}
             maxLength={100}
             error={errors.email}
+            aria-required="true"
           />
 
           <InputField
@@ -104,14 +95,15 @@ export default function ContactForm() {
             onChange={handleChange}
             maxLength={120}
             error={errors.subject}
+            aria-required="true"
           />
 
-          {/* Message */}
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-slate-700">
+          <div className="space-y-1.5">
+            <label htmlFor="message" className="block text-sm font-medium text-ink">
               Message
             </label>
             <textarea
+              id="message"
               name="message"
               rows="5"
               value={values.message}
@@ -119,13 +111,19 @@ export default function ContactForm() {
               onBlur={handleBlur}
               onChange={handleChange}
               maxLength={2000}
-              className={`w-full px-4 py-3 rounded-lg resize-none border outline-none focus:border-blue-600 
-            transition-all duration-200
-            ${errors.message ? "border-red-500" : "border-slate-300"}
-          `}
+              aria-required="true"
+              aria-invalid={Boolean(errors.message) || undefined}
+              aria-describedby={errors.message ? "message-error" : undefined}
+              className={`w-full px-4 py-3 rounded-lg resize-none border outline-none transition-colors bg-paper-raised text-ink placeholder-ink-faint ${
+                errors.message
+                  ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/15"
+                  : "border-hairline-strong focus:border-moss-600 focus:ring-2 focus:ring-moss-600/15"
+              }`}
             />
             {errors.message && (
-              <p className="text-sm text-red-600 mt-1">{errors.message}</p>
+              <p id="message-error" className="text-sm text-red-600" role="alert">
+                {errors.message}
+              </p>
             )}
           </div>
 
@@ -133,37 +131,32 @@ export default function ContactForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
-        disabled:bg-blue-400 disabled:cursor-not-allowed
-          font-semibold flex items-center justify-center gap-2 
-          transition-colors duration-200 focus:outline-none focus-visible:ring-2
-         focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+              className="w-full bg-ink text-paper py-3 rounded-full hover:bg-moss-700 disabled:opacity-60 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
             >
               {isSubmitting ? (
                 <>
-                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  <span className="animate-spin h-4 w-4 border-2 border-paper/40 border-t-paper rounded-full" />
                   Sending message...
                 </>
               ) : (
                 <>
                   <Send className="h-4 w-4" />
-                  Send Message
+                  Send message
                 </>
               )}
             </button>
           )}
 
-          {/* FEEDBACK */}
           {feedback && (
             <div
               className={`flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
                 feedback.success
-                  ? "border-green-200 bg-green-50 text-green-800"
+                  ? "border-moss-200 bg-moss-50 text-moss-700"
                   : "border-red-200 bg-red-50 text-red-800"
               }`}
             >
               {feedback.success ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle className="h-5 w-5 text-moss-600" />
               ) : (
                 <XCircle className="h-5 w-5 text-red-600" />
               )}
