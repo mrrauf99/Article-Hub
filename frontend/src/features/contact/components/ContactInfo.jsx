@@ -5,17 +5,17 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function ContactInfo() {
   return (
-    <div className="space-y-8">
-      <ScrollReveal animation="fade-left" duration={600}>
-        <div className="bg-white rounded-2xl border border-slate-200 p-8">
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">
-            Contact Information
+    <div className="space-y-6 font-ui">
+      <ScrollReveal animation="fade-left" duration={500}>
+        <div className="rounded-xl border border-hairline bg-paper-raised p-6 sm:p-8">
+          <h2 className="font-editorial text-2xl text-ink mb-1.5">
+            Contact information
           </h2>
-          <p className="text-slate-600 mb-8">
-            Reach out to us through any of these channels.
+          <p className="text-ink-muted mb-6">
+            Reach out through any of these channels.
           </p>
 
-          <div className="space-y-4">
+          <div className="divide-y divide-hairline">
             {CONTACT_INFO.map((item) => (
               <ContactInfoItem key={item.title} {...item} />
             ))}
@@ -23,15 +23,12 @@ export default function ContactInfo() {
         </div>
       </ScrollReveal>
 
-      <ScrollReveal animation="fade-left" delay={150} duration={600}>
-        <div className="bg-blue-600 rounded-2xl p-8 text-white">
-          <h3 className="text-2xl font-bold mb-2">Quick Response</h3>
-          <p className="text-blue-50 mb-4">
-            We typically respond within 24 hours during business days.
-          </p>
-          <div className="flex items-center gap-2 text-blue-100">
-            <Clock className="w-5 h-5" />
-            <span className="text-sm">Average response time: 4 hours</span>
+      <ScrollReveal animation="fade-left" delay={120} duration={500}>
+        <div className="rounded-xl bg-ink-950 p-6 sm:p-8 text-paper">
+          <h3 className="font-editorial text-xl mb-2">Quick response</h3>
+          <div className="flex items-center gap-2 text-paper/65 text-sm">
+            <Clock className="w-4 h-4" />
+            <span>We aim to reply within 24 hours, every message read personally.</span>
           </div>
         </div>
       </ScrollReveal>

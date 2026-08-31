@@ -50,13 +50,12 @@ function getPaginationRange(currentPage, totalPages, siblingCount = 0) {
 // Pre-computed class strings — defined once outside the component,
 // never reconstructed during re-renders.
 const BASE_BTN =
-  "min-w-[42px] h-[42px] rounded-xl text-sm font-semibold transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:ring-offset-1";
+  "min-w-[42px] h-[42px] rounded-xl text-sm font-semibold transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-moss-600/20 focus:ring-offset-1";
 const INACTIVE_BTN =
   "bg-white text-slate-600 border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900";
-const ACTIVE_BTN =
-  "bg-gradient-to-br from-indigo-500 to-indigo-600 text-white border border-indigo-500 shadow-md shadow-indigo-500/25";
+const ACTIVE_BTN = "bg-moss-700 text-white border border-moss-700";
 const NAV_BTN =
-  "inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:ring-offset-1 disabled:opacity-40 disabled:cursor-not-allowed";
+  "inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-moss-600/20 focus:ring-offset-1 disabled:text-slate-500 disabled:cursor-not-allowed";
 
 // Combine once — eliminates string concatenation on every render
 const NAV_BTN_FULL = `${NAV_BTN} ${INACTIVE_BTN}`;

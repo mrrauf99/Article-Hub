@@ -89,30 +89,25 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-paper font-ui">
       <SEO
         title={SITE_CONFIG.name}
         description={SITE_CONFIG.description}
         canonicalPath={canonicalPath}
         schema={[organizationSchema, websiteSchema]}
       />
-      {/* Hero Section */}
       <HeroSection articleCount={totalArticles} authorCount={authorCount} />
 
-      {/* Featured Articles */}
       <FeaturedArticles articles={articles} />
 
-      {/* Categories Section */}
       <CategoriesSection
         categories={categories}
         onSelect={handleCategorySelect}
         articleCounts={articleCounts}
       />
 
-      {/* Features Section */}
       <FeaturesSection />
 
-      {/* All Articles Grid */}
       <ArticlesGrid
         articles={articles}
         categories={categories}
@@ -124,10 +119,8 @@ export default function HomePage() {
         totalPages={pagination?.totalPages ?? 1}
       />
 
-      {/* Newsletter Section */}
       <NewsletterSection />
 
-      {/* CTA Section */}
       <CTASection />
     </div>
   );

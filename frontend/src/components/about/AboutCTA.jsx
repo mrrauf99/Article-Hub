@@ -1,5 +1,5 @@
 import { Link, useRouteLoaderData } from "react-router-dom";
-import { PenTool, Info } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function AboutCTA() {
@@ -7,67 +7,40 @@ export default function AboutCTA() {
   const user = data?.user || null;
   const isAdmin = user?.role === "admin";
 
-  return (
-    <section className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-      <div className="w-full max-w-4xl mx-auto">
-        <ScrollReveal animation="scale-up" duration={700}>
-          <div className="bg-gradient-to-br from-sky-500 to-indigo-600 rounded-3xl p-8 sm:p-12 text-center text-white shadow-2xl">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Ready to Join Us?
-            </h2>
-            <p className="text-lg text-sky-50 mb-8 max-w-2xl mx-auto">
-              Be part of a community that values quality over quantity. Start
-              writing, reading, and learning in a space designed for you.
-            </p>
+  const primary = isAdmin
+    ? { to: "/admin/dashboard", label: "Go to dashboard" }
+    : user
+      ? { to: "/user/articles/new", label: "Start writing" }
+      : { to: "/register", label: "Create your account" };
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {isAdmin ? (
-                <Link
-                  to="/admin/dashboard"
-                  className="bg-white/80 text-sky-600 px-8 py-4 rounded-xl font-semibold
-                  inline-flex items-center justify-center gap-2
-                  transition duration-300 ease-out
-                  hover:scale-[1.03] hover:bg-white active:scale-[0.98]"
-                  title="Go to Admin Dashboard"
-                >
-                  Go to Dashboard
-                  <PenTool className="h-5 w-5" />
-                </Link>
-              ) : user ? (
-                <Link
-                  to="/user/articles/new"
-                  className="bg-white text-sky-600 px-8 py-4 rounded-xl font-semibold
-                  inline-flex items-center justify-center gap-2
-                  transition duration-300 ease-out
-                  hover:scale-[1.03] hover:bg-sky-50 active:scale-[0.98]"
-                >
-                  Start Writing Today
-                  <PenTool className="h-5 w-5" />
-                </Link>
-              ) : (
-                <Link
-                  to="/login"
-                  className="bg-white text-sky-600 px-8 py-4 rounded-xl font-semibold
-                  inline-flex items-center justify-center gap-2
-                  transition duration-300 ease-out
-                  hover:scale-[1.03] hover:bg-sky-50 active:scale-[0.98]"
-                >
-                  Start Writing Today
-                  <PenTool className="h-5 w-5" />
-                </Link>
-              )}
-              <Link
-                to="/contact"
-                className="bg-sky-600 text-white px-8 py-4 rounded-xl font-semibold border-2 border-white/20
-                inline-flex items-center justify-center gap-2
-                transition duration-300 ease-out
-                hover:scale-[1.03] hover:bg-sky-700 active:scale-[0.98]"
-              >
-                Get in Touch
-                <Info className="h-5 w-5" />
-              </Link>
-            </div>
-          </div>
+  return (
+    <section className="w-full px-4 sm:px-6 lg:px-8 py-14 sm:py-20 bg-ink-950 font-ui">
+      <div className="w-full max-w-2xl mx-auto text-center">
+        <ScrollReveal animation="fade-up" duration={500}>
+          <h2 className="font-editorial text-3xl sm:text-4xl text-paper mb-4">
+            Ready to join us?
+          </h2>
+          <p className="text-paper/65 mb-9 max-w-lg mx-auto">
+            Be part of a community that values quality over quantity.
+          </p>
+
+          <Link
+            to={primary.to}
+            className="group inline-flex items-center gap-2 bg-paper hover:bg-moss-100 text-ink-950 px-7 py-3.5 rounded-full font-semibold text-[0.9375rem] transition-colors"
+          >
+            {primary.label}
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <p className="mt-6 text-sm text-paper/55">
+            Have a question first?{" "}
+            <Link
+              to="/contact"
+              className="text-paper font-medium hover:text-moss-200 transition-colors underline underline-offset-4"
+            >
+              Get in touch
+            </Link>
+          </p>
         </ScrollReveal>
       </div>
     </section>

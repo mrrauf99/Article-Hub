@@ -1,13 +1,13 @@
 export default function ValueCard({ icon: Icon, title, description }) {
   return (
-    <div className="group relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
+    <div className="p-6 rounded-xl border border-hairline bg-paper-raised">
       <div className="flex items-center gap-3 mb-3">
-        <div className="p-2.5 bg-gradient-to-br from-sky-50 to-indigo-50 text-sky-600 rounded-xl">
-          <Icon className="h-6 w-6" />
-        </div>
-        <h3 className="text-lg font-bold text-slate-900">{title}</h3>
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-moss-50 text-moss-700">
+          <Icon className="h-5 w-5" />
+        </span>
+        <h3 className="font-semibold text-ink">{title}</h3>
       </div>
-      <p className="text-sm text-slate-600 leading-relaxed">{description}</p>
+      <p className="text-sm text-ink-muted leading-relaxed">{description}</p>
     </div>
   );
 }
