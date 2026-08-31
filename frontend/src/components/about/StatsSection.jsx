@@ -1,30 +1,32 @@
 import StatCard from "@/components/StatCard";
-import { ScrollReveal } from "@/components/ScrollReveal";
+import StatsGrid from "@/components/StatsGrid";
+
+const STATS = [
+  { key: "founder", value: "1", label: "Founder", sublabel: "Building with passion" },
+  { key: "adfree", value: "100%", label: "Ad-free", sublabel: "Forever" },
+  { key: "founded", value: "2025", label: "Founded", sublabel: "Just getting started" },
+];
 
 export default function StatsSection() {
-  const stats = [
-    { number: "1", label: "Founder", sublabel: "Building with passion" },
-    { number: "100%", label: "Ad-Free", sublabel: "Forever" },
-    { number: "∞", label: "Possibilities", sublabel: "For creators" },
-    { number: "2025", label: "Founded", sublabel: "Just getting started" },
-  ];
-
   return (
-    <section className="bg-white py-10 sm:py-12 border-y border-slate-200 w-full">
-      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8">
-        <div className="w-full max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            {stats.map((stat, index) => (
-              <ScrollReveal
-                key={stat.label}
-                animation="fade-up"
-                delay={index * 100}
-                duration={500}
-              >
-                <StatCard {...stat} />
-              </ScrollReveal>
-            ))}
-          </div>
+    <section className="bg-paper-raised py-10 sm:py-12 border-y border-hairline font-ui">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-5xl mx-auto">
+          <StatsGrid
+            items={STATS}
+            gridClassName="grid grid-cols-3 divide-x divide-hairline"
+            staggerDelay={80}
+            renderItem={(stat) => (
+              <div className="text-center px-3">
+                <StatCard
+                  variant="plain"
+                  value={stat.value}
+                  label={stat.label}
+                  sublabel={stat.sublabel}
+                />
+              </div>
+            )}
+          />
         </div>
       </div>
     </section>

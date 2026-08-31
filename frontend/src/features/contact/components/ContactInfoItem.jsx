@@ -5,19 +5,19 @@ export default function ContactInfoItem({ icon: Icon, title, content, link }) {
         href: link,
         target: "_blank",
         rel: "noopener noreferrer",
-        className: "hover:text-blue-600 transition-colors",
+        className: "hover:text-moss-700 transition-colors",
       }
     : {};
 
   return (
-    <div className="flex gap-4 p-4 bg-slate-50 rounded-xl hover:bg-slate-100">
-      <div className="w-12 h-12 bg-blue-600/10 rounded-lg flex items-center justify-center">
-        <Icon className="w-6 h-6 text-blue-600" />
-      </div>
+    <div className="flex gap-4 py-4 first:pt-0 last:pb-0">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-moss-50 text-moss-700">
+        <Icon className="w-5 h-5" />
+      </span>
       <div>
-        <h3 className="font-semibold text-slate-900 mb-1">{title}</h3>
+        <h3 className="font-semibold text-ink mb-1">{title}</h3>
         <Wrapper {...props}>
-          <p className="text-slate-600">{content}</p>
+          <p className="text-ink-muted text-sm">{content}</p>
         </Wrapper>
       </div>
     </div>

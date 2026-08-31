@@ -14,7 +14,7 @@ export default function AboutPage() {
   const location = useLocation();
 
   return (
-    <>
+    <div className="bg-paper font-ui">
       <SEO
         title="About"
         description={`Learn about ${SITE_CONFIG.name}, our mission, and the team behind the platform.`}
@@ -28,6 +28,6 @@ export default function AboutPage() {
       <FoundersSection />
       <OfferSection />
       <AboutCTA />
-    </>
+    </div>
   );
 }

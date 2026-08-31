@@ -8,7 +8,7 @@ import { userApi } from "@/features/api/userApi";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter } from "@/utils/stringUtils";
 
-function ArticleCard({ article, mode, onDelete }) {
+function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
   const navigate = useNavigate();
   const [imgLoaded, setImgLoaded] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -16,7 +16,7 @@ function ArticleCard({ article, mode, onDelete }) {
   const [deleteError, setDeleteError] = useState(null);
 
   const openArticle = () => {
-    navigate(`/user/articles/${article.id}`);
+    navigate(`${basePath}/${article.id}`);
   };
 
   const handleEdit = (e) => {
@@ -65,11 +65,11 @@ function ArticleCard({ article, mode, onDelete }) {
         onClick={openArticle}
         draggable
         onDragStart={(e) => {
-          const url = `${window.location.origin}/user/articles/${article.id}`;
+          const url = `${window.location.origin}${basePath}/${article.id}`;
           e.dataTransfer.setData("text/uri-list", url);
           e.dataTransfer.setData("text/plain", url);
         }}
-        className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden hover:-translate-y-1"
+        className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden"
       >
         {/* status */}
         {mode !== "guest" && (
@@ -81,7 +81,7 @@ function ArticleCard({ article, mode, onDelete }) {
         {mode !== "guest" && (
           <div className="absolute top-3 right-3 z-10 flex gap-2">
             <ActionButton title="Edit" onClick={handleEdit}>
-              <Edit className="w-4 h-4 text-indigo-600" />
+              <Edit className="w-4 h-4 text-moss-700" />
             </ActionButton>
 
             <ActionButton title="Delete" onClick={handleDelete}>
@@ -92,28 +92,25 @@ function ArticleCard({ article, mode, onDelete }) {
 
         {/* image */}
         {article.image_url && (
-          <div className="h-48 relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
+          <div className="h-48 relative overflow-hidden bg-slate-100">
             {!imgLoaded && (
-              <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200" />
+              <div className="absolute inset-0 animate-pulse bg-slate-100" />
             )}
 
             <img
               src={article.image_url}
               alt={article.title}
               onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full object-contain sm:object-cover transition-all duration-500 group-hover:scale-105
+              className={`w-full h-full object-contain transition-transform duration-500 group-hover:scale-105
         ${imgLoaded ? "opacity-100" : "opacity-0"}`}
             />
-
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         )}
 
         {/* content */}
         <div className="p-5">
           <div className="flex justify-between items-center mb-3">
-            <span className="bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-indigo-100">
+            <span className="bg-moss-50 text-moss-700 text-xs font-semibold px-3 py-1.5 rounded-full">
               {article.category}
             </span>
 
@@ -123,7 +120,7 @@ function ArticleCard({ article, mode, onDelete }) {
             </div>
           </div>
 
-          <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-indigo-600 transition-colors duration-200">
+          <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-moss-700 transition-colors duration-200">
             {capitalizeFirstLetter(article.title)}
           </h3>
 
