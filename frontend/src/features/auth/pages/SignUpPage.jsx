@@ -22,10 +22,10 @@ export default function SignUp() {
   }
 
   return (
-    <AuthLayout title="Article Hub" subtitle="Create Account">
+    <AuthLayout title="Create your account" subtitle="Join a space built for focused reading and writing.">
       <Form
         method="POST"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
         <SignUpFields form={form} isDisabled={isSubmitting} />

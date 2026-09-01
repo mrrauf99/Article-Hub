@@ -7,7 +7,6 @@ export default async function otpAction({ request }) {
   const intent = formData.get("intent");
   const flow = formData.get("flow"); // "signup" | "password-reset"
 
-  /* ---------------- RESEND OTP ---------------- */
   if (intent === "resend") {
     try {
       const { data } = await authApi.resendOTP(flow);
@@ -26,7 +25,6 @@ export default async function otpAction({ request }) {
     }
   }
 
-  /* ---------------- VERIFY OTP ---------------- */
   try {
     const { data } = await authApi.verifyOTP({ otp }, flow);
 

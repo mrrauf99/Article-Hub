@@ -58,11 +58,9 @@ export function usePasswordResetForm() {
       // Re-evaluate confirmPassword error when password changes
       if (name === FIELD_NAMES.PASSWORD && prev.confirmPassword) {
         setErrors((err) => {
-          // If passwords now match, clear confirmPassword error
           if (err.confirmPassword && value === prev.confirmPassword) {
             return { ...err, confirmPassword: null };
           }
-          // If passwords don't match and confirmPassword has a value, set error
           if (value !== prev.confirmPassword && prev.confirmPassword) {
             return { ...err, confirmPassword: "Passwords do not match." };
           }
@@ -73,7 +71,6 @@ export function usePasswordResetForm() {
       return next;
     });
 
-    // Clear error when user starts typing
     setErrors((prev) => (prev[name] ? { ...prev, [name]: null } : prev));
   }, []);
 

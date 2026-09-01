@@ -2,7 +2,6 @@ import { authApi } from "../../api/authApi";
 import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function verifyOtpPageLoader() {
-  // Try signup flow first
   try {
     const res = await authApi.checkSignupStatus();
     if (res.data.success) {

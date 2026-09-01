@@ -1,12 +1,9 @@
-import {
-  Form,
-  useActionData,
-  useNavigation,
-} from "react-router-dom";
+import { Form, useActionData, useNavigation } from "react-router-dom";
 import { ShieldCheck, CheckCircle } from "lucide-react";
 import { useEffect, useRef, useState, startTransition } from "react";
 
 import { useOTPForm } from "../hooks/useOTPForm";
+import AuthLayout from "../components/AuthLayout";
 import OTPInputs from "../components/OTPInputs";
 import Button from "../components/Button";
 
@@ -38,63 +35,63 @@ export default function TwoFactorPage() {
       : "idle";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-indigo-50 via-indigo-100 to-purple-50">
-      <div className="bg-white w-full max-w-md rounded-2xl border shadow-xl p-8">
-        <div className="text-center space-y-2">
-          <div className="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-            <ShieldCheck className="h-6 w-6 text-indigo-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Two-Factor Login</h1>
-          <p className="text-sm text-slate-600">
-            Enter the 6-digit code from Google Authenticator.
-          </p>
+    <AuthLayout>
+      <div className="text-center mb-8">
+        <div className="mx-auto mb-4 flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-ink">
+          <ShieldCheck className="h-6 w-6 text-paper" strokeWidth={1.75} />
         </div>
-
-        <div className="mt-6 space-y-5">
-          <OTPInputs
-            otp={otpForm.otp}
-            inputRefs={otpForm.inputRefs}
-            handleChange={otpForm.handleChange}
-            handleKeyDown={otpForm.handleKeyDown}
-            handlePaste={otpForm.handlePaste}
-            handleOtpString={otpForm.handleOtpString}
-            isSubmitting={isSubmitting}
-            status={status}
-            onUserInput={() => setMessage(null)}
-          />
-
-          {message?.message && status !== "idle" && (
-            <div
-              className={`text-center text-sm font-medium px-4 py-2 rounded-md ${
-                status === "success"
-                  ? "bg-green-50 text-green-700"
-                  : "bg-red-50 text-red-700"
-              }`}
-            >
-              {message.message}
-            </div>
-          )}
-
-          <Form
-            method="post"
-            onSubmit={() => {
-              setMessage(null);
-            }}
-          >
-            <input type="hidden" name="code" value={otpForm.otp.join("")} />
-            <Button disabled={!otpForm.isOtpComplete} isLoading={isSubmitting}>
-              {isSubmitting ? (
-                "Verifying..."
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5 text-white" />
-                  Verify & Continue
-                </>
-              )}
-            </Button>
-          </Form>
-        </div>
+        <h1 className="font-editorial text-3xl text-ink mb-2">
+          Two-factor login
+        </h1>
+        <p className="text-[0.9375rem] text-ink-muted">
+          Enter the 6-digit code from your authenticator app.
+        </p>
       </div>
-    </div>
+
+      <div className="space-y-6">
+        <OTPInputs
+          otp={otpForm.otp}
+          inputRefs={otpForm.inputRefs}
+          handleChange={otpForm.handleChange}
+          handleKeyDown={otpForm.handleKeyDown}
+          handlePaste={otpForm.handlePaste}
+          handleOtpString={otpForm.handleOtpString}
+          isSubmitting={isSubmitting}
+          status={status}
+          onUserInput={() => setMessage(null)}
+        />
+
+        {message?.message && status !== "idle" && (
+          <div
+            className={`text-center text-sm font-medium px-4 py-2 rounded-lg font-ui ${
+              status === "success"
+                ? "bg-moss-50 text-moss-700"
+                : "bg-red-50 text-red-700"
+            }`}
+          >
+            {message.message}
+          </div>
+        )}
+
+        <Form
+          method="post"
+          onSubmit={() => {
+            setMessage(null);
+          }}
+        >
+          <input type="hidden" name="code" value={otpForm.otp.join("")} />
+          <Button disabled={!otpForm.isOtpComplete} isLoading={isSubmitting}>
+            {isSubmitting ? (
+              "Verifying..."
+            ) : (
+              <>
+                <CheckCircle className="w-5 h-5" />
+                Verify & continue
+              </>
+            )}
+          </Button>
+        </Form>
+      </div>
+    </AuthLayout>
   );
 }

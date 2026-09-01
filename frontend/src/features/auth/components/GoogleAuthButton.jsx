@@ -6,28 +6,21 @@ export default function GoogleAuthButton({ children }) {
   return (
     <button
       className="
-        w-full mt-3 py-3.5 px-4
-        bg-white
-        rounded-xl
-        text-slate-700 text-base font-medium
+        w-full mt-3 py-3 px-4
+        bg-paper-raised
+        rounded-full
+        text-ink text-[0.9375rem] font-medium font-ui
         flex items-center justify-center gap-3
-        hover:bg-slate-50
-        transition-all
-        shadow-sm hover:shadow-md
+        hover:bg-paper
+        transition-colors
         active:scale-[0.98]
-        border border-slate-300
-        focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2
+        border border-hairline-strong
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2
       "
       onClick={handleGoogleLogin}
       type="button"
     >
-      <svg
-        aria-hidden="true"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        role="img"
-      >
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" role="img">
         <path
           fill="#4285F4"
           d="M21.35 12.27c0-.79-.07-1.55-.22-2.27H12v4.3h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.42Z"
