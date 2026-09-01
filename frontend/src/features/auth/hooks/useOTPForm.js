@@ -13,8 +13,6 @@ export function useOTPForm() {
   const inputRefs = useRef([]);
   const isOtpComplete = otp.every(Boolean);
 
-  /* ---------------- Timer ---------------- */
-
   useEffect(() => {
     if (canResend) return;
 
@@ -31,8 +29,6 @@ export function useOTPForm() {
 
     return () => clearInterval(id);
   }, [canResend]);
-
-  /* ---------------- Handlers ---------------- */
 
   const handleChange = useCallback((index, value) => {
     if (!/^\d?$/.test(value)) return;
@@ -76,7 +72,7 @@ export function useOTPForm() {
     inputRefs.current[focusIndex]?.focus();
   }, []);
 
-  // Handle OTP string (for clipboard paste)
+  // Fills all digits at once, for autofill/paste landing in onChange (vs. per-key handlePaste)
   const handleOtpString = useCallback((otpString) => {
     const text = otpString.replace(/\D/g, "").slice(0, OTP_LENGTH);
     if (!text || !/^\d+$/.test(text)) return;
@@ -90,7 +86,6 @@ export function useOTPForm() {
 
     setOtp(newOtp);
 
-    // Focus the next empty field or last field if all filled
     const focusIndex = Math.min(chars.length, OTP_LENGTH - 1);
     setTimeout(() => {
       inputRefs.current[focusIndex]?.focus();

@@ -5,11 +5,15 @@ import styles from "../styles/CountryDropdown.module.css";
 
 export default function CountryDropdown({
   name = "country",
+  id,
   value,
   onChange,
   onBlur,
   hasError,
+  required,
 }) {
+  const triggerId = id || name;
+  const errorId = `${triggerId}-error`;
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef(null);
@@ -17,8 +21,6 @@ export default function CountryDropdown({
   const filteredCountries = COUNTRIES.filter((country) =>
     country.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  /* ---------------- Close on outside click ---------------- */
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -34,8 +36,6 @@ export default function CountryDropdown({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onBlur, name, value]);
-
-  /* ---------------- Handlers ---------------- */
 
   const handleToggle = () => {
     setIsOpen((v) => !v);
@@ -54,9 +54,12 @@ export default function CountryDropdown({
 
   return (
     <div ref={dropdownRef} className="relative">
-      <label className={styles.label}>Country/Region</label>
+      <label htmlFor={triggerId} className={styles.label}>
+        Country/Region
+      </label>
 
       <div
+        id={triggerId}
         role="button"
         tabIndex={0}
         onClick={handleToggle}
@@ -66,6 +69,11 @@ export default function CountryDropdown({
             handleToggle();
           }
         }}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-required={required || undefined}
+        aria-invalid={hasError || undefined}
+        aria-describedby={hasError ? errorId : undefined}
         className={`${styles.input} ${hasError ? styles.inputError : ""}`}
       >
         <Globe className="w-5 h-5 text-slate-400" />
@@ -86,7 +94,6 @@ export default function CountryDropdown({
       {isOpen && (
         <div className={styles.dropdownMenu}>
           <div className={styles.searchContainer}>
-            {/* Search icon */}
             <Search className={styles.searchIcon} />
 
             <input
@@ -120,7 +127,9 @@ export default function CountryDropdown({
       )}
 
       {hasError && (
-        <p className={styles.errorMsg}>Please fill out this field.</p>
+        <p id={errorId} className={styles.errorMsg}>
+          Please fill out this field.
+        </p>
       )}
     </div>
   );

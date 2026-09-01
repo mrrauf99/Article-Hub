@@ -1,40 +1,43 @@
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
 }
 
 .icon {
-  width: 5rem;
-  height: 5rem;
-  background: linear-gradient(to bottom right, #6366f1, #9333ea);
-  border-radius: 50%;
+  width: 3.25rem;
+  height: 3.25rem;
+  background: theme("colors.ink.DEFAULT");
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1rem;
-  box-shadow: 0 0.625rem 0.9375rem -0.1875rem rgba(99, 102, 241, 0.3);
 }
 
 .icon svg {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: theme("colors.paper.DEFAULT");
 }
 
 .title {
-  font-size: 1.875rem;
-  font-weight: bold;
-  color: #1f2937;
+  font-family: theme("fontFamily.editorial");
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: theme("colors.ink.DEFAULT");
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
-  color: #6b7280;
+  font-family: theme("fontFamily.ui");
+  color: theme("colors.ink.muted");
   margin-bottom: 0.25rem;
+  font-size: 0.9375rem;
 }
 
 .email {
-  color: #6366f1;
+  font-family: theme("fontFamily.ui");
+  color: theme("colors.moss.700");
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }

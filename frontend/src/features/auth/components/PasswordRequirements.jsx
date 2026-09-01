@@ -1,3 +1,5 @@
+import { Check, X } from "lucide-react";
+
 export default function PasswordRequirements({
   errors,
   passwordEntered,
@@ -6,7 +8,7 @@ export default function PasswordRequirements({
   const requirements = [
     {
       valid: errors.minLength && errors.maxLength,
-      text: "Between 8–64 characters",
+      text: "Between 8-64 characters",
       show: passwordEntered,
     },
     {
@@ -32,12 +34,12 @@ export default function PasswordRequirements({
   ];
 
   return (
-    <div className="password-requirements mt-4">
-      <h2 className="text-sm font-semibold text-slate-700 mb-3">
-        Password Requirements
+    <div className="mt-3 font-ui">
+      <h2 className="text-sm font-medium text-ink mb-2">
+        Password requirements
       </h2>
 
-      <ul className="text-sm space-y-2 pl-1">
+      <ul className="text-sm space-y-1.5">
         {requirements.map((rule, index) => {
           const showIcons = rule.show;
 
@@ -47,15 +49,19 @@ export default function PasswordRequirements({
               className={
                 showIcons
                   ? `flex items-center gap-2 ${
-                      rule.valid ? "text-emerald-600" : "text-red-600"
+                      rule.valid ? "text-moss-700" : "text-red-600"
                     }`
-                  : "text-slate-600 list-disc ml-4"
+                  : "flex items-center gap-2 text-ink-faint"
               }
             >
-              {showIcons && (
-                <span className="font-bold text-base">
-                  {rule.valid ? "✓" : "✕"}
-                </span>
+              {showIcons ? (
+                rule.valid ? (
+                  <Check className="h-3.5 w-3.5 shrink-0" />
+                ) : (
+                  <X className="h-3.5 w-3.5 shrink-0" />
+                )
+              ) : (
+                <span className="h-1 w-1 shrink-0 rounded-full bg-ink-faint ml-1 mr-0.5" />
               )}
               {rule.text}
             </li>

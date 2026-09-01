@@ -36,13 +36,8 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout
-      title="Forgot Password?"
+      title="Forgot password?"
       subtitle="Enter your email address and we'll send you a code to reset your password."
-      subtitleStyle={{
-        fontSize: "1rem",
-        color: "#6b7280",
-        lineHeight: "1.5",
-      }}
     >
       {alertMessage && (
         <AlertMessageBox
@@ -53,7 +48,7 @@ export default function ForgotPassword() {
 
       <Form
         method="POST"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
         <InputField
@@ -65,6 +60,7 @@ export default function ForgotPassword() {
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           error={form.errors.email}
+          aria-required="true"
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>
@@ -72,7 +68,7 @@ export default function ForgotPassword() {
         </Button>
       </Form>
 
-      <SwitchPage icon={ArrowLeft} linkText="Back To Login" linkTo="/login" />
+      <SwitchPage icon={ArrowLeft} linkText="Back to login" linkTo="/login" />
     </AuthLayout>
   );
 }
