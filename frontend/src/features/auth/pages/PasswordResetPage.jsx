@@ -8,7 +8,7 @@ import {
 } from "react";
 import { Form, useActionData, useNavigation } from "react-router-dom";
 
-import { Lock } from "lucide-react";
+import { Lock, ArrowLeft } from "lucide-react";
 import AlertMessageBox from "../components/AlertMessageBox";
 import InputField from "@/components/InputField";
 import AuthLayout from "../components/AuthLayout";
@@ -17,12 +17,6 @@ import SwitchPage from "../components/SwitchPage";
 import Button from "../components/Button";
 
 import { usePasswordResetForm } from "../hooks/usePasswordResetForm";
-
-const SUBTITLE_STYLE = {
-  fontSize: "1rem",
-  color: "#6b7280",
-  lineHeight: "1.5",
-};
 
 export default function PasswordReset() {
   const form = usePasswordResetForm();
@@ -69,9 +63,8 @@ export default function PasswordReset() {
 
   return (
     <AuthLayout
-      title="Reset Password"
+      title="Reset password"
       subtitle="Create a new secure password for your account."
-      subtitleStyle={SUBTITLE_STYLE}
     >
       {alertMessage && (
         <AlertMessageBox
@@ -82,11 +75,11 @@ export default function PasswordReset() {
 
       <Form
         method="POST"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
         <InputField
-          label="New Password"
+          label="New password"
           icon={Lock}
           type="password"
           name="password"
@@ -96,10 +89,11 @@ export default function PasswordReset() {
           onBlur={form.handleBlur}
           error={form.errors.password}
           disabled={isSubmitting}
+          aria-required="true"
         />
 
         <InputField
-          label="Confirm Password"
+          label="Confirm password"
           icon={Lock}
           type="password"
           name="confirmPassword"
@@ -109,6 +103,7 @@ export default function PasswordReset() {
           onBlur={form.handleBlur}
           error={form.errors.confirmPassword}
           disabled={isSubmitting}
+          aria-required="true"
         />
 
         <PasswordRequirements
@@ -122,7 +117,7 @@ export default function PasswordReset() {
         </Button>
       </Form>
 
-      <SwitchPage linkText="← Back To Login" linkTo="/login" />
+      <SwitchPage icon={ArrowLeft} linkText="Back to login" linkTo="/login" />
     </AuthLayout>
   );
 }

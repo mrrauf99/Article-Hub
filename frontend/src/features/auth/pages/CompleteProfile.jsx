@@ -23,15 +23,10 @@ export default function CompleteProfile() {
     <AuthLayout
       title="Choose a username"
       subtitle="This will be your public identity on Article Hub."
-      subtitleStyle={{
-        fontSize: "1rem",
-        color: "#6b7280",
-        lineHeight: "1.5",
-      }}
     >
       <Form
         method="POST"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
         <InputField
@@ -50,6 +45,7 @@ export default function CompleteProfile() {
               form.usernameCheck.message)
           }
           success={form.usernameCheck.status === "available"}
+          aria-required="true"
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>

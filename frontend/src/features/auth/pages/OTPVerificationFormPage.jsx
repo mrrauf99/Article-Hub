@@ -10,6 +10,7 @@ import { ArrowLeft, CheckCircle } from "lucide-react";
 import { useEffect, useState, useRef, startTransition } from "react";
 
 import { useOTPForm } from "../hooks/useOTPForm";
+import AuthLayout from "../components/AuthLayout";
 import OTPHeader from "../components/OTPHeader";
 import OTPInputs from "../components/OTPInputs";
 import OTPTimer from "../components/OTPTimer";
@@ -35,8 +36,6 @@ export default function OTPVerificationForm() {
   const isVerifying = navigation.state === "submitting";
   const isResending = resendFetcher.state === "submitting";
 
-  /* ---------- Update message when new response arrives ---------- */
-  // Handle verify action response
   useEffect(() => {
     if (
       mode === "verify" &&
@@ -51,7 +50,6 @@ export default function OTPVerificationForm() {
   }, [actionData, mode]);
 
   const lastResendDataRef = useRef(null);
-  // Handle resend fetcher response
   useEffect(() => {
     if (mode === "resend" && resendFetcher.data && resendFetcher.data !== lastResendDataRef.current) {
       lastResendDataRef.current = resendFetcher.data;
@@ -64,7 +62,6 @@ export default function OTPVerificationForm() {
     }
   }, [resendFetcher.data, mode]);
 
-  // Clear message when user starts typing (mode becomes idle)
   useEffect(() => {
     if (mode === "idle") {
       startTransition(() => {
@@ -73,7 +70,6 @@ export default function OTPVerificationForm() {
     }
   }, [mode]);
 
-  // Clear message when submitting
   useEffect(() => {
     if (isVerifying || isResending) {
       startTransition(() => {
@@ -91,16 +87,12 @@ export default function OTPVerificationForm() {
 
   const isVerifySuccess = mode === "verify" && actionData?.success === true;
 
-  /* ---------- effects ---------- */
-
-  // reset OTP after resend success
   useEffect(() => {
     if (mode === "resend" && resendFetcher.data?.success) {
       reset();
     }
   }, [mode, resendFetcher.data?.success, reset]);
 
-  // redirect after verify success
   useEffect(() => {
     if (mode === "verify" && actionData?.success && actionData?.next) {
       const t = setTimeout(() => {
@@ -111,88 +103,84 @@ export default function OTPVerificationForm() {
   }, [mode, actionData, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-indigo-50 via-indigo-100 to-purple-50">
-      <div className="bg-white w-full max-w-md rounded-2xl border shadow-xl p-8">
-        <OTPHeader email={email} />
+    <AuthLayout>
+      <OTPHeader email={email} />
 
-        <div className="flex flex-col gap-6 mt-4">
-          <OTPInputs
-            otp={otpForm.otp}
-            inputRefs={otpForm.inputRefs}
-            handleChange={otpForm.handleChange}
-            handleKeyDown={otpForm.handleKeyDown}
-            handlePaste={otpForm.handlePaste}
-            handleOtpString={otpForm.handleOtpString}
-            isSubmitting={isVerifying || isVerifySuccess}
-            status={status}
-            onUserInput={() => setMode("idle")}
-          />
+      <div className="flex flex-col gap-6 mt-4">
+        <OTPInputs
+          otp={otpForm.otp}
+          inputRefs={otpForm.inputRefs}
+          handleChange={otpForm.handleChange}
+          handleKeyDown={otpForm.handleKeyDown}
+          handlePaste={otpForm.handlePaste}
+          handleOtpString={otpForm.handleOtpString}
+          isSubmitting={isVerifying || isVerifySuccess}
+          status={status}
+          onUserInput={() => setMode("idle")}
+        />
 
-          {message?.message && status !== "idle" && (
-            <div
-              className={`text-center text-sm font-medium px-4 py-2 rounded-md ${
-                status === "success"
-                  ? "bg-green-50 text-green-700"
-                  : "bg-red-50 text-red-700"
-              }`}
-            >
-              {message.message}
-            </div>
-          )}
-
-          {/* ----- RESEND OTP (hidden after success) ----- */}
-          {!isVerifySuccess && (
-            <resendFetcher.Form
-              method="post"
-              className="text-center"
-              onSubmit={() => setMode("resend")}
-            >
-              <input type="hidden" name="intent" value="resend" />
-              <input type="hidden" name="flow" value={flow} />
-
-              <OTPTimer
-                timer={otpForm.timer}
-                canResend={otpForm.canResend}
-                isResending={isResending}
-              />
-            </resendFetcher.Form>
-          )}
-
-          {/* ----- VERIFY OTP ----- */}
-          <Form
-            method="post"
-            onSubmit={() => {
-              setMode("verify");
-            }}
+        {message?.message && status !== "idle" && (
+          <div
+            className={`text-center text-sm font-medium px-4 py-2 rounded-lg font-ui ${
+              status === "success"
+                ? "bg-moss-50 text-moss-700"
+                : "bg-red-50 text-red-700"
+            }`}
           >
-            <input type="hidden" name="otp" value={otpForm.otp.join("")} />
-            <input type="hidden" name="intent" value="verify" />
+            {message.message}
+          </div>
+        )}
+
+        {!isVerifySuccess && (
+          <resendFetcher.Form
+            method="post"
+            className="text-center"
+            onSubmit={() => setMode("resend")}
+          >
+            <input type="hidden" name="intent" value="resend" />
             <input type="hidden" name="flow" value={flow} />
 
-            <Button
-              disabled={
-                !otpForm.isOtpComplete || isResending || isVerifySuccess
-              }
-              isLoading={isVerifying}
-            >
-              {isVerifySuccess ? (
-                <>
-                  <CheckCircle className="w-5 h-5 text-white" />
-                  Verified
-                </>
-              ) : (
-                "Verify & Continue"
-              )}
-            </Button>
-          </Form>
+            <OTPTimer
+              timer={otpForm.timer}
+              canResend={otpForm.canResend}
+              isResending={isResending}
+            />
+          </resendFetcher.Form>
+        )}
 
-          <SwitchPage
-            icon={ArrowLeft}
-            linkText="Back To Login"
-            linkTo="/login"
-          />
-        </div>
+        <Form
+          method="post"
+          onSubmit={() => {
+            setMode("verify");
+          }}
+        >
+          <input type="hidden" name="otp" value={otpForm.otp.join("")} />
+          <input type="hidden" name="intent" value="verify" />
+          <input type="hidden" name="flow" value={flow} />
+
+          <Button
+            disabled={
+              !otpForm.isOtpComplete || isResending || isVerifySuccess
+            }
+            isLoading={isVerifying}
+          >
+            {isVerifySuccess ? (
+              <>
+                <CheckCircle className="w-5 h-5" />
+                Verified
+              </>
+            ) : (
+              "Verify & continue"
+            )}
+          </Button>
+        </Form>
+
+        <SwitchPage
+          icon={ArrowLeft}
+          linkText="Back to login"
+          linkTo="/login"
+        />
       </div>
-    </div>
+    </AuthLayout>
   );
 }

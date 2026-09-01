@@ -57,7 +57,7 @@ export default function Login() {
   }
 
   return (
-    <AuthLayout title="Article Hub" subtitle="Welcome Back">
+    <AuthLayout title="Welcome back" subtitle="Sign in to keep reading and writing.">
       {alertMessage && (
         <AlertMessageBox
           message={alertMessage}
@@ -67,7 +67,7 @@ export default function Login() {
 
       <Form
         method="POST"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
         <InputField
@@ -79,6 +79,7 @@ export default function Login() {
           onBlur={form.handleBlur}
           error={form.errors.identifier}
           disabled={isSubmitting}
+          aria-required="true"
         />
 
         <InputField
@@ -91,12 +92,13 @@ export default function Login() {
           onBlur={form.handleBlur}
           error={form.errors.password}
           disabled={isSubmitting}
+          aria-required="true"
         />
 
-        <div className="text-right">
+        <div className="text-right -mt-1">
           <Link
             to="/forgot-password"
-            className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors font-medium"
+            className="text-sm text-moss-700 hover:text-moss-800 transition-colors font-medium font-ui"
           >
             Forgot password?
           </Link>

@@ -6,8 +6,6 @@ export function useUsernameForm() {
   const [values, setValues] = useState({ username: "" });
   const [errors, setErrors] = useState({});
 
-  /* ---------------- Field validation ---------------- */
-
   const validateField = (value) => {
     if (isEmpty(value)) {
       return "Please fill out this field.";
@@ -15,8 +13,6 @@ export function useUsernameForm() {
 
     return validateUsername(value);
   };
-
-  /* ---------------- Availability check ---------------- */
 
   const isUsernameInvalid =
     isEmpty(values.username) || validateUsername(values.username) !== null;
@@ -26,8 +22,6 @@ export function useUsernameForm() {
     isUsernameInvalid,
     "username"
   );
-
-  /* ---------------- Form validation ---------------- */
 
   const validate = () => {
     const error = validateField(values.username);
@@ -42,7 +36,6 @@ export function useUsernameForm() {
       return false;
     }
 
-    // NETWORK ERROR BLOCK
     if (usernameCheck.status === "error") {
       setErrors({
         username: "Unable to verify username. Please check your connection.",
@@ -53,8 +46,6 @@ export function useUsernameForm() {
     setErrors({});
     return true;
   };
-
-  /* ---------------- Handlers ---------------- */
 
   const handleChange = (e) => {
     const { value } = e.target;

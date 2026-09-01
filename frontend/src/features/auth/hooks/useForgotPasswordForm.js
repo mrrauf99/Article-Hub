@@ -9,8 +9,6 @@ export function useForgotPasswordForm() {
   const [values, setValues] = useState(INITIAL_VALUES);
   const [errors, setErrors] = useState({});
 
-  /* ---------------- Validation ---------------- */
-
   const validateField = (name, value) => {
     if (isEmpty(value)) {
       return "Please fill out this field.";
@@ -32,8 +30,6 @@ export function useForgotPasswordForm() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  /* ---------------- Handlers ---------------- */
 
   const handleChange = (e) => {
     const { name, value } = e.target;

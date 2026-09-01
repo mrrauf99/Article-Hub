@@ -5,22 +5,21 @@ export default function Button({ children, disabled, isLoading, ...props }) {
       disabled={disabled || isLoading}
       style={props.style}
       className={`
-        w-full py-3.5 px-4 rounded-xl mt-6 font-semibold text-base
-        flex items-center justify-center gap-2 transition-all duration-200 border-none
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500
-        focus-visible:ring-offset-2 active:scale-[0.98] text-white 
-        bg-gradient-to-r from-indigo-600 to-purple-600 
-        shadow-lg shadow-indigo-500/25
+        w-full py-3 px-4 rounded-full mt-6 font-semibold text-[0.9375rem] font-ui
+        flex items-center justify-center gap-2 transition-colors border-none
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-600
+        focus-visible:ring-offset-2 active:scale-[0.98] text-paper
+        bg-ink
         ${
           disabled || isLoading
-            ? "opacity-60 cursor-not-allowed"
-            : "hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:shadow-indigo-500/30"
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-moss-700"
         }
       `}
     >
       {isLoading ? (
         <>
-          <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-paper/40 border-t-paper" />
           {children ? children : "Loading..."}
         </>
       ) : (

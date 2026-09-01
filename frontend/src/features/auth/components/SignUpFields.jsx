@@ -5,7 +5,6 @@ import { UserCircle, User, Mail, Lock } from "lucide-react";
 export default function SignUpFields({ form, isDisabled = false }) {
   return (
     <>
-      {/* Name */}
       <InputField
         label="Name"
         icon={UserCircle}
@@ -15,9 +14,9 @@ export default function SignUpFields({ form, isDisabled = false }) {
         onBlur={form.handleBlur}
         error={form.errors.name}
         disabled={isDisabled}
+        aria-required="true"
       />
 
-      {/* Username */}
       <InputField
         label="Username"
         icon={User}
@@ -34,9 +33,9 @@ export default function SignUpFields({ form, isDisabled = false }) {
         }
         success={form.usernameCheck.status === "available"}
         disabled={isDisabled}
+        aria-required="true"
       />
 
-      {/* Email */}
       <InputField
         label="Email"
         icon={Mail}
@@ -55,9 +54,9 @@ export default function SignUpFields({ form, isDisabled = false }) {
         }
         success={form.emailCheck.status === "available"}
         disabled={isDisabled}
+        aria-required="true"
       />
 
-      {/* Country */}
       <CountryDropdown
         name="country"
         value={form.values.country}
@@ -65,9 +64,9 @@ export default function SignUpFields({ form, isDisabled = false }) {
         onBlur={form.handleBlur}
         hasError={Boolean(form.errors.country)}
         disabled={isDisabled}
+        required
       />
 
-      {/* Password */}
       <InputField
         label="Password"
         icon={Lock}
@@ -79,9 +78,9 @@ export default function SignUpFields({ form, isDisabled = false }) {
         onBlur={form.handleBlur}
         error={form.errors.password}
         disabled={isDisabled}
+        aria-required="true"
       />
 
-      {/* Confirm Password */}
       <InputField
         label="Confirm Password"
         icon={Lock}
@@ -92,9 +91,10 @@ export default function SignUpFields({ form, isDisabled = false }) {
         onBlur={form.handleBlur}
         error={form.errors.confirmPassword}
         disabled={isDisabled}
+        aria-required="true"
       />
 
-      {/* Hidden country input for POST */}
+      {/* CountryDropdown has no native form input, so submit its value here */}
       <input type="hidden" name="country" value={form.values.country} />
     </>
   );

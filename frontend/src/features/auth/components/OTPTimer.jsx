@@ -5,21 +5,20 @@ export default function OTPTimer({ timer, canResend, isResending }) {
     return (
       <button
         disabled={isResending}
-        className="text-indigo-600 font-semibold underline underline-offset-2
-                   hover:text-indigo-500 focus:outline-none transition-colors"
+        className="text-sm font-semibold text-moss-700 underline underline-offset-4
+                   hover:text-moss-800 focus:outline-none transition-colors font-ui disabled:opacity-60"
       >
-        {isResending ? "Sending code…" : "Resend code"}
+        {isResending ? "Sending code..." : "Resend code"}
       </button>
     );
   }
 
   return (
-    <div className="flex items-center justify-center gap-2 text-gray-500">
-      <Clock className="w-4 h-4 text-indigo-500 mt-[3px]" />
-
+    <div className="flex items-center justify-center gap-2 text-sm text-ink-muted font-ui">
+      <Clock className="w-4 h-4 text-ink-faint" />
       <p>
         Resend code in
-        <span className="ml-1 font-bold text-indigo-600 text-lg">{timer}s</span>
+        <span className="ml-1 font-semibold text-ink">{timer}s</span>
       </p>
     </div>
   );
