@@ -31,6 +31,34 @@
   }
 }
 
+/* User Panel: paper ground behind the panel (index.html's body is slate-50) and
+   selection tinted from the moss accent instead of browser blue. */
+body:has([data-panel="user"]) {
+  background-color: theme("colors.paper.DEFAULT");
+}
+
+[data-panel="user"] ::selection {
+  background-color: theme("colors.moss.200");
+  color: theme("colors.ink.DEFAULT");
+}
+
+/* User Panel search: native clear button drawn in ink instead of browser blue-grey. */
+[data-panel="user"] input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1rem;
+  width: 1rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  opacity: 0.55;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B1B18' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E") center / 0.875rem no-repeat;
+  transition: opacity 150ms ease;
+}
+
+[data-panel="user"] input[type="search"]::-webkit-search-cancel-button:hover {
+  opacity: 1;
+}
+
 /* Custom scrollbar styles for dropdown */
 .overflow-y-scroll::-webkit-scrollbar {
   width: 8px;

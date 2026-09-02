@@ -20,7 +20,6 @@ export default function NotificationBell({ count = 0 }) {
       >
         <Bell className="w-5 h-5" />
 
-        {/* Badge - only show if count > 0 */}
         {count > 0 && (
           <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-xs font-bold text-white bg-red-600 rounded-full shadow-lg">
             {count > 99 ? "99+" : count}

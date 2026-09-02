@@ -11,10 +11,9 @@ export default {
         accent: "#38BDF8",
         dark: "#020617",
 
-        // Guest/Auth design tokens ("Ink & Moss") — additive only, scoped via
-        // the font-ui/font-editorial + these color utilities on guest/auth
-        // surfaces. Never used as replacements for existing slate/sky tokens
-        // that the User/Admin panels still rely on.
+        // "Ink & Moss" design tokens — the app-wide palette for Guest, Auth,
+        // and the User/Admin panels, applied via the font-ui/font-editorial +
+        // these color utilities.
         paper: {
           DEFAULT: "#FAFAF7",
           raised: "#FFFFFF",
@@ -43,6 +42,18 @@ export default {
           700: "#1E4B39",
           800: "#193D2E",
           900: "#143024",
+        },
+        danger: "#B91C1C",
+        "danger-deep": "#991B1B",
+        "review-amber": {
+          bg: "#FFFBEB",
+          text: "#78350F",
+          ring: "#FDE68A",
+        },
+        "rejected-red": {
+          bg: "#FEF2F2",
+          text: "#991B1B",
+          ring: "#FECACA",
         },
       },
       fontFamily: {

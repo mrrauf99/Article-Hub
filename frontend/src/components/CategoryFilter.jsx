@@ -36,7 +36,6 @@ export default function CategoryFilter({
   const buttonRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -56,14 +55,13 @@ export default function CategoryFilter({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onBlur, name, activeCategory]);
 
-  // Update dropdown position when opened
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const dropdownWidth = Math.min(240, window.innerWidth - 32);
       // Position dropdown to the right edge of the button, ensuring it doesn't go off screen
       let left = rect.right - dropdownWidth;
-      if (left < 16) left = 16; // Minimum 16px from left edge
+      if (left < 16) left = 16;
 
       setDropdownPosition({
         top: rect.bottom + 8,
@@ -77,7 +75,6 @@ export default function CategoryFilter({
   useEffect(() => {
     if (!isOpen) return;
     const handleScroll = (e) => {
-      // Don't close if scrolling inside the dropdown
       if (dropdownRef.current && dropdownRef.current.contains(e.target)) {
         return;
       }
@@ -94,7 +91,6 @@ export default function CategoryFilter({
 
   const isDark = variant === "dark";
 
-  // Filter out empty strings from categories for display
   const displayCategories = categories.filter((cat) => cat !== "");
 
   const dropdownMenu = isOpen && (
@@ -145,7 +141,6 @@ export default function CategoryFilter({
     </div>
   );
 
-  // Check if using custom trigger label (like '+10 more')
   const isMoreButton = triggerLabel !== null;
 
   const moreButtonBaseClasses = isDark
@@ -156,16 +151,12 @@ export default function CategoryFilter({
     ? "border-moss-400 text-moss-200 bg-slate-700/70 shadow-[0_0_0_2px_rgba(79,138,105,0.35)]"
     : "border-moss-300 text-moss-700 bg-moss-50 shadow-[0_0_0_2px_rgba(44,107,79,0.2)]";
 
-  // Error styling classes
-  // ...existing code...
-
   return (
     <div
       className={`relative ${
         isMoreButton ? "inline-block" : "w-full"
       } ${className}`}
     >
-      {/* Trigger Button */}
       <button
         type="button"
         ref={buttonRef}
