@@ -1,10 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Custom hook to detect when an element enters the viewport
- * @param {Object} options - Intersection Observer options
- * @returns {Array} [ref, isVisible] - Ref to attach to element and visibility state
- */
 export function useScrollReveal(options = {}) {
   const prefersReducedMotion =
     typeof window !== "undefined" &&

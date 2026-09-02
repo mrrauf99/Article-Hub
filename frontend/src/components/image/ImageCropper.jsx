@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import Cropper from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 import { X, Check } from "lucide-react";
+import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
 const createImage = (url) =>
   new Promise((resolve, reject) => {
@@ -25,15 +26,12 @@ async function getCroppedImg(imageSrc, pixelCrop) {
   const targetWidth = 1200;
   const targetHeight = 675;
 
-  // Set canvas to target size
   canvas.width = targetWidth;
   canvas.height = targetHeight;
 
-  // Calculate scale factors
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
 
-  // Draw the cropped image, scaled to target dimensions
   ctx.drawImage(
     image,
     pixelCrop.x * scaleX,
@@ -65,6 +63,9 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const modalRef = useRef(null);
+  const dialogRef = useRef(null);
+
+  useModalFocusTrap(dialogRef, Boolean(imageSrc));
 
   useEffect(() => {
     const checkMobile = () => {
@@ -160,26 +161,30 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
   return createPortal(
     <div ref={modalRef} className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4">
       <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+        className="absolute inset-0 bg-ink-950/50" 
       />
-      <div 
-        className="relative w-full max-w-4xl bg-white rounded-lg sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10" 
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="image-cropper-title"
+        className="relative w-full max-w-4xl bg-paper-raised rounded-xl shadow-[0_24px_48px_-12px_rgba(20,20,15,0.35)] overflow-hidden flex flex-col z-10 font-ui"
         style={{ maxHeight: '95vh' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-slate-200 flex-shrink-0">
-          <h2 className="text-base sm:text-lg font-semibold text-slate-900">Crop Image</h2>
+        <div className="flex items-center justify-between px-4 py-3 sm:px-5 border-b border-hairline flex-shrink-0">
+          <h2 id="image-cropper-title" className="text-base font-semibold text-ink">Crop cover image</h2>
           <button
             onClick={onClose}
-            className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-ink-muted hover:bg-ink/5 hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
             aria-label="Close"
           >
-            <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         <div 
-          className="relative w-full bg-slate-100"
+          className="relative w-full bg-ink-950"
           style={{ 
             height: cropperHeight,
             minHeight: '300px',
@@ -209,19 +214,19 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
           />
         </div>
 
-        <div className="p-3 sm:p-4 border-t border-slate-200 flex-shrink-0 bg-white">
+        <div className="px-4 py-3 sm:px-5 border-t border-hairline flex-shrink-0 bg-paper-raised">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
             <button
               onClick={onClose}
               disabled={isProcessing}
-              className="px-4 py-2.5 text-slate-700 hover:bg-slate-100 rounded-lg font-medium transition-colors disabled:opacity-50 border border-slate-300 sm:border-0"
+              className="inline-flex h-10 items-center justify-center rounded-full border border-hairline-strong px-5 text-sm font-semibold text-ink hover:border-ink-faint transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isProcessing || !croppedAreaPixels}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-paper hover:bg-moss-700 transition-colors active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
             >
               {isProcessing ? (
                 <>

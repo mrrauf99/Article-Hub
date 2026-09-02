@@ -211,9 +211,10 @@ export async function verifyOtp(req, res) {
       [email, username, name, password, country],
     );
     clearCookie(res, COOKIE_NAMES.SIGNUP);
-  } else {
-    clearCookie(res, COOKIE_NAMES.PASSWORD_RESET);
   }
+  // For forgot-password, keep the passwordResetToken cookie alive —
+  // it's still needed to authenticate the /reset-password step, which
+  // clears it itself once the password is actually changed.
 
   res.json({
     success: true,

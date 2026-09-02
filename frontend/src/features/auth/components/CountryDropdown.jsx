@@ -76,7 +76,7 @@ export default function CountryDropdown({
         aria-describedby={hasError ? errorId : undefined}
         className={`${styles.input} ${hasError ? styles.inputError : ""}`}
       >
-        <Globe className="w-5 h-5 text-slate-400" />
+        <Globe className="w-5 h-5 text-ink-faint" aria-hidden="true" />
 
         <span
           className={
