@@ -1,9 +1,5 @@
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
-/**
- * Scroll Reveal wrapper component
- * Wraps children and animates them when they enter viewport
- */
 export function ScrollReveal({
   children,
   animation = "fade-up",
@@ -63,10 +59,6 @@ export function ScrollReveal({
   );
 }
 
-/**
- * Staggered animation for lists/grids
- * Each child animates with increasing delay
- */
 export function StaggerReveal({
   children,
   animation = "fade-up",

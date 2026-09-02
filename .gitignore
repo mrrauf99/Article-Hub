@@ -15,8 +15,10 @@ frontend/dist/
 # Claude local settings
 .claude/
 CLAUDE.md
+
 .impeccable/
-PRODUCT.md
+*.md
+
 
 # IDE
 .vscode/

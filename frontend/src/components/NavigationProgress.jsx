@@ -1,10 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigation } from "react-router-dom";
 
-/**
- * Professional top navigation progress bar
- * Shows during route transitions with smooth animation
- */
 export default function NavigationProgress() {
   const navigation = useNavigation();
   const [progress, setProgress] = useState(0);
@@ -47,10 +43,8 @@ export default function NavigationProgress() {
   useEffect(() => {
     // Only trigger on state changes
     if (isNavigating && !wasNavigatingRef.current) {
-      // Started navigating
       queueMicrotask(startProgress);
     } else if (!isNavigating && wasNavigatingRef.current) {
-      // Finished navigating
       queueMicrotask(completeProgress);
     }
 
@@ -66,7 +60,6 @@ export default function NavigationProgress() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] h-[2px] bg-transparent">
-      {/* Progress bar */}
       <div
         className="h-full transition-all duration-300 ease-out"
         style={{
@@ -76,7 +69,6 @@ export default function NavigationProgress() {
         }}
       />
 
-      {/* Glow effect at the end */}
       <div
         className="absolute top-0 h-full w-24 transition-all duration-300 ease-out"
         style={{
@@ -86,7 +78,6 @@ export default function NavigationProgress() {
         }}
       />
 
-      {/* Shimmer effect */}
       <div
         className="absolute top-0 h-full overflow-hidden transition-all duration-300"
         style={{ width: `${progress}%` }}

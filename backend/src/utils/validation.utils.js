@@ -2,10 +2,10 @@ export const PASSWORD_MIN = 8;
 export const PASSWORD_MAX = 64;
 
 const ARTICLE_LIMITS = {
-  title: { min: 10, max: 150 },
-  introduction: { min: 100, max: 1000 },
-  content: { min: 300, max: 100000 },
-  summary: { min: 50, max: 500 },
+  title: { min: 20, max: 150 },
+  introduction: { min: 150, max: 1000 },
+  content: { min: 600, max: 20000 },
+  summary: { min: 80, max: 500 },
 };
 
 const PROFILE_LIMITS = {

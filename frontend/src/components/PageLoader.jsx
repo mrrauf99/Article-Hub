@@ -2,21 +2,17 @@ import { BookOpen } from "lucide-react";
 
 function PageLoader() {
   return (
-    <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-4">
-      <div className="relative flex items-center justify-center w-24 h-24">
-        {/* Subtle background track */}
-        <div className="absolute inset-0 rounded-full border-4 border-slate-100" />
-        
-        {/* Minimalist spinning arc */}
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-sky-500 animate-spin" />
-
-        {/* Clean central icon */}
-        <BookOpen className="w-10 h-10 text-slate-700" strokeWidth={1.5} />
+    <div
+      role="status"
+      className="flex w-full min-h-[60vh] flex-col items-center justify-center gap-5 bg-paper p-4 font-ui"
+    >
+      <div className="relative flex h-24 w-24 items-center justify-center">
+        <div className="absolute inset-0 rounded-full border-4 border-ink/[0.08]" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-moss-600 motion-safe:animate-spin" />
+        <BookOpen className="h-9 w-9 text-ink-muted" strokeWidth={1.5} aria-hidden="true" />
       </div>
 
-      <p className="text-base font-medium text-slate-600 tracking-wide animate-pulse">
-        Loading...
-      </p>
+      <span className="text-sm font-medium text-ink-muted">Loading...</span>
     </div>
   );
 }
