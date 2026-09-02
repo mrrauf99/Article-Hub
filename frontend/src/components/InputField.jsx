@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { Eye, EyeOff, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { control, FIELD_LABEL, FIELD_ERROR } from "@/styles/panelClasses";
 
 export default function InputField({
   label,
@@ -44,15 +45,10 @@ export default function InputField({
   const inputClassName = useMemo(
     () =>
       [
-        "w-full rounded-lg border px-4 py-3 outline-none transition-colors",
-        "bg-white text-slate-900 placeholder-slate-500",
+        control(Boolean(error)),
+        "px-4 py-3",
         Icon ? "pl-11" : "",
         isPassword || loading || error || success ? "pr-11" : "",
-        error
-          ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/15"
-          : "border-slate-300 focus:border-moss-600 focus:ring-2 focus:ring-moss-600/15",
-        "disabled:bg-slate-50 disabled:cursor-not-allowed",
-        "hover:border-slate-400",
       ]
         .filter(Boolean)
         .join(" "),
@@ -66,14 +62,14 @@ export default function InputField({
   return (
     <div className="space-y-1.5">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-slate-700">
+        <label htmlFor={inputId} className={FIELD_LABEL}>
           {label}
         </label>
       )}
 
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[1.1rem] w-[1.1rem] text-slate-400 pointer-events-none" />
+          <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[1.1rem] w-[1.1rem] text-ink-faint pointer-events-none" />
         )}
 
         <input
@@ -94,20 +90,20 @@ export default function InputField({
 
         <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
           {loading && (
-            <Loader2 className="h-[1.1rem] w-[1.1rem] animate-spin text-slate-400" />
+            <Loader2 className="h-[1.1rem] w-[1.1rem] animate-spin text-ink-faint" />
           )}
 
           {showSuccessIcon && (
             <CheckCircle className="h-[1.1rem] w-[1.1rem] text-moss-600" />
           )}
 
-          {showErrorIcon && <XCircle className="h-[1.1rem] w-[1.1rem] text-red-500" />}
+          {showErrorIcon && <XCircle className="h-[1.1rem] w-[1.1rem] text-red-600" />}
 
           {isPassword && !loading && (
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-1 rounded"
+              className="text-ink-faint hover:text-ink-muted transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-1 rounded"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -121,7 +117,7 @@ export default function InputField({
       </div>
 
       {error && (
-        <p id={errorId} className="text-sm text-red-600 mt-1.5">
+        <p id={errorId} className={`${FIELD_ERROR} mt-1.5`}>
           {error}
         </p>
       )}

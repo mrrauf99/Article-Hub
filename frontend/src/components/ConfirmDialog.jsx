@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
-import { useLayoutEffect, useRef } from "react";
+import { useId, useLayoutEffect, useRef } from "react";
 import { AlertTriangle, X, AlertCircle } from "lucide-react";
+import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
 export default function ConfirmDialog({
   isOpen,
@@ -11,8 +12,8 @@ export default function ConfirmDialog({
   variant = "danger", // "danger" | "warning" | "info" | "success"
   isLoading = false,
   loadingText = "Processing",
-  showLoadingDots = true, // Whether to show animated dots during loading
-  error = null, // Error message to display
+  showLoadingDots = true,
+  error = null,
   reasonLabel,
   reasonPlaceholder,
   reasonValue,
@@ -23,6 +24,9 @@ export default function ConfirmDialog({
   onCancel,
 }) {
   const modalRef = useRef(null);
+  const dialogRef = useRef(null);
+  const titleId = useId();
+  const messageId = useId();
 
   useLayoutEffect(() => {
     if (!isOpen) return;
@@ -71,24 +75,26 @@ export default function ConfirmDialog({
     };
   }, [isOpen, isLoading, onCancel]);
 
+  useModalFocusTrap(dialogRef, isOpen);
+
   if (!isOpen) return null;
 
   const variantStyles = {
     danger: {
-      icon: "bg-red-100 text-red-600",
-      button: "bg-red-600 hover:bg-red-700 focus:ring-red-500",
+      icon: "bg-red-50 text-red-700",
+      button: "bg-danger hover:bg-danger-deep focus-visible:ring-red-600",
     },
     warning: {
-      icon: "bg-amber-100 text-amber-600",
-      button: "bg-amber-600 hover:bg-amber-700 focus:ring-amber-500",
+      icon: "bg-amber-50 text-amber-700",
+      button: "bg-ink hover:bg-moss-700 focus-visible:ring-moss-600",
     },
     info: {
-      icon: "bg-blue-100 text-blue-600",
-      button: "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500",
+      icon: "bg-moss-50 text-moss-700",
+      button: "bg-ink hover:bg-moss-700 focus-visible:ring-moss-600",
     },
     success: {
-      icon: "bg-emerald-100 text-emerald-600",
-      button: "bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500",
+      icon: "bg-moss-50 text-moss-700",
+      button: "bg-moss-700 hover:bg-moss-800 focus-visible:ring-moss-600",
     },
   };
 
@@ -102,42 +108,46 @@ export default function ConfirmDialog({
       ref={modalRef}
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-ink-950/50"/>
 
-      {/* Dialog */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col transform transition-all animate-in fade-in zoom-in-95 duration-200">
-        {/* Close button */}
+      <div
+        ref={dialogRef}
+        role={error ? "alertdialog" : "dialog"}
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={messageId}
+        className="relative flex max-h-[90vh] w-full max-w-md flex-col rounded-xl bg-paper-raised font-ui shadow-[0_24px_48px_-12px_rgba(20,20,15,0.35)] animate-in fade-in zoom-in-95 duration-200 motion-reduce:animate-none"
+      >
         <button
           onClick={onCancel}
           disabled={isLoading}
-          className="absolute top-4 right-4 z-10 p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-50"
+          aria-label="Close"
+          className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-ink/5 hover:text-ink disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
         >
-          <X className="w-5 h-5" />
+          <X className="h-5 w-5" aria-hidden="true" />
         </button>
 
         <div className="overflow-y-auto overflow-x-auto max-h-[calc(90vh-1px)]">
           <div className="p-6">
             {error ? (
               <>
-                {/* Error Icon */}
-                <div className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-red-100 text-red-600">
-                  <AlertCircle className="w-7 h-7" />
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-700">
+                  <AlertCircle className="h-5 w-5" aria-hidden="true" />
                 </div>
 
-                {/* Error Title */}
-                <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
-                  Error
+                <h3 id={titleId} className="mb-2 pr-8 text-lg font-semibold text-ink">
+                  Something went wrong
                 </h3>
 
-                {/* Error Message */}
-                <p className="text-slate-600 text-center mb-6">{error}</p>
+                <p id={messageId} className="mb-6 text-[0.9375rem] leading-relaxed text-ink-muted">
+                  {error}
+                </p>
 
-                {/* OK Button */}
                 <div className="flex justify-end">
                   <button
                     onClick={onCancel}
-                    className="px-6 py-2.5 rounded-xl bg-slate-600 text-white font-medium hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                    data-autofocus
+                    className="inline-flex h-10 items-center justify-center rounded-full bg-ink px-6 text-sm font-semibold text-paper transition-colors hover:bg-moss-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
                   >
                     OK
                   </button>
@@ -145,24 +155,23 @@ export default function ConfirmDialog({
               </>
             ) : (
               <>
-                {/* Icon */}
                 <div
-                  className={`mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 ${styles.icon}`}
+                  className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full ${styles.icon}`}
                 >
-                  <AlertTriangle className="w-7 h-7" />
+                  <AlertTriangle className="h-5 w-5" aria-hidden="true" />
                 </div>
 
-                {/* Title */}
-                <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
+                <h3 id={titleId} className="mb-2 pr-8 text-lg font-semibold text-ink">
                   {title}
                 </h3>
 
-                {/* Message */}
-                <p className="text-slate-600 text-center mb-6">{message}</p>
+                <p id={messageId} className="mb-6 text-[0.9375rem] leading-relaxed text-ink-muted">
+                  {message}
+                </p>
 
                 {showReasonField && (
                   <div className="mb-6">
-                    <label className="block text-left text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    <label className="mb-2 block text-left text-sm font-medium text-ink">
                       {reasonLabel || "Reason"}
                       {reasonRequired ? " *" : ""}
                     </label>
@@ -171,38 +180,40 @@ export default function ConfirmDialog({
                       value={reasonValue || ""}
                       onChange={(e) => onReasonChange(e.target.value)}
                       placeholder={reasonPlaceholder || "Add a reason..."}
-                      className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400"
+                      className="w-full resize-y rounded-lg border border-hairline-strong bg-paper-raised px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-moss-600 focus:outline-none focus:ring-2 focus:ring-moss-600/15"
                       required={reasonRequired}
                     />
                     {reasonHelper && (
-                      <p className="mt-2 text-xs text-slate-500">
+                      <p className="mt-2 text-xs text-ink-muted">
                         {reasonHelper}
                       </p>
                     )}
                   </div>
                 )}
 
-                {/* Actions */}
-                <div className="flex gap-3">
+                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <button
+                    type="button"
                     onClick={onCancel}
                     disabled={isLoading}
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-autofocus
+                    className="inline-flex h-10 items-center justify-center rounded-full border border-hairline-strong px-5 text-sm font-semibold text-ink transition-colors hover:border-ink-faint disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
                   >
                     {cancelText}
                   </button>
                   <button
+                    type="button"
                     onClick={onConfirm}
                     disabled={isLoading || isReasonMissing}
-                    className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-80 disabled:cursor-not-allowed ${styles.button}`}
+                    className={`inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${styles.button}`}
                   >
                     {isLoading ? (
                       showLoadingDots ? (
                         <span className="inline-flex items-center justify-center gap-2">
                           <span className="inline-flex gap-1 items-center translate-y-px">
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse [animation-delay:-0.3s]" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse [animation-delay:-0.15s]" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse" />
                           </span>
                           <span>{loadingText}</span>
                         </span>
