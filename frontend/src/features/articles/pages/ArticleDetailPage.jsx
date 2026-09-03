@@ -1,18 +1,34 @@
-import { useLoaderData, useLocation } from "react-router-dom";
+import { Link, useLoaderData, useLocation, useRouteLoaderData } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { Calendar, User, Tag, Share2, Eye } from "lucide-react";
+import { ArrowLeft, Calendar, Check, Eye, PenLine, Share2, Tag, User } from "lucide-react";
 import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
 import formatCount from "@/utils/formatCount";
-import { capitalizeFirstLetter } from "@/utils/stringUtils";
+import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
+import { ARTICLE_PROSE, BTN_SECONDARY } from "@/styles/panelClasses";
+import StatusPill from "@/features/user/components/StatusPill";
+
+const OWNER_NOTES = {
+  pending: {
+    title: "In review.",
+    text: "A moderator hasn't looked at this yet, so readers can't see it. We'll email you with the decision.",
+    box: "border-review-amber-ring bg-review-amber-bg text-review-amber-text",
+  },
+  rejected: {
+    title: "Rejected.",
+    text: "The email we sent has the moderator's reason. Edit the article and resubmit it for review.",
+    box: "border-rejected-red-ring bg-rejected-red-bg text-rejected-red-text",
+  },
+};
 
 export default function ArticleDetailPage() {
   const { article } = useLoaderData();
   const location = useLocation();
 
-  const [showShareTooltip, setShowShareTooltip] = useState(false);
+  const userPanel = useRouteLoaderData("user-layout");
+  const [shareState, setShareState] = useState(null);
 
   // Ensure page scrolls to top on mount (especially important for mobile)
   useEffect(() => {
@@ -32,8 +48,8 @@ export default function ArticleDetailPage() {
   /* ---------------- Guards ---------------- */
   if (!article) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Article not found</p>
+      <div className="flex min-h-[40vh] items-center justify-center font-ui">
+        <p className="text-ink-muted">Article not found</p>
       </div>
     );
   }
@@ -85,11 +101,7 @@ export default function ArticleDetailPage() {
   /* ---------------- Utils ---------------- */
   function buildDescription({ introduction, summary, content }) {
     const preferred = introduction || summary || content || "";
-    const cleanText = preferred
-      .replace(/<[^>]*>/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+    const cleanText = stripMarkdown(preferred.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " "));
     return cleanText.slice(0, 180) || SITE_CONFIG.description;
   }
 
@@ -105,16 +117,30 @@ export default function ArticleDetailPage() {
         });
       } else {
         await navigator.clipboard.writeText(url);
-        setShowShareTooltip(true);
-        setTimeout(() => setShowShareTooltip(false), 2000);
+        setShareState("copied");
+        setTimeout(() => setShareState(null), 2000);
       }
-    } catch {
-      // silent fail (user canceled share)
+    } catch (error) {
+      // AbortError means the user closed the native share sheet.
+      if (error?.name !== "AbortError") {
+        setShareState("failed");
+        setTimeout(() => setShareState(null), 3000);
+      }
     }
   }
 
+  const inAdmin = location.pathname.startsWith("/admin");
+  const isOwner =
+    Boolean(userPanel) && (article.status !== "approved" || Boolean(location.state?.owned));
+  const back = inAdmin
+    ? { to: "/admin/articles", label: "Articles" }
+    : isOwner
+      ? { to: "/user/dashboard", label: "Your articles" }
+      : { to: "/user/articles", label: "Explore" };
+  const statusNote = isOwner ? OWNER_NOTES[article.status] : null;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white w-full">
+    <article className="font-ui">
       <SEO
         title={article.title}
         description={metaDescription}
@@ -123,101 +149,125 @@ export default function ArticleDetailPage() {
         type="article"
         schema={[articleSchema]}
       />
-      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10">
-        <div className="w-full max-w-4xl mx-auto">
-          {/* ================= HEADER ================= */}
-          <div className="mb-10">
-            {/* Category */}
+
+      <div className="mx-auto w-full max-w-2xl py-2 sm:py-4">
+        <Link
+          to={back.to}
+          className="mb-8 inline-flex items-center gap-1.5 rounded-sm text-sm text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+          {back.label}
+        </Link>
+
+        {statusNote && (
+          <div
+            className={`mb-8 flex flex-col gap-3 rounded-xl border px-4 py-3.5 text-sm leading-relaxed sm:flex-row sm:items-center ${statusNote.box}`}
+          >
+            <p className="flex-1">
+              <span className="font-semibold">{statusNote.title}</span> {statusNote.text}
+            </p>
+            <Link
+              to={`/user/articles/${article.id}/edit`}
+              className={`${BTN_SECONDARY} h-9 self-start sm:self-auto`}
+            >
+              <PenLine className="h-4 w-4" aria-hidden="true" />
+              Edit
+            </Link>
+          </div>
+        )}
+
+        <header className="mb-8">
+          <h1 className="mb-6 font-editorial text-3xl leading-[1.15] text-ink sm:text-4xl lg:text-[2.75rem]">
+            {capitalizeFirstLetter(article.title)}
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-hairline pb-5 text-sm text-ink-muted">
             {article.category && (
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-sm font-semibold">
-                <Tag className="w-3 h-3" />
+              <span className="flex items-center gap-1.5 font-medium text-moss-700">
+                <Tag className="h-4 w-4" aria-hidden="true" />
                 {article.category}
               </span>
             )}
 
-            {/* Title */}
-            <h1 className="text-4xl font-bold text-gray-900 mt-6 mb-6 leading-tight">
-              {capitalizeFirstLetter(article.title)}
-            </h1>
+            <span className="flex items-center gap-1.5">
+              <User className="h-4 w-4 text-ink-faint" aria-hidden="true" />
+              {article.author_name || "Unknown author"}
+            </span>
 
-            {/* Meta */}
-            <div className="flex flex-wrap gap-6 text-gray-600 text-sm">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span>{article.author_name || "Unknown author"}</span>
-              </div>
+            {article.published_at && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4 text-ink-faint" aria-hidden="true" />
+                {new Date(article.published_at).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            )}
 
-              {article.published_at && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {new Date(article.published_at).toLocaleDateString()}
-                  </span>
-                </div>
-              )}
+            <span className="flex items-center gap-1.5">
+              <Eye className="h-4 w-4 text-ink-faint" aria-hidden="true" />
+              <span className="tabular-nums">{formatCount(article.views)}</span>
+              <span className="sr-only">reads</span>
+            </span>
 
-              <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4" />
-                <span>{formatCount(article.views)}</span>
-              </div>
-            </div>
+            {(inAdmin || (isOwner && article.status === "approved")) && (
+              <StatusPill status={article.status} />
+            )}
 
-            {/* ================= ACTIONS ================= */}
-            <div className="flex gap-3 mt-6">
-              {/* Share */}
-              <button
-                onClick={handleShare}
-                className="relative inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-indigo-50 transition"
+            {isOwner && article.status === "approved" && (
+              <Link
+                to={`/user/articles/${article.id}/edit`}
+                className="inline-flex items-center gap-1.5 rounded-sm font-medium text-ink transition-colors hover:text-moss-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
               >
-                <Share2 className="w-4 h-4" />
-                Share
-                {showShareTooltip && (
-                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded">
-                    Link copied
-                  </span>
+                <PenLine className="h-4 w-4" aria-hidden="true" />
+                Edit
+              </Link>
+            )}
+
+            {article.status === "approved" && (
+              <button
+                type="button"
+                onClick={handleShare}
+                aria-live="polite"
+                className="ml-auto inline-flex items-center gap-1.5 rounded-sm font-medium text-moss-700 transition-colors hover:text-moss-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
+              >
+                {shareState === "copied" ? (
+                  <Check className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Share2 className="h-4 w-4" aria-hidden="true" />
                 )}
+                {shareState === "copied"
+                  ? "Link copied"
+                  : shareState === "failed"
+                    ? "Couldn't copy link"
+                    : "Share"}
               </button>
-            </div>
+            )}
           </div>
+        </header>
 
-          {/* ================= IMAGE ================= */}
-          {article.image_url && (
-            <img
-              src={article.image_url}
-              alt={article.title}
-              className="w-full rounded-xl mb-8 object-cover"
-              loading="lazy"
-            />
-          )}
+        {article.image_url && (
+          <img
+            src={article.image_url}
+            alt=""
+            className="mb-10 w-full rounded-xl border border-hairline object-cover"
+            loading="lazy"
+          />
+        )}
 
-          {/* ================= INTRO ================= */}
+        <div className={ARTICLE_PROSE}>
           {article.introduction && (
-            <div className="prose max-w-none text-base text-gray-700 leading-relaxed mb-6">
-              <ReactMarkdown>
-                {article.introduction.replace(/\n{3,}/g, "\n\n")}
-              </ReactMarkdown>
-            </div>
+            <ReactMarkdown>{article.introduction.replace(/\n{3,}/g, "\n\n")}</ReactMarkdown>
           )}
-
-          {/* ================= CONTENT ================= */}
           {article.content && (
-            <div className="prose max-w-none text-gray-800 leading-relaxed">
-              <ReactMarkdown>
-                {article.content.replace(/\n{3,}/g, "\n\n")}
-              </ReactMarkdown>
-            </div>
+            <ReactMarkdown>{article.content.replace(/\n{3,}/g, "\n\n")}</ReactMarkdown>
           )}
-
-          {/* ================= CONCLUSION ================= */}
           {article.summary && (
-            <div className="mt-8 prose max-w-none text-base text-gray-700 leading-relaxed">
-              <ReactMarkdown>
-                {article.summary.replace(/\n{3,}/g, "\n\n")}
-              </ReactMarkdown>
-            </div>
+            <ReactMarkdown>{article.summary.replace(/\n{3,}/g, "\n\n")}</ReactMarkdown>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

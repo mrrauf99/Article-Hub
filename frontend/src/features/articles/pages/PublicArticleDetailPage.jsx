@@ -6,7 +6,7 @@ import { Calendar, User, Tag, Share2, Eye, ArrowLeft, Check } from "lucide-react
 import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
 import formatCount from "@/utils/formatCount";
-import { capitalizeFirstLetter } from "@/utils/stringUtils";
+import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 
 /**
  * Guest-facing reading view. Kept separate from the shared
@@ -63,11 +63,7 @@ export default function PublicArticleDetailPage() {
 
   function buildDescription({ introduction, summary, content }) {
     const preferred = introduction || summary || content || "";
-    const cleanText = preferred
-      .replace(/<[^>]*>/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+    const cleanText = stripMarkdown(preferred.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " "));
     return cleanText.slice(0, 180) || SITE_CONFIG.description;
   }
 

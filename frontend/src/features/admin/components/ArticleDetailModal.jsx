@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import formatCount from "@/utils/formatCount";
-import { capitalizeFirstLetter } from "@/utils/stringUtils";
+import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -166,7 +166,7 @@ export default function ArticleDetailModal({
                 Summary
               </h4>
               <p className="text-slate-700 leading-relaxed">
-                {article.summary}
+                {stripMarkdown(article.summary)}
               </p>
             </div>
           </div>
