@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useId, useLayoutEffect, useRef } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { AlertTriangle, X, AlertCircle } from "lucide-react";
 import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
@@ -20,6 +20,9 @@ export default function ConfirmDialog({
   reasonHelper,
   reasonRequired = false,
   onReasonChange,
+  confirmMatchText,
+  confirmMatchLabel = "Type the title to confirm",
+  confirmMatchHelper = "Enter the title exactly as shown above.",
   onConfirm,
   onCancel,
 }) {
@@ -27,6 +30,11 @@ export default function ConfirmDialog({
   const dialogRef = useRef(null);
   const titleId = useId();
   const messageId = useId();
+  const [matchValue, setMatchValue] = useState("");
+
+  useLayoutEffect(() => {
+    if (isOpen) setMatchValue("");
+  }, [isOpen]);
 
   useLayoutEffect(() => {
     if (!isOpen) return;
@@ -102,6 +110,8 @@ export default function ConfirmDialog({
   const showReasonField = typeof onReasonChange === "function";
   const isReasonMissing =
     reasonRequired && (!reasonValue || !reasonValue.trim());
+  const showMatchField = Boolean(confirmMatchText);
+  const isMatchInvalid = showMatchField && matchValue.trim() !== confirmMatchText.trim();
 
   return createPortal(
     <div
@@ -169,6 +179,26 @@ export default function ConfirmDialog({
                   {message}
                 </p>
 
+                {showMatchField && (
+                  <div className="mb-6">
+                    <label className="mb-2 block text-left text-sm font-medium text-ink">
+                      {confirmMatchLabel}
+                    </label>
+                    <input
+                      type="text"
+                      value={matchValue}
+                      onChange={(e) => setMatchValue(e.target.value)}
+                      data-autofocus
+                      autoComplete="off"
+                      spellCheck="false"
+                      className="w-full rounded-lg border border-hairline-strong bg-paper-raised px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-moss-600 focus:outline-none focus:ring-2 focus:ring-moss-600/15"
+                    />
+                    {confirmMatchHelper && (
+                      <p className="mt-2 text-xs text-ink-muted">{confirmMatchHelper}</p>
+                    )}
+                  </div>
+                )}
+
                 {showReasonField && (
                   <div className="mb-6">
                     <label className="mb-2 block text-left text-sm font-medium text-ink">
@@ -204,7 +234,7 @@ export default function ConfirmDialog({
                   <button
                     type="button"
                     onClick={onConfirm}
-                    disabled={isLoading || isReasonMissing}
+                    disabled={isLoading || isReasonMissing || isMatchInvalid}
                     className={`inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${styles.button}`}
                   >
                     {isLoading ? (
