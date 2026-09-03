@@ -6,7 +6,7 @@ import StatusBadge from "./StatusBadge";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { userApi } from "@/features/api/userApi";
 import formatCount from "@/utils/formatCount";
-import { capitalizeFirstLetter } from "@/utils/stringUtils";
+import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 
 function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
   const navigate = useNavigate();
@@ -63,13 +63,22 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
     <>
       <article
         onClick={openArticle}
+        onKeyDown={(e) => {
+          if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            openArticle();
+          }
+        }}
+        role="link"
+        tabIndex={0}
+        aria-label={capitalizeFirstLetter(article.title)}
         draggable
         onDragStart={(e) => {
           const url = `${window.location.origin}${basePath}/${article.id}`;
           e.dataTransfer.setData("text/uri-list", url);
           e.dataTransfer.setData("text/plain", url);
         }}
-        className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden"
+        className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
       >
         {/* status */}
         {mode !== "guest" && (
@@ -125,7 +134,7 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
           </h3>
 
           <p className="text-sm text-slate-600 line-clamp-2 mt-2 mb-4 leading-relaxed">
-            {article.summary}
+            {stripMarkdown(article.summary)}
           </p>
 
           <div className="flex justify-between items-center pt-4 border-t border-slate-100">
@@ -170,6 +179,7 @@ function ActionButton({ children, onClick, title }) {
     <button
       onClick={onClick}
       title={title}
+      aria-label={title}
       className="p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110"
     >
       {children}

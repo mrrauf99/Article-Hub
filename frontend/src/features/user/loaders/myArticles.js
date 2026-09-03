@@ -3,7 +3,6 @@ import { handleLoaderError } from "@/utils/loaderError";
 
 export default async function myArticlesLoader() {
   try {
-    // Fetch both articles and stats in parallel
     const [articlesRes, statsRes] = await Promise.all([
       apiClient.get("articles/me"),
       apiClient.get("user/stats"),
