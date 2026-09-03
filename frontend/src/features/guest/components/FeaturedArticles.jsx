@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Eye, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import formatCount from "@/utils/formatCount";
-import { capitalizeFirstLetter } from "@/utils/stringUtils";
+import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 
 export default function FeaturedArticles({ articles }) {
   const featured = articles
@@ -54,7 +54,7 @@ export default function FeaturedArticles({ articles }) {
                   {capitalizeFirstLetter(main.title)}
                 </h3>
                 <p className="text-sm text-ink-muted line-clamp-2 mb-4 max-w-[58ch]">
-                  {main.summary}
+                  {stripMarkdown(main.summary)}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-ink-faint">
                   <span className="font-medium text-ink-muted">
@@ -99,7 +99,7 @@ export default function FeaturedArticles({ articles }) {
                       {capitalizeFirstLetter(article.title)}
                     </h4>
                     <p className="text-xs text-ink-muted line-clamp-2 mb-2">
-                      {article.summary}
+                      {stripMarkdown(article.summary)}
                     </p>
                     <div className="flex items-center gap-2 text-xs text-ink-faint mt-auto">
                       <span className="truncate">{article.author_name}</span>
