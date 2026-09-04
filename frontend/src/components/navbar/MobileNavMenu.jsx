@@ -15,7 +15,6 @@ export default function MobileNavMenu({
 }) {
   const [avatarError, setAvatarError] = useState(false);
 
-  // Get initials for avatar fallback (memoized to avoid recalculation)
   const initials = useMemo(() => {
     if (!userName) return "U";
     return userName
@@ -26,7 +25,6 @@ export default function MobileNavMenu({
       .slice(0, 2);
   }, [userName]);
 
-  // Helper to check if avatar is valid
   const isValidAvatar = avatar && typeof avatar === "string" && avatar.trim();
 
   const isAdmin = role === "admin";
@@ -36,7 +34,6 @@ export default function MobileNavMenu({
     <div className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}>
       <div className={styles.mobileMenuContent}>
         <div className={styles.mobileMenuInner}>
-          {/* User info for logged-in users */}
         {role !== "guest" && (
           <div className={styles.mobileUserHeader}>
             <div className={styles.mobileAvatarContainer}>
@@ -61,14 +58,13 @@ export default function MobileNavMenu({
                     Administrator
                   </>
                 ) : (
-                  "Member"
+                  "Writer"
                 )}
               </span>
             </div>
           </div>
         )}
 
-        {/* Navigation links */}
         {navItems.length > 0 && (
           <div className={styles.mobileNavSection}>
             {navItems.map(({ label, href, icon: Icon }) => (
@@ -83,7 +79,6 @@ export default function MobileNavMenu({
               </Link>
             ))}
 
-            {/* Pending articles notification for admin */}
             {isAdmin && (
               <Link
                 to="/admin/articles?status=pending"
@@ -102,7 +97,6 @@ export default function MobileNavMenu({
           </div>
         )}
 
-        {/* Guest actions */}
         {role === "guest" ? (
           <div className={styles.mobileGuestActions}>
             <Link
@@ -122,7 +116,6 @@ export default function MobileNavMenu({
           </div>
         ) : (
           <>
-            {/* User menu links */}
             <div className={styles.mobileNavSection}>
               <Link
                 to={profilePath}
@@ -130,11 +123,10 @@ export default function MobileNavMenu({
                 className={styles.mobileLink}
               >
                 <User className={styles.mobileLinkIcon} />
-                Profile
+                {isAdmin ? "Profile" : "Profile & security"}
               </Link>
             </div>
 
-            {/* Logout */}
             <div className={styles.mobileLogoutSection}>
               <button
                 onClick={() => {

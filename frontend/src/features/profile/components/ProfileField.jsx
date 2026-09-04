@@ -1,12 +1,13 @@
 import {
+  EMPTY_VALUE,
   FIELD_GROUP,
-  FIELD_LABEL,
   FIELD_INPUT,
-  FIELD_READONLY,
+  FIELD_LABEL,
+  READ_LABEL,
+  READ_VALUE,
 } from "../styles/profileClasses";
 
 export default function ProfileField({
-  icon: Icon,
   label,
   value,
   name,
@@ -15,46 +16,61 @@ export default function ProfileField({
   disabled = false,
   type = "text",
   rows,
+  placeholder,
+  className = "",
 }) {
-  return (
-    <div className={FIELD_GROUP}>
-      <label className={FIELD_LABEL}>
-        <Icon className="w-4 h-4 text-indigo-600" />
-        {label}
-      </label>
-      {isEditing && !disabled ? (
-        rows ? (
+  const id = `profile-${name}`;
+
+  if (isEditing && !disabled) {
+    return (
+      <div className={`${FIELD_GROUP} ${className}`}>
+        <label htmlFor={id} className={FIELD_LABEL}>
+          {label}
+        </label>
+        {rows ? (
           <textarea
+            id={id}
             name={name}
             value={value || ""}
             onChange={onChange}
             rows={rows}
-            className={`${FIELD_INPUT} resize-none`}
-            placeholder={`Enter your ${label.toLowerCase()}...`}
+            placeholder={placeholder}
+            className={`${FIELD_INPUT} resize-y leading-relaxed`}
           />
         ) : (
           <input
+            id={id}
             type={type}
             name={name}
             value={value || ""}
             onChange={onChange}
+            placeholder={placeholder}
             className={FIELD_INPUT}
           />
-        )
-      ) : (
-        <div
-          className={`${FIELD_READONLY} ${
-            disabled ? "text-gray-500" : "text-gray-900"
-          }`}
-        >
-          {value || "Not set"}
-          {disabled && (
-            <span className="text-xs ml-2 text-gray-400 italic">
-              (Read-only)
-            </span>
-          )}
-        </div>
-      )}
+        )}
+      </div>
+    );
+  }
+
+  const isLink = type === "url" && value;
+
+  return (
+    <div className={`${FIELD_GROUP} ${className}`}>
+      <dt className={READ_LABEL}>{label}</dt>
+      <dd className={`${READ_VALUE} ${rows ? "whitespace-pre-line leading-relaxed" : ""}`}>
+        {isLink ? (
+          <a
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-moss-700 underline-offset-4 hover:underline"
+          >
+            {value}
+          </a>
+        ) : (
+          value || <span className={EMPTY_VALUE}>Not added</span>
+        )}
+      </dd>
     </div>
   );
 }
