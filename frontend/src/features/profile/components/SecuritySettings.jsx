@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { KeyRound, ShieldCheck, QrCode, Lock, Copy } from "lucide-react";
+import { Check, Copy, KeyRound, Loader2, Lock, QrCode, ShieldCheck } from "lucide-react";
 import { useProfile } from "../hooks/useProfile";
 import { userApi } from "@/features/api/userApi";
 import InputField from "@/components/InputField";
@@ -9,7 +9,7 @@ import {
   validatePassword,
   getPasswordGenericError,
 } from "@/features/auth/util/authValidation";
-import { SECTION_DESCRIPTION } from "../styles/profileClasses";
+import { BTN_DANGER, BTN_GHOST, BTN_PRIMARY, BTN_SECONDARY, ICON_BTN } from "@/styles/panelClasses";
 
 export default function SecuritySettings() {
   const { user } = useProfile();
@@ -323,335 +323,295 @@ export default function SecuritySettings() {
     }
   }, [setupData?.secret]);
 
-  const statusBadge = useMemo(
-    () => (
-      <span
-        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
-          twoFactorEnabled
-            ? "bg-emerald-50 text-emerald-700"
-            : "bg-slate-100 text-slate-600"
-        }`}
-      >
-        {twoFactorEnabled ? "Enabled" : "Disabled"}
-      </span>
-    ),
-    [twoFactorEnabled],
-  );
-
-  const panelClassName = "rounded-xl border border-slate-200 bg-slate-50 p-5";
-
   return (
-    <div className="border-t border-gray-200 bg-white">
-      <div className="p-4 lg:p-6 space-y-6">
-        <div>
-          <h2 className="text-lg lg:text-xl font-bold text-gray-900 mb-1">
-            Security
-          </h2>
-          <p className={SECTION_DESCRIPTION}>
-            Manage your password and two-factor authentication.
+    <section
+      aria-labelledby="security-title"
+      className="mt-10 overflow-hidden rounded-xl border border-hairline bg-paper-raised"
+    >
+      <div className="border-b border-hairline px-5 py-6 sm:px-8">
+        <h2 id="security-title" className="font-editorial text-2xl text-ink">
+          Security
+        </h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          Your password and the second step you use to sign in.
+        </p>
+      </div>
+
+      <div className="grid lg:grid-cols-2 lg:divide-x lg:divide-hairline">
+        <div className="px-5 py-8 sm:px-8">
+          <div className="flex items-center gap-2.5">
+            <KeyRound className="h-5 w-5 text-ink-muted" aria-hidden="true" />
+            <h3 className="text-base font-semibold text-ink">Change password</h3>
+          </div>
+          <p className="mt-1.5 text-sm text-ink-muted">
+            You'll stay signed in on this device after changing it.
           </p>
+
+          <form onSubmit={handleChangePassword} className="mt-6 space-y-4" noValidate>
+            <input
+              type="text"
+              name="username"
+              autoComplete="username"
+              value={user?.username || ""}
+              readOnly
+              hidden
+            />
+            <InputField
+              label="Current password"
+              icon={Lock}
+              type="password"
+              name="currentPassword"
+              value={passwordForm.currentPassword}
+              onChange={handlePasswordChange}
+              onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
+              error={passwordErrors.currentPassword}
+              autoComplete="current-password"
+            />
+            <InputField
+              label="New password"
+              icon={Lock}
+              type="password"
+              name="newPassword"
+              value={passwordForm.newPassword}
+              onChange={handlePasswordChange}
+              onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
+              error={passwordErrors.newPassword}
+              autoComplete="new-password"
+            />
+            <InputField
+              label="Confirm new password"
+              icon={Lock}
+              type="password"
+              name="confirmPassword"
+              value={passwordForm.confirmPassword}
+              onChange={handlePasswordChange}
+              onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
+              error={passwordErrors.confirmPassword}
+              autoComplete="new-password"
+            />
+
+            <PasswordRequirements
+              errors={passwordRuleErrors}
+              passwordEntered={passwordEntered}
+              confirmEntered={confirmEntered}
+            />
+
+            <FormMessage message={passwordMessage} />
+
+            <button type="submit" disabled={passwordSaving} className={`${BTN_PRIMARY} w-full sm:w-auto`}>
+              {passwordSaving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+              {passwordSaving ? "Updating…" : "Update password"}
+            </button>
+          </form>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className={panelClassName}>
-            <div className="flex items-center gap-2 text-slate-900 font-semibold">
-              <KeyRound className="h-5 w-5 text-indigo-600" />
-              Change Password
+        <div className="border-t border-hairline px-5 py-8 sm:px-8 lg:border-t-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <ShieldCheck
+                className={`h-5 w-5 ${twoFactorEnabled ? "text-moss-700" : "text-ink-muted"}`}
+                aria-hidden="true"
+              />
+              <h3 className="text-base font-semibold text-ink">Two-factor authentication</h3>
             </div>
-            <p className="text-sm text-slate-600 mt-2">
-              Use a strong password to keep your account secure.
-            </p>
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
+                twoFactorEnabled
+                  ? "bg-moss-50 text-moss-800 ring-moss-200"
+                  : "bg-review-amber-bg text-review-amber-text ring-review-amber-ring"
+              }`}
+            >
+              {twoFactorEnabled ? "On" : "Off"}
+            </span>
+          </div>
+          <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+            {twoFactorEnabled
+              ? "Signing in asks for a 6-digit code from your authenticator app as well as your password."
+              : "Add a 6-digit code from an authenticator app, such as Google Authenticator, to every sign-in. Recommended."}
+          </p>
 
-            <form onSubmit={handleChangePassword} className="mt-4 space-y-3">
+          {!twoFactorEnabled && !setupData && (
+            <form onSubmit={handleSetupTwoFactor} className="mt-6 space-y-4" noValidate>
+              <input
+                type="text"
+                name="username"
+                autoComplete="username"
+                value={user?.username || ""}
+                readOnly
+                hidden
+              />
               <InputField
-                label="Current Password"
+                label="Confirm your password to start"
                 icon={Lock}
                 type="password"
-                name="currentPassword"
-                value={passwordForm.currentPassword}
-                onChange={handlePasswordChange}
-                onFocus={handlePasswordFocus}
-                onBlur={handlePasswordBlur}
-                error={passwordErrors.currentPassword}
+                name="setupPassword"
+                value={setupPassword}
+                onChange={(e) => {
+                  setSetupPassword(e.target.value);
+                  if (setupErrors.password) {
+                    setSetupErrors((prev) => ({ ...prev, password: null }));
+                  }
+                }}
+                error={setupErrors.password}
                 autoComplete="current-password"
-                placeholder="Enter your current password"
-              />
-              <InputField
-                label="New Password"
-                icon={Lock}
-                type="password"
-                name="newPassword"
-                value={passwordForm.newPassword}
-                onChange={handlePasswordChange}
-                onFocus={handlePasswordFocus}
-                onBlur={handlePasswordBlur}
-                error={passwordErrors.newPassword}
-                autoComplete="new-password"
-                placeholder="Enter a new password"
-              />
-              <InputField
-                label="Confirm Password"
-                icon={Lock}
-                type="password"
-                name="confirmPassword"
-                value={passwordForm.confirmPassword}
-                onChange={handlePasswordChange}
-                onFocus={handlePasswordFocus}
-                onBlur={handlePasswordBlur}
-                error={passwordErrors.confirmPassword}
-                autoComplete="new-password"
-                placeholder="Re-enter your new password"
               />
 
-              <PasswordRequirements
-                errors={passwordRuleErrors}
-                passwordEntered={passwordEntered}
-                confirmEntered={confirmEntered}
-              />
+              <FormMessage message={setupMessage} />
 
-              {passwordMessage && (
-                <p
-                  className={`text-sm ${
-                    passwordMessage.success
-                      ? "text-emerald-600"
-                      : "text-rose-600"
-                  }`}
-                >
-                  {passwordMessage.message}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={passwordSaving}
-                className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition disabled:opacity-60"
-              >
-                {passwordSaving ? "Updating..." : "Update Password"}
+              <button type="submit" disabled={setupLoading} className={`${BTN_SECONDARY} w-full sm:w-auto`}>
+                {setupLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+                {setupLoading ? "Generating QR code…" : "Set up two-factor"}
               </button>
             </form>
-          </div>
+          )}
 
-          <div className={panelClassName}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-slate-900 font-semibold">
-                <ShieldCheck className="h-5 w-5 text-indigo-600" />
-                Two-Factor Authentication
-              </div>
-              {statusBadge}
-            </div>
-
-            <p className="text-sm text-slate-600 mt-2">
-              Use Google Authenticator to add an extra layer of protection.
-            </p>
-
-            {!twoFactorEnabled && (
-              <form onSubmit={handleSetupTwoFactor} className="mt-4 space-y-3">
-                <input
-                  type="password"
-                  placeholder="Confirm password to continue"
-                  value={setupPassword}
-                  onChange={(e) => {
-                    setSetupPassword(e.target.value);
-                    if (setupErrors.password) {
-                      setSetupErrors((prev) => ({ ...prev, password: null }));
-                    }
-                  }}
-                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                    setupErrors.password
-                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
-                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
-                  }`}
-                  autoComplete="current-password"
-                />
-                {setupErrors.password && (
-                  <p className="text-sm text-rose-600">
-                    {setupErrors.password}
-                  </p>
-                )}
-                <button
-                  type="submit"
-                  disabled={setupLoading}
-                  className="w-full rounded-lg border border-indigo-600 text-indigo-700 px-4 py-2.5 text-sm font-semibold hover:bg-indigo-50 transition disabled:opacity-60"
-                >
-                  {setupLoading ? "Generating QR..." : "Generate QR Code"}
-                </button>
-
-                {setupMessage && !setupData && (
-                  <p
-                    className={`text-sm ${
-                      setupMessage.success
-                        ? "text-emerald-600"
-                        : "text-rose-600"
-                    }`}
-                  >
-                    {setupMessage.message}
-                  </p>
-                )}
-              </form>
-            )}
-
-            {!twoFactorEnabled && setupData && (
-              <form onSubmit={handleVerifyTwoFactor} className="mt-5 space-y-4">
-                <div className="rounded-lg border border-slate-200 bg-white p-4 text-center">
-                  <QrCode className="h-5 w-5 text-indigo-600 mx-auto mb-2" />
-                  <img
-                    src={setupData.qrCodeDataUrl}
-                    alt="2FA QR Code"
-                    className="mx-auto h-40 w-40"
-                  />
-                  <p className="text-xs text-slate-500 mt-3">
-                    Or enter this key manually:
-                  </p>
-                  <div className="mt-2 flex items-center justify-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
-                    <p className="font-mono text-xs text-slate-800 break-all flex-1 text-center">
+          {!twoFactorEnabled && setupData && (
+            <form onSubmit={handleVerifyTwoFactor} className="mt-6 space-y-5" noValidate>
+              <ol className="space-y-5 text-sm text-ink">
+                <li>
+                  <p className="font-medium">1. Scan this code with your authenticator app.</p>
+                  <div className="mt-3 inline-flex rounded-lg border border-hairline bg-paper-raised p-3">
+                    <img
+                      src={setupData.qrCodeDataUrl}
+                      alt="QR code for your authenticator app"
+                      className="h-40 w-40"
+                    />
+                  </div>
+                  <p className="mt-3 text-ink-muted">Can't scan it? Enter this key instead:</p>
+                  <div className="mt-2 flex items-center gap-2 rounded-lg border border-hairline bg-paper px-3 py-2">
+                    <code className="flex-1 break-all font-mono text-xs text-ink">
                       {setupData.secret}
-                    </p>
+                    </code>
                     <button
                       type="button"
                       onClick={handleCopySecret}
-                      className="flex-shrink-0 w-16 px-2 py-1.5 rounded hover:bg-slate-200 transition-colors text-xs font-semibold flex items-center justify-center"
-                      title={copiedSecret ? "Copied!" : "Copy secret"}
+                      className={`${ICON_BTN} h-9 w-auto gap-1.5 px-3 text-xs font-semibold`}
+                      aria-label={copiedSecret ? "Key copied" : "Copy key"}
                     >
                       {copiedSecret ? (
-                        <span className="text-slate-700">Copied!</span>
+                        <>
+                          <Check className="h-4 w-4 text-moss-700" aria-hidden="true" />
+                          Copied
+                        </>
                       ) : (
-                        <Copy className="w-4 h-4 text-slate-600" />
+                        <Copy className="h-4 w-4" aria-hidden="true" />
                       )}
                     </button>
                   </div>
-                </div>
-
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="Enter 6-digit code"
-                  value={setupToken}
-                  onChange={(e) => {
-                    setSetupToken(e.target.value);
-                    if (setupErrors.token) {
-                      setSetupErrors((prev) => ({ ...prev, token: null }));
-                    }
-                  }}
-                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                    setupErrors.token
-                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
-                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
-                  }`}
-                />
-                {setupErrors.token && (
-                  <p className="text-sm text-rose-600">{setupErrors.token}</p>
-                )}
-
-                {setupMessage && (
-                  <p
-                    className={`text-sm ${
-                      setupMessage.success
-                        ? "text-emerald-600"
-                        : "text-rose-600"
-                    }`}
-                  >
-                    {setupMessage.message}
-                  </p>
-                )}
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    type="submit"
-                    disabled={verifyLoading}
-                    className="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition disabled:opacity-60"
-                  >
-                    {verifyLoading ? "Verifying..." : "Enable 2FA"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSetupData(null);
-                      setSetupToken("");
-                      setSetupMessage(null);
+                </li>
+                <li>
+                  <p className="mb-3 font-medium">2. Enter the 6-digit code it shows.</p>
+                  <InputField
+                    label="Verification code"
+                    icon={QrCode}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    name="setupToken"
+                    value={setupToken}
+                    onChange={(e) => {
+                      setSetupToken(e.target.value);
+                      if (setupErrors.token) {
+                        setSetupErrors((prev) => ({ ...prev, token: null }));
+                      }
                     }}
-                    className="flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
+                    error={setupErrors.token}
+                  />
+                </li>
+              </ol>
 
-            {twoFactorEnabled && (
-              <form
-                onSubmit={handleDisableTwoFactor}
-                className="mt-4 space-y-3"
-              >
-                <input
-                  type="password"
-                  placeholder="Confirm password"
-                  value={disablePassword}
-                  onChange={(e) => {
-                    setDisablePassword(e.target.value);
-                    if (disableErrors.password) {
-                      setDisableErrors((prev) => ({
-                        ...prev,
-                        password: null,
-                      }));
-                    }
-                  }}
-                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                    disableErrors.password
-                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
-                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
-                  }`}
-                  autoComplete="current-password"
-                />
-                {disableErrors.password && (
-                  <p className="text-sm text-rose-600">
-                    {disableErrors.password}
-                  </p>
-                )}
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="Enter 6-digit code"
-                  value={disableToken}
-                  onChange={(e) => {
-                    setDisableToken(e.target.value);
-                    if (disableErrors.token) {
-                      setDisableErrors((prev) => ({ ...prev, token: null }));
-                    }
-                  }}
-                  className={`w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                    disableErrors.token
-                      ? "border-rose-500 focus:border-rose-500 focus:ring-rose-200"
-                      : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-200"
-                  }`}
-                />
-                {disableErrors.token && (
-                  <p className="text-sm text-rose-600">{disableErrors.token}</p>
-                )}
+              <FormMessage message={setupMessage} />
 
-                {disableMessage && (
-                  <p
-                    className={`text-sm ${
-                      disableMessage.success
-                        ? "text-emerald-600"
-                        : "text-rose-600"
-                    }`}
-                  >
-                    {disableMessage.message}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={disableLoading}
-                  className="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 transition disabled:opacity-60"
-                >
-                  {disableLoading ? "Disabling..." : "Disable 2FA"}
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button type="submit" disabled={verifyLoading} className={BTN_PRIMARY}>
+                  {verifyLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+                  {verifyLoading ? "Verifying…" : "Turn on two-factor"}
                 </button>
-              </form>
-            )}
-          </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSetupData(null);
+                    setSetupToken("");
+                    setSetupMessage(null);
+                  }}
+                  className={BTN_GHOST}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
+          {twoFactorEnabled && (
+            <form onSubmit={handleDisableTwoFactor} className="mt-6 space-y-4" noValidate>
+              <input
+                type="text"
+                name="username"
+                autoComplete="username"
+                value={user?.username || ""}
+                readOnly
+                hidden
+              />
+              <p className="text-sm text-ink-muted">
+                To turn it off, confirm your password and a current code.
+              </p>
+              <InputField
+                label="Password"
+                icon={Lock}
+                type="password"
+                name="disablePassword"
+                value={disablePassword}
+                onChange={(e) => {
+                  setDisablePassword(e.target.value);
+                  if (disableErrors.password) {
+                    setDisableErrors((prev) => ({ ...prev, password: null }));
+                  }
+                }}
+                error={disableErrors.password}
+                autoComplete="current-password"
+              />
+              <InputField
+                label="Verification code"
+                icon={QrCode}
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                name="disableToken"
+                value={disableToken}
+                onChange={(e) => {
+                  setDisableToken(e.target.value);
+                  if (disableErrors.token) {
+                    setDisableErrors((prev) => ({ ...prev, token: null }));
+                  }
+                }}
+                error={disableErrors.token}
+              />
+
+              <FormMessage message={disableMessage} />
+
+              <button type="submit" disabled={disableLoading} className={`${BTN_DANGER} w-full sm:w-auto`}>
+                {disableLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+                {disableLoading ? "Turning off…" : "Turn off two-factor"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+function FormMessage({ message }) {
+  if (!message) return null;
+  return (
+    <p
+      role={message.success ? "status" : "alert"}
+      className={`text-sm ${message.success ? "text-moss-800" : "text-rejected-red-text"}`}
+    >
+      {message.message}
+    </p>
   );
 }

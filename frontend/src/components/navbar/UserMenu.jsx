@@ -14,7 +14,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
   const [dropdownAvatarError, setDropdownAvatarError] = useState(false);
   const menuRef = useRef(null);
 
-  // Close on click outside
   useEffect(() => {
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -27,7 +26,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
-  // Close on Escape key
   useEffect(() => {
     function handleEscape(e) {
       if (e.key === "Escape") setOpen(false);
@@ -38,7 +36,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open]);
 
-  // Get initials for avatar fallback (memoized to avoid recalculation)
   const initials = useMemo(() => {
     if (!userName) return "U";
     return userName
@@ -49,7 +46,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
       .slice(0, 2);
   }, [userName]);
 
-  // GUEST
   if (role === "guest") {
     return (
       <div className={styles.desktopUser}>
@@ -66,7 +62,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
   const isAdmin = role === "admin";
   const profilePath = isAdmin ? "/admin/profile" : "/user/profile";
 
-  // Helper to check if avatar is valid
   const isValidAvatar = avatar && typeof avatar === 'string' && avatar.trim();
 
   return (
@@ -100,7 +95,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
       <div
         className={`${styles.dropdownMenu} ${open ? styles.dropdownOpen : ""}`}
       >
-        {/* User info header */}
         <div className={styles.dropdownHeader}>
           <div className={styles.dropdownAvatarLarge}>
             {isValidAvatar && !dropdownAvatarError ? (
@@ -123,7 +117,7 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
                   Administrator
                 </>
               ) : (
-                "Member"
+                "Writer"
               )}
             </span>
           </div>
@@ -131,7 +125,6 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
 
         <div className={styles.dropdownDivider} />
 
-        {/* Menu items */}
         <div className={styles.dropdownBody}>
           <Link
             to={profilePath}
@@ -139,13 +132,12 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
             onClick={() => setOpen(false)}
           >
             <User className={styles.dropdownItemIcon} />
-            Profile
+            {isAdmin ? "Profile" : "Profile & security"}
           </Link>
         </div>
 
         <div className={styles.dropdownDivider} />
 
-        {/* Logout */}
         <div className={styles.dropdownFooter}>
           <button
             onClick={() => {

@@ -1,8 +1,9 @@
 import {
+  EMPTY_VALUE,
   FIELD_GROUP,
-  FIELD_LABEL,
   FIELD_INPUT,
-  FIELD_READONLY,
+  FIELD_LABEL,
+  READ_LABEL,
 } from "../styles/profileClasses";
 
 export default function SocialLinkField({
@@ -14,14 +15,16 @@ export default function SocialLinkField({
   onChange,
   placeholder,
 }) {
-  return (
-    <div className={FIELD_GROUP}>
-      <label className={FIELD_LABEL}>
-        <Icon className="w-5 h-5 text-gray-600" />
-        {label}
-      </label>
-      {isEditing ? (
+  const id = `profile-${name}`;
+
+  if (isEditing) {
+    return (
+      <div className={FIELD_GROUP}>
+        <label htmlFor={id} className={FIELD_LABEL}>
+          {label}
+        </label>
         <input
+          id={id}
           type="url"
           name={name}
           value={value || ""}
@@ -29,22 +32,32 @@ export default function SocialLinkField({
           placeholder={placeholder}
           className={FIELD_INPUT}
         />
-      ) : (
-        <div className={FIELD_READONLY}>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${FIELD_GROUP} flex items-start gap-3`}>
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink/[0.05] text-ink-muted">
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <dt className={READ_LABEL}>{label}</dt>
+        <dd className="mt-0.5 truncate text-[0.9375rem]">
           {value ? (
             <a
               href={value}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 hover:text-indigo-800 hover:underline truncate block"
+              className="text-moss-700 underline-offset-4 hover:underline"
             >
-              {value}
+              {value.replace(/^https?:\/\/(www\.)?/, "")}
             </a>
           ) : (
-            <span className="text-gray-500">Not set</span>
+            <span className={EMPTY_VALUE}>Not added</span>
           )}
-        </div>
-      )}
+        </dd>
+      </div>
     </div>
   );
 }

@@ -1,43 +1,28 @@
-import { Save } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useProfile } from "../hooks/useProfile";
+import { BTN_GHOST, BTN_PRIMARY } from "@/styles/panelClasses";
 
 export default function ProfileActions() {
   const { isEditing, isSaving, handleCancel } = useProfile();
-  
+
   if (!isEditing) return null;
 
   return (
-    <div className="border-t border-gray-200 bg-gray-50">
-      <div className="p-4 lg:p-6 pt-4">
-        <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
-          <button
-            onClick={handleCancel}
-            disabled={isSaving}
-            className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold
-              hover:bg-gray-100 transition text-gray-700
-              disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+    <div className="sticky bottom-0 z-10 border-t border-hairline bg-paper-raised px-5 py-4 shadow-[0_-8px_16px_-12px_rgba(20,20,15,0.18)] animate-in fade-in slide-in-from-bottom-2 duration-200 motion-reduce:animate-none sm:px-8">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-ink-muted">Changes apply once you save.</p>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row">
+          <button type="button" onClick={handleCancel} disabled={isSaving} className={BTN_GHOST}>
             Cancel
           </button>
-
-          <button
-            disabled={isSaving}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold
-              hover:bg-indigo-700 transition shadow-md
-              flex items-center justify-center gap-2
-              disabled:opacity-50 disabled:cursor-not-allowed
-              min-w-[160px]"
-          >
+          <button type="submit" disabled={isSaving} className={`${BTN_PRIMARY} sm:min-w-[9rem]`}>
             {isSaving ? (
               <>
-                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving...
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                Saving…
               </>
             ) : (
-              <>
-                <Save className="w-5 h-5" />
-                Save Changes
-              </>
+              "Save changes"
             )}
           </button>
         </div>

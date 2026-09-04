@@ -1,4 +1,5 @@
-import styles from "../../styles/ArticleForm.module.css";
+import { control } from "@/styles/panelClasses";
+import FieldShell, { describedBy } from "./FieldShell";
 
 export default function Input({
   label,
@@ -9,26 +10,21 @@ export default function Input({
   onChange,
   onBlur,
   error,
+  hint,
   placeholder,
-  required,
   maxLength,
   charCount,
+  className = "px-4 py-3 text-[0.9375rem]",
 }) {
   return (
-    <div className={styles.group}>
-      {label && (
-        <label htmlFor={id} className={styles.label}>
-          <span>
-            {label} {required && <span className={styles.required}>*</span>}
-          </span>
-          {maxLength && (
-            <span className={styles.charCount}>
-              {charCount} / {maxLength}
-            </span>
-          )}
-        </label>
-      )}
-
+    <FieldShell
+      id={id}
+      label={label}
+      hint={hint}
+      error={error}
+      charCount={charCount}
+      maxLength={maxLength}
+    >
       <input
         id={id}
         type={type}
@@ -37,10 +33,10 @@ export default function Input({
         onChange={onChange}
         onBlur={onBlur}
         placeholder={placeholder}
-        className={`${styles.control} ${error ? styles.errorControl : ""}`}
+        aria-invalid={Boolean(error) || undefined}
+        aria-describedby={describedBy(id, { hint, error, maxLength })}
+        className={`${control(Boolean(error))} ${className}`}
       />
-
-      {error && <p className={styles.errorMsg}>{error}</p>}
-    </div>
+    </FieldShell>
   );
 }

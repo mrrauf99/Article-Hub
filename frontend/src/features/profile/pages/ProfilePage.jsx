@@ -12,6 +12,7 @@ import {
   useActionData,
   useSubmit,
   useRevalidator,
+  useLocation,
 } from "react-router-dom";
 
 import { CheckCircle, XCircle } from "lucide-react";
@@ -22,13 +23,14 @@ import AuthorInfo from "../components/AuthorInfo";
 import SocialLinks from "../components/SocialLinks";
 import ProfileActions from "../components/ProfileActions";
 import SecuritySettings from "../components/SecuritySettings";
-import { ScrollReveal } from "@/components/ScrollReveal";
-import SurfaceCard from "@/components/SurfaceCard";
+import SEO from "@/components/SEO";
+import PageHeader from "@/features/user/components/PageHeader";
 
 import ProfileProvider from "../context/ProfileProvider";
 
 export default function ProfilePage() {
   const { user } = useLoaderData();
+  const location = useLocation();
   const actionData = useActionData();
   const submit = useSubmit();
   const revalidator = useRevalidator();
@@ -122,41 +124,44 @@ export default function ProfilePage() {
 
   return (
     <ProfileProvider value={profileValue}>
-      <ScrollReveal animation="fade-up" duration={600}>
-        <div className="w-full md:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="w-full max-w-6xl mx-auto">
-            <SurfaceCard>
-              <ProfileHeader />
+      <SEO title="Profile & security" canonicalPath={location.pathname} noindex nofollow />
 
-              {/* FEEDBACK */}
-              {feedback && (
-                <div
-                  className={`mx-6 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
-                    feedback.success
-                      ? "border-green-200 bg-green-50 text-green-800"
-                      : "border-red-200 bg-red-50 text-red-800"
-                  }`}
-                >
-                  {feedback.success ? (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-red-600" />
-                  )}
-                  <span>{feedback.message}</span>
-                </div>
-              )}
+      <div className="font-ui">
+        <PageHeader
+          title="Profile & security"
+          description="Your writer details, the links readers can follow, and how your account is protected."
+        />
 
-              <form onSubmit={handleSubmit}>
-                <AuthorInfo />
-                <SocialLinks />
-                <ProfileActions />
-              </form>
-
-              <SecuritySettings />
-            </SurfaceCard>
+        {feedback && (
+          <div
+            role={feedback.success ? "status" : "alert"}
+            className={`mt-8 flex items-center gap-3 rounded-xl border px-4 py-3.5 text-sm ${
+              feedback.success
+                ? "border-moss-200 bg-moss-50 text-moss-800"
+                : "border-rejected-red-ring bg-rejected-red-bg text-rejected-red-text"
+            }`}
+          >
+            {feedback.success ? (
+              <CheckCircle className="h-4 w-4 shrink-0 text-moss-800" aria-hidden="true" />
+            ) : (
+              <XCircle className="h-4 w-4 shrink-0 text-rejected-red-text" aria-hidden="true" />
+            )}
+            <span>{feedback.message}</span>
           </div>
+        )}
+
+        <div className="mt-10 rounded-xl border border-hairline bg-paper-raised">
+          <ProfileHeader />
+
+          <form onSubmit={handleSubmit} className="border-t border-hairline">
+            <AuthorInfo />
+            <SocialLinks />
+            <ProfileActions />
+          </form>
         </div>
-      </ScrollReveal>
+
+        <SecuritySettings />
+      </div>
     </ProfileProvider>
   );
 }

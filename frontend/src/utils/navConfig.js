@@ -13,7 +13,7 @@ export function getNavItemsForRole(role) {
     return [
       { label: "Dashboard", href: "/user/dashboard", icon: LayoutDashboard },
       { label: "Explore", href: "/user/articles", icon: Compass },
-      { label: "Create", href: "/user/articles/new", icon: PenSquare },
+      { label: "New article", href: "/user/articles/new", icon: PenSquare },
     ];
   }
 
