@@ -2,24 +2,22 @@ import { useState } from "react";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 import { allowedImageTypes } from "@/utils/allowedImagesTypes";
 
-// Normalize line breaks: convert Windows \r\n to Unix \n
 // This ensures consistent character counting between frontend and backend
 const normalizeLineBreaks = (text) => text.replace(/\r\n/g, "\n");
 
 // Max character limits matching backend validation
-// Industry standard limits for professional article publishing
-const MAX_LENGTHS = {
+export const MAX_LENGTHS = {
   title: 150,
   introduction: 1000,
   summary: 500,
-  content: 100000,
+  content: 20000,
 };
 
-const MIN_LENGTHS = {
-  title: 10,
-  introduction: 100,
-  summary: 50,
-  content: 300,
+export const MIN_LENGTHS = {
+  title: 20,
+  introduction: 150,
+  summary: 80,
+  content: 600,
 };
 
 export function useNewArticleForm(article) {
@@ -30,7 +28,7 @@ export function useNewArticleForm(article) {
     content: article?.content ?? "",
     summary: article?.summary ?? "",
     imageFile: null,
-    imageUrl: article?.imageUrl ?? null,
+    imageUrl: article?.imageUrl ?? article?.image_url ?? null,
   });
 
   const [charCounts, setCharCounts] = useState({
@@ -49,7 +47,6 @@ export function useNewArticleForm(article) {
     // Always update form data - don't block input
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Update character counts for all tracked fields
     if (
       name === "title" ||
       name === "introduction" ||
@@ -62,7 +59,6 @@ export function useNewArticleForm(article) {
       }));
     }
 
-    // Show real-time error when exceeding limits
     if (MAX_LENGTHS[name] && normalizedLength > MAX_LENGTHS[name]) {
       const fieldLabels = {
         title: "Title",
