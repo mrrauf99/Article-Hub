@@ -345,15 +345,21 @@ a.active:not(.signupBtn) {
   min-height: 2.5rem;
   padding: 0.35rem;
   border-radius: 0.5rem;
-  border: 1px solid rgba(250, 250, 247, 0.18);
-  background: rgba(250, 250, 247, 0.04);
-  color: rgba(250, 250, 247, 0.9);
+  border: none;
+  background: transparent;
+  color: rgba(250, 250, 247, 0.75);
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: color 0.2s ease;
 }
 
-.mobileToggle:hover {
-  background: rgba(250, 250, 247, 0.1);
+.mobileToggle:hover,
+.mobileToggle:focus-visible {
+  color: theme("colors.paper.DEFAULT");
+}
+
+.mobileToggle:focus-visible {
+  outline: 2px solid theme("colors.moss.400");
+  outline-offset: 2px;
 }
 
 .mobileToggleIcon {
@@ -377,33 +383,94 @@ a.active:not(.signupBtn) {
   transform: rotate(90deg) scale(0.5);
 }
 
-.mobileMenu {
-  background: theme("colors.ink.950");
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, border-color 0.4s ease;
+.mobileBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 15, 0.5);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  border-top: 1px solid transparent;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  z-index: 55;
+}
+
+.mobileBackdropOpen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+.mobileMenu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(86vw, 22rem);
+  display: flex;
+  flex-direction: column;
+  background: theme("colors.ink.950");
+  border-left: 1px solid rgba(250, 250, 247, 0.08);
+  box-shadow: -16px 0 40px -12px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.35s;
+  z-index: 60;
 }
 
 .mobileMenu.open {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  pointer-events: auto;
-  border-top: 1px solid rgba(250, 250, 247, 0.08);
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mobileMenuContent {
-  overflow: hidden;
+@media (prefers-reduced-motion: reduce) {
+  .mobileBackdrop,
+  .mobileBackdropOpen,
+  .mobileMenu,
+  .mobileMenu.open {
+    transition-duration: 0.01ms;
+  }
+}
+
+.mobileMenuHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(250, 250, 247, 0.08);
+}
+
+.mobileMenuClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: rgba(250, 250, 247, 0.75);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.mobileMenuClose:hover {
+  color: theme("colors.paper.DEFAULT");
+}
+
+.mobileMenuClose:focus-visible {
+  outline: 2px solid theme("colors.moss.400");
+  outline-offset: 2px;
 }
 
 .mobileMenuInner {
-  padding: 0.75rem 1rem 1.25rem;
+  padding: 0.75rem 1rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-height: calc(100vh - 4rem);
+  flex: 1 1 auto;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(250, 250, 247, 0.2) transparent;
@@ -531,6 +598,11 @@ a.active:not(.signupBtn) {
   color: theme("colors.paper.DEFAULT");
 }
 
+.mobileLink:focus-visible {
+  outline: 2px solid theme("colors.moss.400");
+  outline-offset: 2px;
+}
+
 .mobileLink:hover .mobileLinkIcon,
 .mobileLink:active .mobileLinkIcon {
   color: rgba(250, 250, 247, 0.7);
@@ -563,6 +635,11 @@ a.active:not(.signupBtn) {
   border-color: rgba(250, 250, 247, 0.3);
 }
 
+.mobileLoginBtn:focus-visible {
+  outline: 2px solid theme("colors.moss.400");
+  outline-offset: 2px;
+}
+
 .mobileSignupBtn {
   display: flex;
   align-items: center;
@@ -580,6 +657,11 @@ a.active:not(.signupBtn) {
 
 .mobileSignupBtn:hover {
   background: theme("colors.moss.100");
+}
+
+.mobileSignupBtn:focus-visible {
+  outline: 2px solid theme("colors.moss.400");
+  outline-offset: 2px;
 }
 
 .mobileLogoutSection {
@@ -608,6 +690,11 @@ a.active:not(.signupBtn) {
 .mobileLogoutBtn:hover {
   background: rgba(239, 68, 68, 0.12);
   color: #fecaca;
+}
+
+.mobileLogoutBtn:focus-visible {
+  outline: 2px solid theme("colors.moss.400");
+  outline-offset: 2px;
 }
 
 .mobileLogoutBtn .mobileLinkIcon {

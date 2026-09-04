@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { User, LogOut, Shield, Bell } from "lucide-react";
+import { User, LogOut, Shield, Bell, X } from "lucide-react";
 import styles from "@/styles/navbar.module.css";
+import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
 export default function MobileNavMenu({
   isOpen,
@@ -14,6 +15,26 @@ export default function MobileNavMenu({
   pendingCount = 0,
 }) {
   const [avatarError, setAvatarError] = useState(false);
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  useModalFocusTrap(panelRef, isOpen);
 
   const initials = useMemo(() => {
     if (!userName) return "U";
@@ -31,8 +52,32 @@ export default function MobileNavMenu({
   const profilePath = isAdmin ? "/admin/profile" : "/user/profile";
 
   return (
-    <div className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}>
-      <div className={styles.mobileMenuContent}>
+    <>
+      <div
+        className={`${styles.mobileBackdrop} ${isOpen ? styles.mobileBackdropOpen : ""}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+        className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}
+      >
+        <div className={styles.mobileMenuHeader}>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close menu"
+            data-autofocus
+            className={styles.mobileMenuClose}
+          >
+            <X className={styles.mobileToggleIcon} />
+          </button>
+        </div>
+
         <div className={styles.mobileMenuInner}>
         {role !== "guest" && (
           <div className={styles.mobileUserHeader}>
@@ -143,6 +188,6 @@ export default function MobileNavMenu({
         )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
