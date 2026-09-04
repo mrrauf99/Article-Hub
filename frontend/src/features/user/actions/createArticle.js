@@ -7,14 +7,12 @@ export default async function createArticleAction({ request, params }) {
     const isEditing = !!params?.id;
 
     if (isEditing) {
-      // Update existing article
       await apiClient.patch(`articles/${params.id}`, formData);
     } else {
-      // Create new article
       await apiClient.post("articles", formData);
     }
 
-    return redirect("/user/dashboard");
+    return redirect(`/user/dashboard?submitted=${isEditing ? "updated" : "new"}`);
   } catch (err) {
     console.error("createArticleAction error:", err);
 

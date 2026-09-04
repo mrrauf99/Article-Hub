@@ -1,53 +1,63 @@
-import { User } from "lucide-react";
 import {
+  EMPTY_VALUE,
   FIELD_GROUP,
   FIELD_LABEL,
-  FIELD_READONLY,
+  READ_LABEL,
+  READ_VALUE,
 } from "../styles/profileClasses";
 
 export default function ProfileRadioField({
-  icon: Icon = User,
   label,
   value,
   name,
   isEditing,
   onChange,
   options = [],
+  className = "",
 }) {
+  if (!isEditing) {
+    return (
+      <div className={`${FIELD_GROUP} ${className}`}>
+        <dt className={READ_LABEL}>{label}</dt>
+        <dd className={READ_VALUE}>
+          {value ? (
+            options.find((opt) => opt.value === value)?.label || value
+          ) : (
+            <span className={EMPTY_VALUE}>Not added</span>
+          )}
+        </dd>
+      </div>
+    );
+  }
+
   return (
-    <div className={FIELD_GROUP}>
-      <label className={FIELD_LABEL}>
-        <Icon className="w-4 h-4 text-indigo-600" />
-        {label}
-      </label>
-      {isEditing ? (
-        <div className="flex flex-wrap gap-4 px-4 py-3 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all">
-          {options.map((option) => (
+    <fieldset className={`${FIELD_GROUP} ${className}`}>
+      <legend className={FIELD_LABEL}>{label}</legend>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {options.map((option) => {
+          const checked = value === option.value;
+          return (
             <label
               key={option.value}
-              className="flex items-center gap-2 cursor-pointer group"
+              className={`relative flex h-10 cursor-pointer items-center rounded-full border px-4 text-sm transition-colors duration-150 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-moss-600 has-[:focus-visible]:ring-offset-2 ${
+                checked
+                  ? "border-ink bg-ink text-paper"
+                  : "border-hairline-strong bg-paper-raised text-ink-muted hover:border-ink-faint hover:text-ink"
+              }`}
             >
               <input
                 type="radio"
                 name={name}
                 value={option.value}
-                checked={value === option.value}
+                checked={checked}
                 onChange={onChange}
-                className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                className="sr-only"
               />
-              <span className="text-sm lg:text-base text-gray-700 group-hover:text-indigo-600 transition-colors">
-                {option.label}
-              </span>
+              {option.label}
             </label>
-          ))}
-        </div>
-      ) : (
-        <div className={`${FIELD_READONLY} text-gray-900`}>
-          {value
-            ? options.find((opt) => opt.value === value)?.label || value
-            : "Not set"}
-        </div>
-      )}
-    </div>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }
