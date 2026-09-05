@@ -1,10 +1,10 @@
 import { BookOpen } from "lucide-react";
 
-function PageLoader() {
+function PageLoader({ fullScreen = false }) {
   return (
     <div
       role="status"
-      className="flex w-full min-h-[60vh] flex-col items-center justify-center gap-5 bg-paper p-4 font-ui"
+      className={`flex w-full ${fullScreen ? "min-h-[100dvh]" : "min-h-[60vh]"} flex-col items-center justify-center gap-5 bg-paper p-4 font-ui`}
     >
       <div className="relative flex h-24 w-24 items-center justify-center">
         <div className="absolute inset-0 rounded-full border-4 border-ink/[0.08]" />

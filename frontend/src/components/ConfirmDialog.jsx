@@ -1,6 +1,8 @@
 import { createPortal } from "react-dom";
-import { useId, useLayoutEffect, useRef, useState } from "react";
-import { AlertTriangle, X, AlertCircle } from "lucide-react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { AlertCircle, AlertTriangle, Check, Info, Trash2, X } from "lucide-react";
+
+const VARIANT_ICON = { danger: Trash2, warning: AlertTriangle, info: Info, success: Check };
 import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
 export default function ConfirmDialog({
@@ -10,6 +12,7 @@ export default function ConfirmDialog({
   confirmText = "Confirm",
   cancelText = "Cancel",
   variant = "danger", // "danger" | "warning" | "info" | "success"
+  icon,
   isLoading = false,
   loadingText = "Processing",
   showLoadingDots = true,
@@ -30,6 +33,9 @@ export default function ConfirmDialog({
   const dialogRef = useRef(null);
   const titleId = useId();
   const messageId = useId();
+  const matchId = useId();
+  const reasonId = useId();
+  const confirmRef = useRef(null);
   const [matchValue, setMatchValue] = useState("");
 
   useLayoutEffect(() => {
@@ -85,6 +91,12 @@ export default function ConfirmDialog({
 
   useModalFocusTrap(dialogRef, isOpen);
 
+  // The confirm button was disabled while the request ran, which drops focus;
+  // put it back on the retry.
+  useEffect(() => {
+    if (isOpen && error && !isLoading) confirmRef.current?.focus();
+  }, [isOpen, error, isLoading]);
+
   if (!isOpen) return null;
 
   const variantStyles = {
@@ -107,6 +119,7 @@ export default function ConfirmDialog({
   };
 
   const styles = variantStyles[variant] || variantStyles.danger;
+  const Icon = icon || VARIANT_ICON[variant] || AlertTriangle;
   const showReasonField = typeof onReasonChange === "function";
   const isReasonMissing =
     reasonRequired && (!reasonValue || !reasonValue.trim());
@@ -122,7 +135,7 @@ export default function ConfirmDialog({
 
       <div
         ref={dialogRef}
-        role={error ? "alertdialog" : "dialog"}
+        role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={messageId}
@@ -139,146 +152,146 @@ export default function ConfirmDialog({
 
         <div className="overflow-y-auto overflow-x-auto max-h-[calc(90vh-1px)]">
           <div className="p-6">
-            {error ? (
-              <>
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-700">
-                  <AlertCircle className="h-5 w-5" aria-hidden="true" />
-                </div>
+            <div
+              className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full ${styles.icon}`}
+            >
+              <Icon className="h-5 w-5" aria-hidden="true" />
+            </div>
 
-                <h3 id={titleId} className="mb-2 pr-8 text-lg font-semibold text-ink">
-                  Something went wrong
-                </h3>
+            <h3 id={titleId} className="mb-2 pr-8 text-lg font-semibold text-ink">
+              {title}
+            </h3>
 
-                <p id={messageId} className="mb-6 text-[0.9375rem] leading-relaxed text-ink-muted">
-                  {error}
-                </p>
+            <p id={messageId} className="mb-6 text-[0.9375rem] leading-relaxed text-ink-muted">
+              {message}
+            </p>
 
-                <div className="flex justify-end">
-                  <button
-                    onClick={onCancel}
-                    data-autofocus
-                    className="inline-flex h-10 items-center justify-center rounded-full bg-ink px-6 text-sm font-semibold text-paper transition-colors hover:bg-moss-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
-                  >
-                    OK
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div
-                  className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full ${styles.icon}`}
-                >
-                  <AlertTriangle className="h-5 w-5" aria-hidden="true" />
-                </div>
-
-                <h3 id={titleId} className="mb-2 pr-8 text-lg font-semibold text-ink">
-                  {title}
-                </h3>
-
-                <p id={messageId} className="mb-6 text-[0.9375rem] leading-relaxed text-ink-muted">
-                  {message}
-                </p>
-
-                {showMatchField && (
-                  <div className="mb-6">
-                    <label className="mb-2 block text-left text-sm font-medium text-ink">
-                      {confirmMatchLabel}
-                    </label>
-                    <input
-                      type="text"
-                      value={matchValue}
-                      onChange={(e) => setMatchValue(e.target.value)}
-                      data-autofocus
-                      autoComplete="off"
-                      spellCheck="false"
-                      className="w-full rounded-lg border border-hairline-strong bg-paper-raised px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-moss-600 focus:outline-none focus:ring-2 focus:ring-moss-600/15"
-                    />
-                    {confirmMatchHelper && (
-                      <p className="mt-2 text-xs text-ink-muted">{confirmMatchHelper}</p>
-                    )}
-                  </div>
+            {showMatchField && (
+              <div className="mb-6">
+                <label htmlFor={matchId} className="mb-2 block text-left text-sm font-medium text-ink">
+                  {confirmMatchLabel}
+                </label>
+                <input
+                  id={matchId}
+                  type="text"
+                  value={matchValue}
+                  onChange={(e) => setMatchValue(e.target.value)}
+                  data-autofocus
+                  autoComplete="off"
+                  spellCheck="false"
+                  aria-required="true"
+                  aria-describedby={confirmMatchHelper ? `${matchId}-hint` : undefined}
+                  className="w-full rounded-lg border border-hairline-strong bg-paper-raised px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-moss-600 focus:outline-none focus:ring-2 focus:ring-moss-600/15"
+                />
+                {confirmMatchHelper && (
+                  <p id={`${matchId}-hint`} className="mt-2 text-sm text-ink-muted">
+                    {confirmMatchHelper}
+                  </p>
                 )}
-
-                {showReasonField && (
-                  <div className="mb-6">
-                    <label className="mb-2 block text-left text-sm font-medium text-ink">
-                      {reasonLabel || "Reason"}
-                      {reasonRequired ? " *" : ""}
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={reasonValue || ""}
-                      onChange={(e) => onReasonChange(e.target.value)}
-                      placeholder={reasonPlaceholder || "Add a reason..."}
-                      className="w-full resize-y rounded-lg border border-hairline-strong bg-paper-raised px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-moss-600 focus:outline-none focus:ring-2 focus:ring-moss-600/15"
-                      required={reasonRequired}
-                    />
-                    {reasonHelper && (
-                      <p className="mt-2 text-xs text-ink-muted">
-                        {reasonHelper}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                  <button
-                    type="button"
-                    onClick={onCancel}
-                    disabled={isLoading}
-                    data-autofocus
-                    className="inline-flex h-10 items-center justify-center rounded-full border border-hairline-strong px-5 text-sm font-semibold text-ink transition-colors hover:border-ink-faint disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
-                  >
-                    {cancelText}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onConfirm}
-                    disabled={isLoading || isReasonMissing || isMatchInvalid}
-                    className={`inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${styles.button}`}
-                  >
-                    {isLoading ? (
-                      showLoadingDots ? (
-                        <span className="inline-flex items-center justify-center gap-2">
-                          <span className="inline-flex gap-1 items-center translate-y-px">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse [animation-delay:-0.3s]" />
-                            <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse [animation-delay:-0.15s]" />
-                            <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse" />
-                          </span>
-                          <span>{loadingText}</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center justify-center gap-2">
-                          <svg
-                            className="animate-spin h-4 w-4 shrink-0"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            style={{ marginTop: "-1px" }}
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                          <span>{loadingText}</span>
-                        </span>
-                      )
-                    ) : (
-                      confirmText
-                    )}
-                  </button>
-                </div>
-              </>
+              </div>
             )}
+
+            {showReasonField && (
+              <div className="mb-6">
+                <label htmlFor={reasonId} className="mb-2 block text-left text-sm font-medium text-ink">
+                  {reasonLabel || "Reason"}
+                  {reasonRequired && (
+                    <>
+                      <span aria-hidden="true"> *</span>
+                      <span className="sr-only"> (required)</span>
+                    </>
+                  )}
+                </label>
+                <textarea
+                  id={reasonId}
+                  rows={4}
+                  value={reasonValue || ""}
+                  onChange={(e) => onReasonChange(e.target.value)}
+                  placeholder={reasonPlaceholder || "Add a reason..."}
+                  {...(showMatchField ? {} : { "data-autofocus": true })}
+                  aria-required={reasonRequired || undefined}
+                  aria-describedby={reasonHelper ? `${reasonId}-hint` : undefined}
+                  className="w-full resize-y rounded-lg border border-hairline-strong bg-paper-raised px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-moss-600 focus:outline-none focus:ring-2 focus:ring-moss-600/15"
+                  required={reasonRequired}
+                />
+                {reasonHelper && (
+                  <p id={`${reasonId}-hint`} className="mt-2 text-xs text-ink-muted">
+                    {reasonHelper}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div role="alert">
+              {error && !isLoading && (
+                <div className="mb-5 flex items-start gap-2.5 rounded-lg bg-rejected-red-bg px-3 py-2.5 text-sm leading-relaxed text-rejected-red-text">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  <p>
+                    <span className="font-semibold">That didn't go through.</span> {error}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={isLoading}
+                {...(showMatchField || showReasonField ? {} : { "data-autofocus": true })}
+                className="inline-flex h-10 items-center justify-center rounded-full border border-hairline-strong px-5 text-sm font-semibold text-ink transition-colors hover:border-ink-faint disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
+              >
+                {cancelText}
+              </button>
+              <button
+                ref={confirmRef}
+                type="button"
+                onClick={onConfirm}
+                disabled={isLoading || isReasonMissing || isMatchInvalid}
+                className={`inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${styles.button}`}
+              >
+                {isLoading ? (
+                  showLoadingDots ? (
+                    <span className="inline-flex items-center justify-center gap-2">
+                      <span className="inline-flex gap-1 items-center translate-y-px">
+                        <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse [animation-delay:-0.3s]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse [animation-delay:-0.15s]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse" />
+                      </span>
+                      <span>{loadingText}</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center justify-center gap-2">
+                      <svg
+                        className="animate-spin h-4 w-4 shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        style={{ marginTop: "-1px" }}
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      <span>{loadingText}</span>
+                    </span>
+                  )
+                ) : error ? (
+                  "Try again"
+                ) : (
+                  confirmText
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

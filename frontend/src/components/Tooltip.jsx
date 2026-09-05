@@ -18,15 +18,14 @@ export default function Tooltip({
     : "absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-b-slate-800 border-l-transparent border-r-transparent border-t-transparent";
 
   const transitionClasses =
-    delay > 0
-      ? `opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out`
-      : `opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out group-hover:delay-[${delay}ms]`;
+    "opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out";
 
   return (
     <div className="relative group">
       {children}
       <div
         className={`${containerClasses} px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg whitespace-nowrap ${transitionClasses} z-50 pointer-events-none shadow-lg`}
+        style={{ transitionDelay: `${delay}ms` }}
       >
         {text}
         <div className={arrowClasses} />

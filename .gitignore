@@ -18,6 +18,7 @@ CLAUDE.md
 
 .impeccable/
 *.md
+.playwright-mcp/
 
 
 # IDE
