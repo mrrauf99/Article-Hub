@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { User, LogOut, Shield, Bell, X } from "lucide-react";
+import { User, LogOut, Shield, X } from "lucide-react";
 import styles from "@/styles/navbar.module.css";
 import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
@@ -121,24 +121,14 @@ export default function MobileNavMenu({
               >
                 {Icon && <Icon className={styles.mobileLinkIcon} />}
                 {label}
-              </Link>
-            ))}
-
-            {isAdmin && (
-              <Link
-                to="/admin/articles?status=pending"
-                onClick={onClose}
-                className={styles.mobileLink}
-              >
-                <Bell className={styles.mobileLinkIcon} />
-                Pending Articles
-                {pendingCount > 0 && (
-                  <span className="ml-auto bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {isAdmin && href === "/admin/dashboard" && pendingCount > 0 && (
+                  <span className="ml-auto rounded-full bg-moss-700 px-2 py-0.5 text-xs font-semibold tabular-nums text-paper">
                     {pendingCount > 99 ? "99+" : pendingCount}
+                    <span className="sr-only"> in review</span>
                   </span>
                 )}
               </Link>
-            )}
+            ))}
           </div>
         )}
 
@@ -168,7 +158,7 @@ export default function MobileNavMenu({
                 className={styles.mobileLink}
               >
                 <User className={styles.mobileLinkIcon} />
-                {isAdmin ? "Profile" : "Profile & security"}
+                Profile & security
               </Link>
             </div>
 

@@ -120,7 +120,7 @@ import "./index.css";
 
 const router = createBrowserRouter([
   {
-    hydrateFallbackElement: <PageLoader />,
+    hydrateFallbackElement: <PageLoader fullScreen />,
     errorElement: (
       <Suspense fallback={<PageLoader />}>
         <ErrorPage />

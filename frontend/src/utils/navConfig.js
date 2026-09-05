@@ -3,6 +3,7 @@ import {
   Compass,
   Users,
   FileText,
+  Inbox,
   PenSquare,
   Info,
   Mail,
@@ -19,9 +20,9 @@ export function getNavItemsForRole(role) {
 
   if (role === "admin") {
     return [
-      { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+      { label: "Review queue", href: "/admin/dashboard", icon: Inbox },
       { label: "Articles", href: "/admin/articles", icon: FileText },
-      { label: "Users", href: "/admin/users", icon: Users },
+      { label: "Members", href: "/admin/users", icon: Users },
     ];
   }
 

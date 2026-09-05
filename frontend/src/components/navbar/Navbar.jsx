@@ -28,7 +28,8 @@ export default function Navbar({
 
         {navItems.length > 0 && <DesktopNavLinks navItems={navItems} />}
 
-        <div className="flex items-center gap-2">
+        {/* On mobile the bell sits beside the menu toggle instead of floating mid-bar. */}
+        <div className="ml-auto mr-1 flex items-center gap-2 md:ml-0 md:mr-0">
           {role === "admin" && <NotificationBell count={pendingCount} />}
 
           <UserMenu
