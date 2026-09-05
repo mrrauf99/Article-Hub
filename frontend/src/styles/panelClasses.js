@@ -1,21 +1,37 @@
-// Ink & Moss control vocabulary for the signed-in panels (User Panel, plus the
-// profile and article-detail pages shared with Admin). Pills for actions,
-// 8px inputs, 12px containers.
+// Ink & Moss control vocabulary for the signed-in panels (User and Admin).
+// Pills for actions, 8px inputs, 12px containers.
 
 const FOCUS =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2 focus-visible:ring-offset-paper";
 
 const BTN_BASE = `inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 ${FOCUS}`;
 
-export const BTN_PRIMARY = `${BTN_BASE} h-10 px-5 bg-ink text-paper hover:bg-moss-700`;
+const PRIMARY = "bg-ink text-paper hover:bg-moss-700";
+const SECONDARY = "border border-hairline-strong bg-paper-raised text-ink hover:border-ink-faint";
+const GHOST = "text-ink-muted hover:bg-ink/5 hover:text-ink";
 
-export const BTN_SECONDARY = `${BTN_BASE} h-10 px-5 border border-hairline-strong bg-paper-raised text-ink hover:border-ink-faint`;
+// Invisible tap-target expansion: grows the clickable area to ~44px without
+// changing the button's painted size, so dense rows stay visually compact.
+const HIT_SLOP_SM = "relative before:absolute before:-inset-1 before:content-['']";
+const HIT_SLOP_ICON = "relative before:absolute before:-inset-0.5 before:content-['']";
+
+export const BTN_PRIMARY = `${BTN_BASE} h-10 px-5 ${PRIMARY}`;
+
+export const BTN_SECONDARY = `${BTN_BASE} h-10 px-5 ${SECONDARY}`;
 
 export const BTN_DANGER = `${BTN_BASE} h-10 px-5 bg-danger text-paper-raised hover:bg-danger-deep`;
 
-export const BTN_GHOST = `${BTN_BASE} h-10 px-3 text-ink-muted hover:bg-ink/5 hover:text-ink`;
+export const BTN_GHOST = `${BTN_BASE} h-10 px-3 ${GHOST}`;
 
-export const ICON_BTN = `inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink/5 hover:text-ink ${FOCUS}`;
+// Compact sizes for actions inside dense rows. Painted at 36px to preserve
+// desktop density; HIT_SLOP_SM extends the actual hit area to ~44px.
+export const BTN_PRIMARY_SM = `${BTN_BASE} h-9 px-4 ${PRIMARY} ${HIT_SLOP_SM}`;
+
+export const BTN_SECONDARY_SM = `${BTN_BASE} h-9 px-4 ${SECONDARY} ${HIT_SLOP_SM}`;
+
+export const BTN_GHOST_SM = `${BTN_BASE} h-9 px-3 ${GHOST} ${HIT_SLOP_SM}`;
+
+export const ICON_BTN = `inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink/5 hover:text-ink ${HIT_SLOP_ICON} ${FOCUS}`;
 
 export const FIELD_LABEL = "block text-sm font-medium text-ink";
 

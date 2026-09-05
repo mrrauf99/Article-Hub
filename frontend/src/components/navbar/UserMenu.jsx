@@ -132,7 +132,7 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
             onClick={() => setOpen(false)}
           >
             <User className={styles.dropdownItemIcon} />
-            {isAdmin ? "Profile" : "Profile & security"}
+            Profile & security
           </Link>
         </div>
 

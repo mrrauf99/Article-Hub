@@ -31,19 +31,19 @@
   }
 }
 
-/* User Panel: paper ground behind the panel (index.html's body is slate-50) and
-   selection tinted from the moss accent instead of browser blue. */
-body:has([data-panel="user"]) {
+/* Signed-in panels: paper ground behind the panel (index.html's body is
+   slate-50) and selection tinted from the moss accent instead of browser blue. */
+body:has([data-panel]) {
   background-color: theme("colors.paper.DEFAULT");
 }
 
-[data-panel="user"] ::selection {
+[data-panel] ::selection {
   background-color: theme("colors.moss.200");
   color: theme("colors.ink.DEFAULT");
 }
 
-/* User Panel search: native clear button drawn in ink instead of browser blue-grey. */
-[data-panel="user"] input[type="search"]::-webkit-search-cancel-button {
+/* Panel search: native clear button drawn in ink instead of browser blue-grey. */
+[data-panel] input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
   height: 1rem;
@@ -55,7 +55,7 @@ body:has([data-panel="user"]) {
   transition: opacity 150ms ease;
 }
 
-[data-panel="user"] input[type="search"]::-webkit-search-cancel-button:hover {
+[data-panel] input[type="search"]::-webkit-search-cancel-button:hover {
   opacity: 1;
 }
 

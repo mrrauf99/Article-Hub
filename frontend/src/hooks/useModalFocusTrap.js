@@ -35,7 +35,7 @@ export default function useModalFocusTrap(dialogRef, isOpen) {
     document.addEventListener("keydown", trap);
     return () => {
       document.removeEventListener("keydown", trap);
-      if (opener instanceof HTMLElement) opener.focus();
+      if (opener instanceof HTMLElement && opener.isConnected && !opener.disabled) opener.focus();
     };
   }, [isOpen, dialogRef]);
 }
