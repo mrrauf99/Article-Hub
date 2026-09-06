@@ -1,9 +1,17 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { STATUS_TABS } from "../constants/articleStatus";
 
-export default function StatusTabs({ value, counts, onChange }) {
+export default function StatusTabs({
+  value,
+  counts,
+  onChange,
+  tabs = STATUS_TABS,
+  label = "Filter by status",
+}) {
+  const scrollerRef = useRef(null);
   const listRef = useRef(null);
   const [indicator, setIndicator] = useState(null);
+  const [edges, setEdges] = useState({ start: false, end: false });
   const [animate, setAnimate] = useState(false);
 
   useLayoutEffect(() => {
@@ -23,6 +31,31 @@ export default function StatusTabs({ value, counts, onChange }) {
     return () => observer.disconnect();
   }, [value, counts]);
 
+  // On narrow screens the tab row scrolls; fade whichever edge hides more tabs.
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const update = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = scroller;
+      setEdges({
+        start: scrollLeft > 1,
+        end: scrollLeft + clientWidth < scrollWidth - 1,
+      });
+    };
+    update();
+    scroller.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(scroller);
+    return () => {
+      scroller.removeEventListener("scroll", update);
+      observer.disconnect();
+    };
+  }, []);
+
+  const fade = `linear-gradient(to right, ${edges.start ? "transparent, #000 2rem" : "#000"}, ${
+    edges.end ? "#000 calc(100% - 2rem), transparent" : "#000"
+  })`;
+
   // Enable the glide only after the first placement so the bar doesn't sweep in from 0.
   useLayoutEffect(() => {
     if (indicator && !animate) {
@@ -32,14 +65,22 @@ export default function StatusTabs({ value, counts, onChange }) {
   }, [indicator, animate]);
 
   return (
-    <div className="-mb-px overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div
+      ref={scrollerRef}
+      className="-mb-px overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      style={
+        edges.start || edges.end
+          ? { maskImage: fade, WebkitMaskImage: fade }
+          : undefined
+      }
+    >
       <div
         ref={listRef}
         role="group"
-        aria-label="Filter by status"
+        aria-label={label}
         className="relative flex min-w-max gap-1"
       >
-        {STATUS_TABS.map((tab) => {
+        {tabs.map((tab) => {
           const isActive = value === tab.value;
           return (
             <button
@@ -54,7 +95,9 @@ export default function StatusTabs({ value, counts, onChange }) {
               {tab.label}
               <span
                 className={`min-w-[1.5rem] rounded-full px-1.5 py-0.5 text-center text-xs tabular-nums ${
-                  isActive ? "bg-moss-700 text-paper" : "bg-ink/[0.06] text-ink-muted"
+                  isActive
+                    ? "bg-moss-700 text-paper"
+                    : "bg-ink/[0.06] text-ink-muted"
                 }`}
               >
                 {counts[tab.value] ?? 0}
@@ -67,13 +110,12 @@ export default function StatusTabs({ value, counts, onChange }) {
           <span
             aria-hidden="true"
             className={`pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-full bg-moss-700 motion-reduce:transition-none ${
-              animate
-                ? "transition-[transform,width] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
-                : ""
+              animate ? "transition-[transform,width] duration-200" : ""
             }`}
             style={{
               width: indicator.w,
               transform: `translateX(${indicator.x}px)`,
+              transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)",
             }}
           />
         )}

@@ -3,8 +3,6 @@ import { useLoaderData, useLocation, useSearchParams } from "react-router-dom";
 
 import HeroSection from "../components/HeroSection";
 import FeaturedArticles from "../components/FeaturedArticles";
-import CategoriesSection from "../components/CategoriesSection";
-import FeaturesSection from "../components/FeaturesSection";
 import CTASection from "../components/CTASection";
 import ArticlesGrid from "../components/ArticlesGrid";
 import NewsletterSection from "../components/NewsletterSection";
@@ -99,14 +97,6 @@ export default function HomePage() {
       <HeroSection articleCount={totalArticles} authorCount={authorCount} />
 
       <FeaturedArticles articles={articles} />
-
-      <CategoriesSection
-        categories={categories}
-        onSelect={handleCategorySelect}
-        articleCounts={articleCounts}
-      />
-
-      <FeaturesSection />
 
       <ArticlesGrid
         articles={articles}

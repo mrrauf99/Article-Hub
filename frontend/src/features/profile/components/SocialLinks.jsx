@@ -18,8 +18,9 @@ const LINKS = [
 ];
 
 export default function SocialLinks() {
-  const { formData, isEditing, handleChange } = useProfile();
+  const { formData, isEditing, handleChange, canEdit } = useProfile();
   const Group = isEditing ? "div" : "dl";
+  const links = canEdit ? LINKS : LINKS.filter((link) => String(formData[link.name] ?? "").trim());
 
   return (
     <section className={SECTION} aria-labelledby="social-links-title">
@@ -27,24 +28,32 @@ export default function SocialLinks() {
         <h2 id="social-links-title" className={SECTION_TITLE}>
           Social links
         </h2>
-        <p className={SECTION_DESCRIPTION}>Full profile URLs, starting with https://.</p>
+        <p className={SECTION_DESCRIPTION}>
+          {canEdit
+            ? "Full profile URLs, starting with https://."
+            : "Where readers can follow this writer."}
+        </p>
       </div>
 
       <div className={SECTION_BODY}>
-        <Group className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          {LINKS.map((link) => (
-            <SocialLinkField
-              key={link.name}
-              icon={link.icon}
-              label={link.label}
-              name={link.name}
-              value={formData[link.name]}
-              isEditing={isEditing}
-              onChange={handleChange}
-              placeholder={link.placeholder}
-            />
-          ))}
-        </Group>
+        {links.length === 0 ? (
+          <p className="text-sm text-ink-muted">No social links added yet.</p>
+        ) : (
+          <Group className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            {links.map((link) => (
+              <SocialLinkField
+                key={link.name}
+                icon={link.icon}
+                label={link.label}
+                name={link.name}
+                value={formData[link.name]}
+                isEditing={isEditing}
+                onChange={handleChange}
+                placeholder={link.placeholder}
+              />
+            ))}
+          </Group>
+        )}
       </div>
     </section>
   );
