@@ -129,7 +129,11 @@ export default function ProfilePage() {
       <div className="font-ui">
         <PageHeader
           title="Profile & security"
-          description="Your writer details, the links readers can follow, and how your account is protected."
+          description={
+            user.role === "admin"
+              ? "Your details, the links readers can follow, and how your account is protected."
+              : "Your writer details, the links readers can follow, and how your account is protected."
+          }
         />
 
         {feedback && (

@@ -1,4 +1,4 @@
-import { PenTool, Code2, Users, CheckCircle2 } from "lucide-react";
+import { PenTool, Code2, CheckCircle2 } from "lucide-react";
 import { FEATURES } from "@/data/about/features";
 import OfferCard from "./OfferCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -7,17 +7,12 @@ const OFFERS = [
   {
     icon: <PenTool className="h-4.5 w-4.5" />,
     title: "For readers",
-    text: "Discover thoughtfully curated articles, free from ads and noise. Save favorites and build your own collections.",
+    text: "Discover thoughtfully curated articles, free from ads and noise, browsable by category across every topic.",
   },
   {
     icon: <Code2 className="h-4.5 w-4.5" />,
     title: "For writers",
     text: "A distraction-free markdown editor with powerful formatting. Focus on ideas while we handle publishing and hosting.",
-  },
-  {
-    icon: <Users className="h-4.5 w-4.5" />,
-    title: "For teams",
-    text: "Build knowledge repositories and preserve institutional wisdom together, with role-based permissions.",
   },
 ];
 
@@ -39,7 +34,7 @@ export default function OfferSection() {
           </ScrollReveal>
 
           <ScrollReveal animation="fade-up" delay={100} duration={500}>
-            <div className="rounded-xl border border-hairline bg-paper-raised grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-hairline mb-6">
+            <div className="rounded-xl border border-hairline bg-paper-raised grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-hairline mb-6">
               {OFFERS.map((offer) => (
                 <OfferCard key={offer.title} {...offer} />
               ))}

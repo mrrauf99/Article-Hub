@@ -20,8 +20,18 @@ const GENDER_OPTIONS = [
 ];
 
 export default function AuthorInfo() {
-  const { formData, isEditing, handleChange, canEdit } = useProfile();
+  const { user, formData, isEditing, handleChange, canEdit } = useProfile();
   const Group = isEditing ? "div" : "dl";
+  // Visitors (e.g. an admin viewing a member) only see what the writer filled in.
+  const show = (value) => canEdit || Boolean(String(value ?? "").trim());
+  const hasAny = [
+    "name",
+    "expertise",
+    "gender",
+    "country",
+    "portfolio_url",
+    "bio",
+  ].some((k) => show(formData[k]));
 
   return (
     <section className={SECTION} aria-labelledby="author-info-title">
@@ -31,78 +41,96 @@ export default function AuthorInfo() {
         </h2>
         <p className={SECTION_DESCRIPTION}>
           {canEdit
-            ? "Who you are as a writer. Your username and email can't be changed here."
+            ? user.role === "admin"
+              ? "Your public details. Your username and email can't be changed here."
+              : "Who you are as a writer. Your username and email can't be changed here."
             : "Details this writer has added to their profile."}
         </p>
       </div>
 
       <div className={SECTION_BODY}>
-        <Group className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          <ProfileField
-            label="Name"
-            value={formData.name}
-            name="name"
-            isEditing={isEditing}
-            onChange={handleChange}
-          />
-          <ProfileField
-            label="Expertise"
-            value={formData.expertise}
-            name="expertise"
-            isEditing={isEditing}
-            onChange={handleChange}
-            placeholder="e.g. Web development"
-          />
-
-          <ProfileRadioField
-            className="sm:col-span-2"
-            label="Gender"
-            value={formData.gender}
-            name="gender"
-            isEditing={isEditing}
-            onChange={handleChange}
-            options={GENDER_OPTIONS}
-          />
-
-          {isEditing ? (
-            <div className="min-w-0">
-              <CountryDropdown
-                name="country"
-                value={formData.country}
+        {!hasAny ? (
+          <p className="text-sm text-ink-muted">No author details added yet.</p>
+        ) : (
+          <Group className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            {show(formData.name) && (
+              <ProfileField
+                label="Name"
+                value={formData.name}
+                name="name"
+                isEditing={isEditing}
                 onChange={handleChange}
-                hasError={false}
               />
-            </div>
-          ) : (
-            <div className="min-w-0">
-              <dt className={READ_LABEL}>Country or region</dt>
-              <dd className={READ_VALUE}>
-                {formData.country || <span className={EMPTY_VALUE}>Not added</span>}
-              </dd>
-            </div>
-          )}
+            )}
+            {show(formData.expertise) && (
+              <ProfileField
+                label="Expertise"
+                value={formData.expertise}
+                name="expertise"
+                isEditing={isEditing}
+                onChange={handleChange}
+                placeholder="e.g. Web development"
+              />
+            )}
 
-          <ProfileField
-            label="Website or portfolio"
-            value={formData.portfolio_url}
-            name="portfolio_url"
-            isEditing={isEditing}
-            onChange={handleChange}
-            type="url"
-            placeholder="https://"
-          />
+            {show(formData.gender) && (
+              <ProfileRadioField
+                className={isEditing ? "sm:col-span-2" : undefined}
+                label="Gender"
+                value={formData.gender}
+                name="gender"
+                isEditing={isEditing}
+                onChange={handleChange}
+                options={GENDER_OPTIONS}
+              />
+            )}
 
-          <ProfileField
-            className="sm:col-span-2"
-            label="Bio"
-            value={formData.bio}
-            name="bio"
-            isEditing={isEditing}
-            onChange={handleChange}
-            rows={5}
-            placeholder="Your background, what you write about, and why."
-          />
-        </Group>
+            {isEditing ? (
+              <div className="min-w-0">
+                <CountryDropdown
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  hasError={false}
+                />
+              </div>
+            ) : (
+              show(formData.country) && (
+                <div className="min-w-0">
+                  <dt className={READ_LABEL}>Country or region</dt>
+                  <dd className={READ_VALUE}>
+                    {formData.country || <span className={EMPTY_VALUE}>Not added</span>}
+                  </dd>
+                </div>
+              )
+            )}
+
+            {show(formData.portfolio_url) && (
+              <ProfileField
+                label="Website or portfolio"
+                value={formData.portfolio_url}
+                name="portfolio_url"
+                isEditing={isEditing}
+                onChange={handleChange}
+                type="url"
+                placeholder="https://"
+              />
+            )}
+
+            {show(formData.bio) && (
+              <ProfileField
+                className="sm:col-span-2"
+                label="Bio"
+                value={formData.bio}
+                name="bio"
+                isEditing={isEditing}
+                onChange={handleChange}
+                rows={5}
+                placeholder="Your background, what you write about, and why."
+              />
+            )}
+          </Group>
+        )}
       </div>
     </section>
   );

@@ -4,7 +4,5 @@ export const FEATURES = [
   "No ads or algorithmic manipulation",
   "Responsive design for all devices",
   "SEO optimized for discoverability",
-  "Advanced search and filtering",
-  "Bookmarking and collections",
-  "Author profiles and following",
+  "Browse by category across every topic",
 ];
