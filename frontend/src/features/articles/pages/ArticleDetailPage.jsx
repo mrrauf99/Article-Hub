@@ -9,6 +9,7 @@ import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 import { ARTICLE_PROSE, BTN_SECONDARY } from "@/styles/panelClasses";
 import StatusPill from "@/features/user/components/StatusPill";
+import AdminDecisionBar from "@/features/admin/components/AdminDecisionBar";
 
 const OWNER_NOTES = {
   pending: {
@@ -159,6 +160,8 @@ export default function ArticleDetailPage() {
           {back.label}
         </Link>
 
+        {inAdmin && <AdminDecisionBar article={article} />}
+
         {statusNote && (
           <div
             className={`mb-8 flex flex-col gap-3 rounded-xl border px-4 py-3.5 text-sm leading-relaxed sm:flex-row sm:items-center ${statusNote.box}`}
@@ -211,7 +214,7 @@ export default function ArticleDetailPage() {
               <span className="sr-only">reads</span>
             </span>
 
-            {(inAdmin || (isOwner && article.status === "approved")) && (
+            {isOwner && article.status === "approved" && (
               <StatusPill status={article.status} />
             )}
 

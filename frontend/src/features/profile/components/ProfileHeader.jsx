@@ -7,13 +7,15 @@ import { useProfile } from "../hooks/useProfile";
 import { BTN_GHOST, BTN_PRIMARY, BTN_SECONDARY } from "@/styles/panelClasses";
 import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
-export default function ProfileHeader() {
+export default function ProfileHeader({ headingLevel = 2 }) {
+  const Heading = `h${headingLevel}`;
   const { user, formData, isEditing, handleChange, handleEdit, canEdit } =
     useProfile();
   const fileInputRef = useRef(null);
   const [showCropper, setShowCropper] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState(null);
   const [avatarError, setAvatarError] = useState(null);
+  const [failedAvatar, setFailedAvatar] = useState(null);
 
   const handleAvatarClick = () => {
     if (isEditing && fileInputRef.current) {
@@ -77,8 +79,14 @@ export default function ProfileHeader() {
   const joined = formatJoined(formData.joined_at || user.joined_at);
   const displayName = formData.name || user.name || user.username;
 
-  const avatar = displayAvatar ? (
-    <img src={displayAvatar} alt="" className="h-full w-full object-cover" />
+  const avatar = displayAvatar && failedAvatar !== displayAvatar ? (
+    <img
+      src={displayAvatar}
+      alt=""
+      referrerPolicy="no-referrer"
+      onError={() => setFailedAvatar(displayAvatar)}
+      className="h-full w-full object-cover"
+    />
   ) : (
     <span className="text-3xl font-semibold text-paper">
       {user.username.charAt(0).toUpperCase()}
@@ -119,9 +127,9 @@ export default function ProfileHeader() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <h2 className="truncate font-editorial text-2xl leading-tight text-ink sm:text-[1.75rem]">
+          <Heading className="truncate font-editorial text-2xl leading-tight text-ink sm:text-[1.75rem]">
             {displayName}
-          </h2>
+          </Heading>
           <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-muted">
             <span>@{user.username}</span>
             {user.email && (

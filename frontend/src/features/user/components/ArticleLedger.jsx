@@ -74,7 +74,10 @@ function LedgerRow({ article, onRequestDelete }) {
           <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted lg:hidden">
             <StatusPill status={article.status} />
             <span className="tabular-nums">{readsLabel}</span>
-            <span aria-label={dateLabel}>{dateText}</span>
+            <span>
+              <span className="sr-only">{dateLabel}</span>
+              <span aria-hidden="true">{dateText}</span>
+            </span>
           </div>
         </div>
 
@@ -86,14 +89,13 @@ function LedgerRow({ article, onRequestDelete }) {
       <div className="hidden lg:block">
         <StatusPill status={article.status} />
       </div>
-      <div
-        className="hidden text-right text-sm tabular-nums text-ink lg:block"
-        aria-label={readsLabel}
-      >
-        {formatCount(article.views)}
+      <div className="hidden text-right text-sm tabular-nums text-ink lg:block">
+        <span className="sr-only">{readsLabel}</span>
+        <span aria-hidden="true">{formatCount(article.views)}</span>
       </div>
-      <div className="hidden text-sm text-ink-muted lg:block" aria-label={dateLabel}>
-        {dateText}
+      <div className="hidden text-sm text-ink-muted lg:block">
+        <span className="sr-only">{dateLabel}</span>
+        <span aria-hidden="true">{dateText}</span>
       </div>
       <div className="hidden justify-end gap-1 lg:flex">
         <RowActions article={article} title={title} onRequestDelete={onRequestDelete} />
