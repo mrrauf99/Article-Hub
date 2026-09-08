@@ -1,121 +1,63 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   useLoaderData,
-  useSearchParams,
-  useFetcher,
+  useLocation,
   useOutletContext,
-  useRevalidator,
+  useSearchParams,
 } from "react-router-dom";
-import { Users, User, Shield } from "lucide-react";
+import { SearchX, Users } from "lucide-react";
 
-import { PillFilter, SearchInput } from "../components/AdminFilters";
 import Pagination from "@/features/articles/components/Pagination";
-import UsersGrid from "../components/UsersGrid";
-import RoleChangeModal from "../components/RoleChangeModal";
-import ConfirmDialog from "@/components/ConfirmDialog";
-import SectionHeader from "@/components/SectionHeader";
+import PageHeader from "@/features/user/components/PageHeader";
+import StatusTabs from "@/features/user/components/StatusTabs";
+import SearchField from "@/features/user/components/SearchField";
+import EmptyState from "@/features/user/components/EmptyState";
+import useScrollOnChange from "@/hooks/useScrollOnChange";
+import { BTN_SECONDARY } from "@/styles/panelClasses";
+import MemberRoster from "../components/MemberRoster";
+import ActionNotice from "../components/ActionNotice";
+import useMemberActions from "../hooks/useMemberActions";
+import { isSelfMember } from "../utils/identity";
 
-const ROLE_OPTIONS = [
-  {
-    value: "all",
-    label: "All Users",
-    icon: Users,
-    activeClasses: "bg-slate-900 text-white shadow-lg shadow-slate-900/25",
-  },
-  {
-    value: "user",
-    label: "Users",
-    icon: User,
-    activeClasses:
-      "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/30",
-  },
-  {
-    value: "admin",
-    label: "Admins",
-    icon: Shield,
-    activeClasses:
-      "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30",
-  },
+const ROLE_TABS = [
+  { value: "all", label: "All" },
+  { value: "user", label: "Writers" },
+  { value: "admin", label: "Administrators" },
 ];
 
 export default function AdminUsersPage() {
-  const { users: allUsers, pagination, filters } = useLoaderData();
-  const outletContext = useOutletContext();
-  const currentUser = outletContext?.user;
+  const { users, pagination, filters, counts } = useLoaderData();
+  const { user: currentUser } = useOutletContext() ?? {};
   const [searchParams, setSearchParams] = useSearchParams();
-  const fetcher = useFetcher();
-  const revalidator = useRevalidator();
-
   const [searchValue, setSearchValue] = useState(filters.search);
-  const [confirmDelete, setConfirmDelete] = useState(null);
-  const [selectedUserForRoleChange, setSelectedUserForRoleChange] =
-    useState(null);
-  const [confirmRoleChange, setConfirmRoleChange] = useState(null);
+  const location = useLocation();
+  const members = useMemberActions({ initialNotice: location.state?.notice ?? null });
 
-  const isSubmitting = fetcher.state !== "idle";
-  const pendingIntent = fetcher.formData?.get("intent");
-
-  const normalizeId = useCallback((user) => {
-    if (!user) return null;
-    return user.id ?? user.user_id ?? user._id ?? null;
-  }, []);
-
-  const isCurrentUser = useCallback(
-    (user) => {
-      const currentId = normalizeId(currentUser);
-      const targetId = normalizeId(user);
-
-      if (currentId && targetId) {
-        return String(currentId) === String(targetId);
-      }
-
-      if (currentUser?.email && user?.email) {
-        return currentUser.email.toLowerCase() === user.email.toLowerCase();
-      }
-
-      return false;
-    },
-    [currentUser, normalizeId],
+  const isSelf = useCallback(
+    (member) => isSelfMember(currentUser, member),
+    [currentUser],
   );
 
-  // Filter out the current admin from the users list
-  const users = useMemo(() => {
-    if (!allUsers || !Array.isArray(allUsers)) return [];
-    return allUsers.filter((user) => !isCurrentUser(user));
-  }, [allUsers, isCurrentUser]);
-
-  const baseCount =
-    typeof pagination?.totalCount === "number"
-      ? pagination.totalCount
-      : allUsers?.length || 0;
-  const shouldSubtract = allUsers?.some((user) => isCurrentUser(user)) ? 1 : 0;
-  const displayTotalCount = Math.max(baseCount - shouldSubtract, 0);
-
-  const handleRoleFilter = (role) => {
+  const updateParams = (mutate) => {
     const params = new URLSearchParams(searchParams);
-    if (role === "all") {
-      params.delete("role");
-    } else {
-      params.set("role", role);
-    }
+    mutate(params);
     params.delete("page");
-    setSearchParams(params);
+    setSearchParams(params, { preventScrollReset: true });
   };
+
+  const handleRoleChange = (role) =>
+    updateParams((p) => (role === "all" ? p.delete("role") : p.set("role", role)));
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const params = new URLSearchParams(searchParams);
-    if (searchValue.trim()) {
-      params.set("search", searchValue.trim());
-    } else {
-      params.delete("search");
-    }
-    params.delete("page");
-    setSearchParams(params);
+    const value = searchValue.trim();
+    updateParams((p) => (value ? p.set("search", value) : p.delete("search")));
   };
 
-  const prevPageRef = useRef(pagination.page);
-  const prevFiltersRef = useRef({ role: filters.role, search: filters.search });
+  const clearSearch = () => {
+    setSearchValue("");
+    updateParams((p) => p.delete("search"));
+  };
 
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams);
@@ -123,170 +65,102 @@ export default function AdminUsersPage() {
     setSearchParams(params, { preventScrollReset: true });
   };
 
-  useEffect(() => {
-    const pageChanged = prevPageRef.current !== pagination.page;
-    const filtersChanged =
-      prevFiltersRef.current.role !== filters.role ||
-      prevFiltersRef.current.search !== filters.search;
+  useScrollOnChange({ deps: [pagination.page], behavior: "smooth", delay: 100 });
 
-    if (pageChanged || filtersChanged) {
-      const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      };
-
-      const timeoutId = setTimeout(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(scrollToTop);
-        });
-      }, 100);
-
-      prevPageRef.current = pagination.page;
-      prevFiltersRef.current = { role: filters.role, search: filters.search };
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [pagination.page, filters.role, filters.search]);
-
-  // Revalidate loaders when action succeeds
-  useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.success) {
-      revalidator.revalidate();
-    }
-  }, [fetcher.state, fetcher.data?.success, revalidator]);
-
-  const handleRoleChange = (userId, newRole) => {
-    fetcher.submit(
-      { intent: "changeRole", userId, newRole },
-      { method: "post" },
-    );
-    setConfirmRoleChange(null);
-    setSelectedUserForRoleChange(null);
-  };
-
-  const handleRoleChangeConfirm = (userId, newRole) => {
-    const user = selectedUserForRoleChange;
-    setSelectedUserForRoleChange(null);
-    setConfirmRoleChange({ user, newRole });
-  };
-
-  const handleInitiateRoleChange = (user) => {
-    setSelectedUserForRoleChange(user);
-  };
-
-  const handleDelete = () => {
-    if (!confirmDelete) return;
-    fetcher.submit(
-      { intent: "delete", userId: confirmDelete.id },
-      { method: "post" },
-    );
-    setConfirmDelete(null);
-  };
+  const first = (pagination.page - 1) * pagination.limit + 1;
+  const last = Math.min(pagination.page * pagination.limit, pagination.totalCount);
 
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        title="Manage Users"
-        subtitle="View, search, and manage platform users"
-        titleAs="h1"
-        titleClassName="text-2xl sm:text-3xl font-bold text-slate-900"
-        subtitleClassName="text-slate-500 mt-1"
-        meta={
-          <div>
-            Total:{" "}
-            <span className="font-semibold text-slate-900">
-              {displayTotalCount}
-            </span>{" "}
-            users
-          </div>
-        }
-        metaClassName="text-sm text-slate-500 mt-2"
+    <>
+      <PageHeader
+        title="Members"
+        description="Everyone with an Article Hub account, newest first. Deleting a member also deletes every article they wrote."
       />
 
-      {/* Filters */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4 w-full">
-          <div className="w-full lg:w-auto overflow-x-auto scrollbar-hide -mx-3 sm:mx-0 px-3 sm:px-0">
-            <PillFilter
-              options={ROLE_OPTIONS}
-              value={filters.role}
-              onChange={handleRoleFilter}
-            />
-          </div>
-          <div className="w-full lg:w-auto">
-            <SearchInput
-              value={searchValue}
-              onChange={setSearchValue}
-              onSubmit={handleSearch}
-              placeholder="Search by name, username or email..."
-            />
-          </div>
-        </div>
+      <div className="mt-8">
+        <ActionNotice notice={members.notice} onDismiss={members.dismissNotice} />
       </div>
 
-      {/* Users Grid */}
-      <UsersGrid
-        users={users}
-        onChangeRole={handleInitiateRoleChange}
-        onDelete={setConfirmDelete}
-      />
-
-      {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <Pagination
-          current={pagination.page}
-          total={pagination.totalPages}
-          onChange={handlePageChange}
+      <div className="flex flex-col gap-4 border-b border-hairline md:flex-row md:items-end md:justify-between">
+        <StatusTabs
+          value={filters.role}
+          counts={counts}
+          onChange={handleRoleChange}
+          tabs={ROLE_TABS}
+          label="Filter by role"
         />
+        <form role="search" onSubmit={handleSearch} className="pb-3 md:w-72">
+          <SearchField
+            id="admin-member-search"
+            label="Search members by name, username or email"
+            placeholder="Search name, username or email"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </form>
+      </div>
+
+      {users.length === 0 ? (
+        filters.search ? (
+          <EmptyState
+            icon={SearchX}
+            title={`No members match "${filters.search}"`}
+            action={
+              <button type="button" onClick={clearSearch} className={BTN_SECONDARY}>
+                Clear search
+              </button>
+            }
+          >
+            Search looks at names, usernames and email addresses.
+          </EmptyState>
+        ) : (
+          <EmptyState
+            icon={Users}
+            title={
+              filters.role === "admin"
+                ? "No administrators"
+                : filters.role === "user"
+                  ? "No writers yet"
+                  : "No members yet"
+            }
+          />
+        )
+      ) : (
+        <>
+          <p className="py-4 text-sm text-ink-muted" aria-live="polite">
+            <span className="tabular-nums">
+              {first}–{last}
+            </span>{" "}
+            of <span className="tabular-nums">{pagination.totalCount}</span>
+            {filters.search && (
+              <>
+                {" "}matching "<span className="text-ink">{filters.search}</span>"{" "}
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="ml-1 rounded-sm font-medium text-moss-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
+                >
+                  Clear
+                </button>
+              </>
+            )}
+          </p>
+
+          <MemberRoster members={users} isSelf={isSelf} onAction={members.open} />
+
+          {pagination.totalPages > 1 && (
+            <div className="mt-8">
+              <Pagination
+                current={pagination.page}
+                total={pagination.totalPages}
+                onChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
 
-      {/* Role Change Modal */}
-      {selectedUserForRoleChange && (
-        <RoleChangeModal
-          user={selectedUserForRoleChange}
-          isLoading={isSubmitting && pendingIntent === "changeRole"}
-          onChangeRole={handleRoleChangeConfirm}
-          onClose={() => setSelectedUserForRoleChange(null)}
-        />
-      )}
-
-      {/* Confirm Role Change Dialog */}
-      {confirmRoleChange && (
-        <ConfirmDialog
-          isOpen={!!confirmRoleChange}
-          title="Confirm Role Change"
-          message={`Are you sure you want to change ${confirmRoleChange.user.name}'s role to "${confirmRoleChange.newRole}"?`}
-          confirmText={`Yes, Change to ${confirmRoleChange.newRole.charAt(0).toUpperCase() + confirmRoleChange.newRole.slice(1)}`}
-          cancelText="Cancel"
-          variant="info"
-          isLoading={isSubmitting && pendingIntent === "changeRole"}
-          loadingText="Changing"
-          onConfirm={() =>
-            handleRoleChange(
-              confirmRoleChange.user.id,
-              confirmRoleChange.newRole,
-            )
-          }
-          onCancel={() => setConfirmRoleChange(null)}
-        />
-      )}
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmDialog
-        isOpen={!!confirmDelete}
-        title="Delete User"
-        message={
-          confirmDelete
-            ? `Are you sure you want to delete ${confirmDelete.name}? This will also delete all ${confirmDelete.article_count} articles by this user.`
-            : ""
-        }
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
-        variant="danger"
-        isLoading={isSubmitting && pendingIntent === "delete"}
-        loadingText="Deleting"
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmDelete(null)}
-      />
-    </div>
+      {members.dialog}
+    </>
   );
 }

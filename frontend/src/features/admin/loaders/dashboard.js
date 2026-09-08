@@ -3,10 +3,13 @@ import { handleLoaderError } from "@/utils/loaderError.js";
 
 export default async function dashboardLoader() {
   try {
-    const response = await adminApi.getDashboardStats();
-    const { stats, recentArticles, recentUsers } = response.data.data;
-    return { stats, recentArticles, recentUsers };
+    const [statsResponse, queueResponse] = await Promise.all([
+      adminApi.getDashboardStats(),
+      adminApi.getPendingArticles(),
+    ]);
+    const { stats, recentArticles, recentUsers } = statsResponse.data.data;
+    return { stats, recentArticles, recentUsers, queue: queueResponse.data.data ?? [] };
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load dashboard." });
+    return handleLoaderError(error, { fallbackMessage: "Failed to load the review queue." });
   }
 }
