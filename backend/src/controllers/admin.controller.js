@@ -293,7 +293,6 @@ export const deleteArticle = async (req, res) => {
     });
   }
 
-  // First, get the article to fetch image_public_id
   const { rows } = await db.query(
     `SELECT
         a.image_public_id,
@@ -313,17 +312,15 @@ export const deleteArticle = async (req, res) => {
     });
   }
 
-  // Delete the article from database
   await db.query(`DELETE FROM articles WHERE id = $1`, [articleId]);
 
   const article = rows[0];
   const imagePublicId = article.image_public_id;
 
-  // Delete image from Cloudinary if it exists
   try {
     await deleteImageFromCloudinary(imagePublicId);
   } catch (deleteErr) {
-    // Log error but don't fail the request if deletion fails
+    // Best effort; the article is already deleted.
     console.error("Failed to delete image from Cloudinary:", deleteErr);
   }
 
@@ -342,7 +339,7 @@ export const getUsers = async (req, res) => {
   const { role = "all", search = "" } = req.query;
   const page = Math.max(parseInt(req.query.page) || 1, 1);
   const limit = Math.min(Math.max(parseInt(req.query.limit) || 9, 1), 45);
-  const offset = (page - 1) * limit; // skip rows
+  const offset = (page - 1) * limit;
 
   let whereClause = "WHERE 1=1";
   const params = [];
@@ -435,7 +432,6 @@ export const updateUserRole = async (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid role." });
   }
 
-  // Prevent admin from changing their own role
   if (userId === adminId) {
     return res.status(400).json({
       success: false,
@@ -443,7 +439,6 @@ export const updateUserRole = async (req, res) => {
     });
   }
 
-  // Update user role in database
   const { rowCount } = await db.query(
     `UPDATE users SET role = $1 WHERE id = $2`,
     [role, userId],
@@ -460,7 +455,6 @@ export const deleteUser = async (req, res) => {
   const { userId } = req.params;
   const adminId = req.user.userId;
 
-  // Prevent admin from deleting themselves
   if (userId === adminId) {
     return res.status(400).json({
       success: false,
@@ -468,7 +462,6 @@ export const deleteUser = async (req, res) => {
     });
   }
 
-  // Check user exists
   const userQuery = await db.query(
     `SELECT avatar_public_id FROM users WHERE id = $1`,
     [userId],
@@ -487,7 +480,6 @@ export const deleteUser = async (req, res) => {
     [userId],
   );
 
-  // Delete article images from Cloudinary
   const deleteResults = await Promise.allSettled(
     articles.map((article) =>
       deleteImageFromCloudinary(article.image_public_id),
@@ -503,10 +495,8 @@ export const deleteUser = async (req, res) => {
     }
   });
 
-  // delete the user
   await db.query(`DELETE FROM users WHERE id = $1`, [userId]);
 
-  // Delete user avatar from Cloudinary if it exists
   const { avatar_public_id } = userQuery.rows[0];
 
   if (avatar_public_id) {

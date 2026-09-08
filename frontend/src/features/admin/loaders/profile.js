@@ -12,7 +12,6 @@ export default async function profileLoader() {
 
     const user = profileResponse.data.data;
 
-    // Redirect non-admin users
     if (user.role !== "admin") {
       return redirectToDashboard(user.role);
     }

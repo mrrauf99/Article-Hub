@@ -1,91 +1,83 @@
-import { useState, useEffect } from "react";
-import { useLoaderData, useSearchParams, useFetcher } from "react-router-dom";
-import { LayoutGrid, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { useState } from "react";
+import { useLoaderData, useSearchParams } from "react-router-dom";
+import { FileText, Inbox, SearchX } from "lucide-react";
 
-import { PillFilter, SearchInput } from "../components/AdminFilters";
 import Pagination from "@/features/articles/components/Pagination";
-import ArticlesTable from "../components/ArticlesTable";
-import ArticleDetailModal from "../components/ArticleDetailModal";
-import ConfirmDialog from "@/components/ConfirmDialog";
-import SectionHeader from "@/components/SectionHeader";
+import PageHeader from "@/features/user/components/PageHeader";
+import StatusTabs from "@/features/user/components/StatusTabs";
+import SearchField from "@/features/user/components/SearchField";
+import EmptyState from "@/features/user/components/EmptyState";
 import useScrollOnChange from "@/hooks/useScrollOnChange";
-import { capitalizeFirstLetter } from "@/utils/stringUtils";
+import { BTN_SECONDARY } from "@/styles/panelClasses";
+import ArticleRegister from "../components/ArticleRegister";
+import ArticleReviewDialog from "../components/ArticleReviewDialog";
+import ActionNotice from "../components/ActionNotice";
+import useArticleModeration from "../hooks/useArticleModeration";
 
-const STATUS_OPTIONS = [
-  {
-    value: "all",
-    label: "All",
-    icon: LayoutGrid,
-    activeClasses: "bg-slate-900 text-white shadow-lg shadow-slate-900/25",
-  },
-  {
-    value: "approved",
-    label: "Approved",
-    icon: CheckCircle2,
-    activeClasses:
-      "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30",
-  },
-  {
-    value: "pending",
-    label: "Pending",
-    icon: Clock,
-    activeClasses:
-      "bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-lg shadow-amber-500/30",
-  },
-  {
-    value: "rejected",
-    label: "Rejected",
-    icon: XCircle,
-    activeClasses:
-      "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30",
-  },
-];
+const STATUS_WORD = { approved: "published", pending: "in review", rejected: "rejected" };
+
+function ResultEmpty({ filters, onClearSearch }) {
+  if (filters.search) {
+    return (
+      <EmptyState
+        icon={SearchX}
+        title={`No articles match "${filters.search}"`}
+        action={
+          <button type="button" onClick={onClearSearch} className={BTN_SECONDARY}>
+            Clear search
+          </button>
+        }
+      >
+        Search looks at article titles and author names.
+      </EmptyState>
+    );
+  }
+  if (filters.status === "pending") {
+    return (
+      <EmptyState icon={Inbox} title="Nothing in review">
+        Every submitted article has a decision.
+      </EmptyState>
+    );
+  }
+  const word = STATUS_WORD[filters.status];
+  return (
+    <EmptyState icon={FileText} title={word ? `No ${word} articles` : "No articles yet"}>
+      Articles appear here once writers create them.
+    </EmptyState>
+  );
+}
 
 export default function AdminArticlesPage() {
-  const { articles, pagination, filters } = useLoaderData();
+  const { articles, pagination, filters, counts } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
-  const fetcher = useFetcher();
-
   const [searchValue, setSearchValue] = useState(filters.search);
-  const [selectedArticle, setSelectedArticle] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null);
-  const [confirmApprove, setConfirmApprove] = useState(null);
-  const [confirmReject, setConfirmReject] = useState(null);
-  const [rejectReason, setRejectReason] = useState("");
-  const [deleteReason, setDeleteReason] = useState("");
+  const [reviewing, setReviewing] = useState(null);
+  const moderation = useArticleModeration();
 
-  const isSubmitting = fetcher.state !== "idle";
-  const pendingArticleId = fetcher.formData?.get("articleId");
-  const pendingIntent = fetcher.formData?.get("intent");
-
-  const handleStatusChange = (status) => {
+  const updateParams = (mutate, options) => {
     const params = new URLSearchParams(searchParams);
-    if (status === "all") {
-      params.delete("status");
-    } else {
-      params.set("status", status);
-    }
+    mutate(params);
     params.delete("page");
-    setSearchParams(params);
+    setSearchParams(params, options);
   };
+
+  const handleStatusChange = (status) =>
+    updateParams((p) => (status === "all" ? p.delete("status") : p.set("status", status)), {
+      preventScrollReset: true,
+    });
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const params = new URLSearchParams(searchParams);
-    if (searchValue.trim()) {
-      params.set("search", searchValue.trim());
-    } else {
-      params.delete("search");
-    }
-    params.delete("page");
-    setSearchParams(params);
+    const value = searchValue.trim();
+    updateParams((p) => (value ? p.set("search", value) : p.delete("search")), {
+      preventScrollReset: true,
+    });
   };
 
-  useScrollOnChange({
-    deps: [pagination.page, filters.status, filters.search],
-    behavior: "smooth",
-    delay: 100,
-  });
+  const clearSearch = () => {
+    setSearchValue("");
+    updateParams((p) => p.delete("search"), { preventScrollReset: true });
+  };
 
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams);
@@ -93,215 +85,90 @@ export default function AdminArticlesPage() {
     setSearchParams(params, { preventScrollReset: true });
   };
 
-  const handleDelete = () => {
-    if (!confirmDelete) return;
-    fetcher.submit(
-      {
-        intent: "delete",
-        articleId: confirmDelete.id,
-        reason: deleteReason,
-      },
-      { method: "post" },
-    );
+  useScrollOnChange({ deps: [pagination.page], behavior: "smooth", delay: 100 });
+
+  const decide = (type, article) => {
+    setReviewing(null);
+    moderation.open(type, article);
   };
 
-  const handleApprove = () => {
-    if (!confirmApprove) return;
-    fetcher.submit(
-      { intent: "approve", articleId: confirmApprove.id },
-      { method: "post" },
-    );
-  };
-
-  const handleReject = () => {
-    if (!confirmReject) return;
-    fetcher.submit(
-      {
-        intent: "reject",
-        articleId: confirmReject.id,
-        reason: rejectReason,
-      },
-      { method: "post" },
-    );
-  };
-
-  // Close dialogs when fetcher completes
-  useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data) {
-      queueMicrotask(() => {
-        setConfirmDelete(null);
-        setConfirmApprove(null);
-        setConfirmReject(null);
-        setRejectReason("");
-        setDeleteReason("");
-      });
-    }
-  }, [fetcher.state, fetcher.data]);
-
-  // Helper to check if an action is pending for a specific article
-  const getLoadingAction = (articleId) => {
-    if (isSubmitting && pendingArticleId === String(articleId)) {
-      return `${pendingIntent}-${articleId}`;
-    }
-    return null;
-  };
+  const first = (pagination.page - 1) * pagination.limit + 1;
+  const last = Math.min(pagination.page * pagination.limit, pagination.totalCount);
 
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        title="Manage Articles"
-        subtitle="Review, approve, or reject article submissions"
-        titleAs="h1"
-        titleClassName="text-2xl sm:text-3xl font-bold text-slate-900"
-        subtitleClassName="text-slate-500 mt-1"
-        meta={
-          <div>
-            Total:{" "}
-            <span className="font-semibold text-slate-900">
-              {pagination.totalCount}
-            </span>{" "}
-            articles
-          </div>
-        }
-        metaClassName="text-sm text-slate-500 mt-2"
+    <>
+      <PageHeader
+        title="Articles"
+        description="Every article on Article Hub, newest first. Open one to read its summary before you decide."
       />
 
-      {/* Filters */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4 w-full">
-          <div className="w-full lg:w-auto overflow-x-auto scrollbar-hide -mx-3 sm:mx-0 px-3 sm:px-0">
-            <PillFilter
-              options={STATUS_OPTIONS}
-              value={filters.status}
-              onChange={handleStatusChange}
-            />
-          </div>
-          <div className="w-full lg:w-auto">
-            <SearchInput
-              value={searchValue}
-              onChange={setSearchValue}
-              onSubmit={handleSearch}
-              placeholder="Search by title or author..."
-            />
-          </div>
-        </div>
+      <div className="mt-8">
+        <ActionNotice notice={moderation.notice} onDismiss={moderation.dismissNotice} />
       </div>
 
-      {/* Table */}
-      <ArticlesTable
-        articles={articles}
-        getLoadingAction={getLoadingAction}
-        onViewArticle={setSelectedArticle}
-        onApprove={(article) => setConfirmApprove(article)}
-        onReject={(article) => {
-          setConfirmReject({
-            id: article.id,
-            title: article.title,
-          });
-          setRejectReason("");
-        }}
-        onDelete={(article) => {
-          setConfirmDelete(article);
-          setDeleteReason("");
-        }}
-      />
+      <div className="flex flex-col gap-4 border-b border-hairline md:flex-row md:items-end md:justify-between">
+        <StatusTabs value={filters.status} counts={counts} onChange={handleStatusChange} />
+        <form role="search" onSubmit={handleSearch} className="pb-3 md:w-72">
+          <SearchField
+            id="admin-article-search"
+            label="Search articles by title or author"
+            placeholder="Search title or author"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </form>
+      </div>
 
-      {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <Pagination
-          current={pagination.page}
-          total={pagination.totalPages}
-          onChange={handlePageChange}
-        />
+      {articles.length === 0 ? (
+        <ResultEmpty filters={filters} onClearSearch={clearSearch} />
+      ) : (
+        <>
+          <p className="py-4 text-sm text-ink-muted" aria-live="polite">
+            <span className="tabular-nums">
+              {first}–{last}
+            </span>{" "}
+            of <span className="tabular-nums">{pagination.totalCount}</span>
+            {filters.search && (
+              <>
+                {" "}matching "<span className="text-ink">{filters.search}</span>"{" "}
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="ml-1 rounded-sm font-medium text-moss-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
+                >
+                  Clear
+                </button>
+              </>
+            )}
+          </p>
+
+          <ArticleRegister
+            articles={articles}
+            onReview={setReviewing}
+            onDecide={decide}
+            submittingId={moderation.submittingId}
+          />
+
+          {pagination.totalPages > 1 && (
+            <div className="mt-8">
+              <Pagination
+                current={pagination.page}
+                total={pagination.totalPages}
+                onChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
 
-      {/* Article Detail Modal */}
-      {selectedArticle && (
-        <ArticleDetailModal
-          article={selectedArticle}
-          onClose={() => setSelectedArticle(null)}
-          onApprove={(article) => {
-            setConfirmApprove(article);
-            setSelectedArticle(null);
-          }}
-          onReject={(id) => {
-            setConfirmReject({ id, title: selectedArticle?.title });
-            setRejectReason("");
-            setSelectedArticle(null);
-          }}
-          showInternalConfirmations={false}
+      {reviewing && (
+        <ArticleReviewDialog
+          article={reviewing}
+          onClose={() => setReviewing(null)}
+          onDecide={decide}
         />
       )}
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmDialog
-        isOpen={!!confirmDelete}
-        title="Delete Article"
-        message={
-          confirmDelete
-            ? `Are you sure you want to delete "${capitalizeFirstLetter(confirmDelete.title)}"?`
-            : ""
-        }
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
-        variant="danger"
-        isLoading={isSubmitting && pendingIntent === "delete"}
-        loadingText="Deleting"
-        reasonLabel="Reason for deletion"
-        reasonPlaceholder="Explain why the article is being removed (e.g., prohibited content, violates terms)."
-        reasonValue={deleteReason}
-        reasonRequired
-        onReasonChange={setDeleteReason}
-        onConfirm={handleDelete}
-        onCancel={() => {
-          setConfirmDelete(null);
-          setDeleteReason("");
-        }}
-      />
-
-      {/* Approve Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={!!confirmApprove}
-        title="Approve Article"
-        message={
-          confirmApprove
-            ? `Are you sure you want to approve "${capitalizeFirstLetter(confirmApprove.title)}"?`
-            : ""
-        }
-        confirmText="Yes, Approve"
-        cancelText="Cancel"
-        variant="success"
-        loadingText="Approving"
-        isLoading={isSubmitting && pendingIntent === "approve"}
-        onConfirm={handleApprove}
-        onCancel={() => setConfirmApprove(null)}
-      />
-
-      {/* Reject Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={!!confirmReject}
-        title="Reject Article"
-        message={
-          confirmReject
-            ? `Are you sure you want to reject "${capitalizeFirstLetter(confirmReject.title)}"?`
-            : ""
-        }
-        confirmText="Yes, Reject"
-        cancelText="Cancel"
-        variant="warning"
-        loadingText="Rejecting"
-        isLoading={isSubmitting && pendingIntent === "reject"}
-        reasonLabel="Reason for rejection"
-        reasonPlaceholder="Share the rejection reasons so the author can improve."
-        reasonValue={rejectReason}
-        reasonRequired
-        onReasonChange={setRejectReason}
-        onConfirm={handleReject}
-        onCancel={() => {
-          setConfirmReject(null);
-          setRejectReason("");
-        }}
-      />
-    </div>
+      {moderation.dialog}
+    </>
   );
 }
