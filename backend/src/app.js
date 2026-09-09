@@ -60,7 +60,7 @@ app.use("/api/user", authenticate(COOKIE_NAMES.ACCESS), userRoutes);
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: "Endpoint not found.",
+    message: "That page or resource doesn't exist.",
   });
 });
 
@@ -69,7 +69,7 @@ app.use((error, req, res, _next) => {
 
   return res.status(500).json({
     success: false,
-    message: "Internal server error.",
+    message: "Something on our end broke. Please try again.",
   });
 });
 

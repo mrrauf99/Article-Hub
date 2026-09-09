@@ -169,23 +169,23 @@ export function validateProfileData(data) {
 
   if (data.gender !== undefined && normalizeText(data.gender) !== "") {
     if (!VALID_GENDERS.includes(data.gender.toLowerCase())) {
-      errors.push(`Gender must be one of: ${VALID_GENDERS.join(", ")}.`);
+      errors.push("Please choose a gender option from the list.");
     }
   }
 
   const urlFields = [
-    "portfolio_url",
-    "linkedin_url",
-    "x_url",
-    "instagram_url",
-    "facebook_url",
+    ["portfolio_url", "Portfolio"],
+    ["linkedin_url", "LinkedIn"],
+    ["x_url", "X (Twitter)"],
+    ["instagram_url", "Instagram"],
+    ["facebook_url", "Facebook"],
   ];
 
-  for (const field of urlFields) {
+  for (const [field, label] of urlFields) {
     const value = normalizeText(data[field]);
 
     if (value && !isValidUrl(value)) {
-      errors.push(`${field.replace(/_/g, " ")} must be a valid URL.`);
+      errors.push(`Enter a full web address for ${label}, starting with https://.`);
     }
   }
 

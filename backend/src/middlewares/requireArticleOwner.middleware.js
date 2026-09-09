@@ -25,7 +25,7 @@ export async function requireArticleOwner(req, res, next) {
   if (rows[0].author_id !== userId) {
     return res.status(403).json({
       success: false,
-      message: "Not authorized to modify this article.",
+      message: "You can only edit or delete articles you wrote.",
     });
   }
 

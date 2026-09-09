@@ -5,7 +5,7 @@ export function requireRole(allowedRole) {
     if (role !== allowedRole) {
       return res.status(403).json({
         success: false,
-        message: `${allowedRole} access required.`,
+        message: "You don't have permission to view this.",
       });
     }
 
