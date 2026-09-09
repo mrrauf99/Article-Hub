@@ -100,7 +100,7 @@ export async function updateUserProfile(req, res) {
   if (validationErrors.length > 0) {
     return res.status(422).json({
       success: false,
-      message: validationErrors.join(", "),
+      message: validationErrors.join(" "),
     });
   }
 

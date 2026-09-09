@@ -44,7 +44,7 @@ export async function signUp(req, res) {
   if (rowCount > 0) {
     return res.status(400).json({
       success: false,
-      message: "Email or username already exists.",
+      message: "That email or username is already taken.",
     });
   }
 
@@ -128,7 +128,7 @@ export async function resendOtp(req, res) {
   if (resendCount === MAX_RESEND_COUNT) {
     return res.status(429).json({
       success: false,
-      message: "Maximum resend limit reached. Please start again.",
+      message: "You've used all your resend attempts. Please start over.",
       resendsRemaining: 0,
     });
   }
@@ -195,7 +195,7 @@ export async function verifyOtp(req, res) {
 
     return res.status(400).json({
       success: false,
-      message: `Invalid code. ${remaining} attempt(s) remaining.`,
+      message: `Invalid code. ${remaining} ${remaining === 1 ? "attempt" : "attempts"} remaining.`,
       attemptsRemaining: remaining,
     });
   }
@@ -218,7 +218,7 @@ export async function verifyOtp(req, res) {
 
   res.json({
     success: true,
-    message: "OTP verified successfully.",
+    message: "Code verified.",
     next: req.type === "forgot-password" ? "/reset-password" : "/login",
   });
 }
@@ -314,7 +314,7 @@ export async function verifyTwoFactorLogin(req, res) {
   if (!isValid) {
     return res.status(400).json({
       success: false,
-      message: "Invalid authentication code.",
+      message: "That code isn't valid. Please try again.",
     });
   }
 

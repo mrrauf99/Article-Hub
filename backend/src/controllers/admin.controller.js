@@ -2,6 +2,8 @@ import db from "../config/db.config.js";
 import { deleteImageFromCloudinary } from "../services/cloudinary.service.js";
 import { sendArticleStatusEmail } from "../services/email.service.js";
 
+const ROLE_LABEL = { user: "Writer", admin: "Administrator" };
+
 async function fetchArticleAuthorDetails(articleId) {
   const { rows } = await db.query(
     `SELECT
@@ -332,7 +334,7 @@ export const deleteArticle = async (req, res) => {
     reason,
   });
 
-  res.json({ success: true, message: "Article deleted successfully." });
+  res.json({ success: true, message: "Article deleted." });
 };
 
 export const getUsers = async (req, res) => {
@@ -429,13 +431,16 @@ export const updateUserRole = async (req, res) => {
   const adminId = req.user.userId;
 
   if (!["user", "admin"].includes(role)) {
-    return res.status(400).json({ success: false, message: "Invalid role." });
+    return res.status(400).json({
+      success: false,
+      message: "That's not a valid role. Choose Writer or Administrator.",
+    });
   }
 
   if (userId === adminId) {
     return res.status(400).json({
       success: false,
-      message: "Cannot change your own role.",
+      message: "You can't change your own role.",
     });
   }
 
@@ -448,7 +453,7 @@ export const updateUserRole = async (req, res) => {
     return res.status(404).json({ success: false, message: "User not found." });
   }
 
-  res.json({ success: true, message: `User role updated to ${role}.` });
+  res.json({ success: true, message: `Role updated to ${ROLE_LABEL[role]}.` });
 };
 
 export const deleteUser = async (req, res) => {
@@ -458,7 +463,7 @@ export const deleteUser = async (req, res) => {
   if (userId === adminId) {
     return res.status(400).json({
       success: false,
-      message: "Cannot delete your own account.",
+      message: "You can't delete your own account.",
     });
   }
 
@@ -507,5 +512,5 @@ export const deleteUser = async (req, res) => {
     }
   }
 
-  res.json({ success: true, message: "User deleted successfully." });
+  res.json({ success: true, message: "Member deleted." });
 };

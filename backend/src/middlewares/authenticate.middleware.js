@@ -19,7 +19,7 @@ export const authenticate = (cookieName) => (req, res, next) => {
   } catch {
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired token.",
+      message: "Your session has expired. Please sign in again.",
     });
   }
 };

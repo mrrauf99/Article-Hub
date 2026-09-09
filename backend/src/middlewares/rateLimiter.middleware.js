@@ -16,7 +16,7 @@ export const rateLimiter = rateLimit({
     res.status(429).json({
       success: false,
       type: "RATE_LIMIT",
-      message: "Too many requests. Please try again later.",
+      message: "You've made too many attempts. Please wait a few minutes and try again.",
       retryAfterSeconds: getRetryAfterSeconds(req),
     });
   },
