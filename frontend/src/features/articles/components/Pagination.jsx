@@ -101,14 +101,14 @@ function Pagination({ current, total, onChange, siblingCount = 0 }) {
       className={`flex justify-center items-center gap-1.5 transition-opacity duration-200 ${
         isPending ? "opacity-60 pointer-events-none" : "opacity-100"
       }`}
-      aria-label="Pagination Navigation"
+      aria-label="Pagination"
       aria-busy={isPending}
     >
       <button
         disabled={currentPage === 1 || isPending}
         onClick={() => handlePageChange(currentPage - 1)}
         className={NAV_BTN_FULL}
-        aria-label="Previous Page"
+        aria-label="Previous page"
       >
         <ChevronLeft className="w-4 h-4" />
         Prev
@@ -140,7 +140,7 @@ function Pagination({ current, total, onChange, siblingCount = 0 }) {
         disabled={currentPage === totalPages || isPending}
         onClick={() => handlePageChange(currentPage + 1)}
         className={NAV_BTN_FULL}
-        aria-label="Next Page"
+        aria-label="Next page"
       >
         Next
         <ChevronRight className="w-4 h-4" />

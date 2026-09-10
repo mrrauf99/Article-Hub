@@ -21,7 +21,7 @@ export default async function forgotPasswordAction({ request }) {
       success: false,
       message:
         err.response?.data?.message ||
-        "Something went wrong. Please try again.",
+        "We couldn't send the code. Please try again.",
     };
   }
 }

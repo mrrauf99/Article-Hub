@@ -7,7 +7,7 @@ export default async function twoFactorSessionLoader() {
     return null;
   } catch (error) {
     return handleLoaderError(error, {
-      fallbackMessage: "Failed to load 2FA session.",
+      fallbackMessage: "We couldn't load your two-factor login session. Please sign in again.",
     });
   }
 }

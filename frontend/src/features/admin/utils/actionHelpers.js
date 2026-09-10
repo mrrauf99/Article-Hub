@@ -18,7 +18,7 @@ export function handleActionError(error, action = "operation") {
   } else if (status === 401) {
     message = "Your session has expired. Log in again, then retry.";
   } else if (status === 403) {
-    message = serverMessage || "Your account isn't allowed to do this any more.";
+    message = serverMessage || "Your account no longer has permission to do this.";
   } else if (status === 404) {
     message = "It no longer exists. Another admin may have deleted it; the list will refresh.";
   } else if (status === 429) {
@@ -30,6 +30,6 @@ export function handleActionError(error, action = "operation") {
   return { success: false, message };
 }
 
-export function handleActionSuccess(message = "Operation completed successfully") {
+export function handleActionSuccess(message = "Done.") {
   return { success: true, message };
 }

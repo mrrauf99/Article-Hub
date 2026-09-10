@@ -69,6 +69,6 @@ export default async function publicArticlesLoader(args) {
     };
   } catch (error) {
     console.error("publicArticlesLoader error:", error);
-    throw new Response("Failed to load articles", { status: 500 });
+    throw new Response("We couldn't load articles right now.", { status: 500 });
   }
 }

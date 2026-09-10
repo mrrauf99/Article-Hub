@@ -110,7 +110,7 @@ export default function useArticleModeration({ onSuccess } = {}) {
       setNotice({ id: Date.now(), text: successText(done.type, done.article) });
       onSuccess?.(done.type, done.article);
     } else {
-      setError(fetcher.data.message || "The change couldn't be saved. Please try again.");
+      setError(fetcher.data.message || "That didn't save. Try again in a moment.");
     }
   }, [fetcher.state, fetcher.data, onSuccess]);
 

@@ -14,6 +14,6 @@ export default async function myArticlesLoader() {
       stats: statsRes.data.data,
     };
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load articles." });
+    return handleLoaderError(error, { fallbackMessage: "We couldn't load your articles." });
   }
 }

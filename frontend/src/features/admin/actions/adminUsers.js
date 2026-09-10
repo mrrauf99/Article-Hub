@@ -14,12 +14,12 @@ export async function adminUsersAction({ request }) {
       case "changeRole": {
         const newRole = formData.get("newRole");
         await adminApi.updateUserRole(userId, newRole);
-        return handleActionSuccess("User role updated successfully");
+        return handleActionSuccess("Role updated.");
       }
 
       case "delete":
         await adminApi.deleteUser(userId);
-        return handleActionSuccess("User deleted successfully");
+        return handleActionSuccess("Member deleted.");
 
       default:
         return { success: false, message: "Unknown action." };

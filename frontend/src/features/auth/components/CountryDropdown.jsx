@@ -128,7 +128,7 @@ export default function CountryDropdown({
 
       {hasError && (
         <p id={errorId} className={styles.errorMsg}>
-          Please fill out this field.
+          Select your country.
         </p>
       )}
     </div>

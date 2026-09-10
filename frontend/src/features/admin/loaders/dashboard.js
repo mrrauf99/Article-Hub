@@ -10,6 +10,6 @@ export default async function dashboardLoader() {
     const { stats, recentArticles, recentUsers } = statsResponse.data.data;
     return { stats, recentArticles, recentUsers, queue: queueResponse.data.data ?? [] };
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load the review queue." });
+    return handleLoaderError(error, { fallbackMessage: "Couldn't load the review queue." });
   }
 }

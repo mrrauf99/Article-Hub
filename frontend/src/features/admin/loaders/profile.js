@@ -21,7 +21,7 @@ export default async function profileLoader() {
     return { user, pendingCount };
   } catch (error) {
     return handleLoaderError(error, {
-      fallbackMessage: "Failed to load profile.",
+      fallbackMessage: "Couldn't load your profile.",
     });
   }
 }

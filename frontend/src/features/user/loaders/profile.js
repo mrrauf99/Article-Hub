@@ -14,6 +14,6 @@ export default async function profileLoader() {
       user: data.data,
     };
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load user profile." });
+    return handleLoaderError(error, { fallbackMessage: "We couldn't load your profile." });
   }
 }
