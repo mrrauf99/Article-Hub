@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
                   </button>
                   <span>
                     <span className="tabular-nums">{rows.length}</span> of{" "}
-                    <span className="tabular-nums">{queue.length}</span> shown, oldest first
+                    <span className="tabular-nums">{queue.length}</span> loaded, oldest first
                   </span>
                 </div>
               )}

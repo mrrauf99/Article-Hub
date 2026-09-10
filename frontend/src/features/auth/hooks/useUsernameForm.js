@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAvailability } from "./useAvailability";
 import { isEmpty, validateUsername } from "../util/authValidation";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 
 export function useUsernameForm() {
   const [values, setValues] = useState({ username: "" });
@@ -8,7 +9,7 @@ export function useUsernameForm() {
 
   const validateField = (value) => {
     if (isEmpty(value)) {
-      return "Please fill out this field.";
+      return REQUIRED_FIELD_MESSAGE;
     }
 
     return validateUsername(value);
@@ -37,9 +38,7 @@ export function useUsernameForm() {
     }
 
     if (usernameCheck.status === "error") {
-      setErrors({
-        username: "Unable to verify username. Please check your connection.",
-      });
+      setErrors({ username: usernameCheck.message });
       return false;
     }
 

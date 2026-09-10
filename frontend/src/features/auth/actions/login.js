@@ -27,7 +27,8 @@ export default async function loginAction({ request }) {
     if (err.response?.status === 429) {
       return {
         success: false,
-        retryAfterSeconds: err.response.data.retryAfterSeconds,
+        message: err.response.data?.message,
+        retryAfterSeconds: err.response.data?.retryAfterSeconds,
       };
     }
 
@@ -35,7 +36,7 @@ export default async function loginAction({ request }) {
       success: false,
       message:
         err.response?.data?.message ||
-        "Something went wrong. Please try again.",
+        "We couldn't sign you in. Please try again.",
     };
   }
 }

@@ -26,6 +26,6 @@ export default async function usersLoader({ request }) {
       counts: { all: writers + admins, user: writers, admin: admins },
     };
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load members." });
+    return handleLoaderError(error, { fallbackMessage: "Couldn't load the members list." });
   }
 }

@@ -10,11 +10,11 @@ export default function MissionSection() {
               Our mission
             </h2>
             <p className="text-lg text-paper/75 leading-relaxed mb-4">
-              To create a digital space where{" "}
+              To build a space where{" "}
               <span className="text-paper font-semibold">
-                meaningful content thrives
+                good writing thrives
               </span>
-              , writers feel empowered, and readers can learn deeply without
+              , writers get real support, and readers can dig in without
               distraction.
             </p>
             <p className="text-paper/55">

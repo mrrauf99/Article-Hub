@@ -10,7 +10,7 @@ export default async function articleDetailLoader({ params, request }) {
     const { data } = await apiClient.get(endpoint);
 
     if (!data?.success || !data?.data) {
-      throw new Response("Article not found", { status: 404 });
+      throw new Response("We couldn't find that article.", { status: 404 });
     }
 
     const article = data.data;
@@ -24,7 +24,7 @@ export default async function articleDetailLoader({ params, request }) {
   } catch (error) {
     return handleLoaderError(error, {
       forbiddenRedirect: "/",
-      fallbackMessage: error?.response?.data?.message || "Article not found.",
+      fallbackMessage: error?.response?.data?.message || "We couldn't find that article.",
     });
   }
 }

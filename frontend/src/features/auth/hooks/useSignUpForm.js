@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAvailability } from "./useAvailability";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 import {
   isEmpty,
   isEmailValid,
@@ -25,16 +26,16 @@ export function useSignUpForm() {
 
   const validateField = (name, value, passwordToCheck = values.password, confirmPasswordToCheck = values.confirmPassword) => {
     if (name === "country") {
-      return !value ? "Please fill out this field." : null;
+      return !value ? REQUIRED_FIELD_MESSAGE : null;
     }
-    
-    if (isEmpty(value)) return "Please fill out this field.";
+
+    if (isEmpty(value)) return REQUIRED_FIELD_MESSAGE;
 
     switch (name) {
       case "username":
         return validateUsername(value);
       case "email":
-        return !isEmailValid(value) ? "Please enter a valid email." : null;
+        return !isEmailValid(value) ? "Enter a valid email address." : null;
       case "password": {
         const freshPasswordErrors = validatePassword(value, confirmPasswordToCheck);
         return getPasswordGenericError(freshPasswordErrors, value);
@@ -59,14 +60,14 @@ export function useSignUpForm() {
     Object.keys(values).forEach((key) => {
       if (key === "password") {
         if (isEmpty(values.password)) {
-          newErrors.password = "Please fill out this field.";
+          newErrors.password = REQUIRED_FIELD_MESSAGE;
         } else {
           const passwordError = getPasswordGenericError(currentPasswordErrors, values.password);
           if (passwordError) newErrors.password = passwordError;
         }
       } else if (key === "country") {
         if (!values[key]) {
-          newErrors[key] = "Please fill out this field.";
+          newErrors[key] = REQUIRED_FIELD_MESSAGE;
         }
       } else {
         const error = validateField(key, values[key], values.password, values.confirmPassword);
@@ -77,10 +78,10 @@ export function useSignUpForm() {
     if (usernameCheck.status === "unavailable") newErrors.username = usernameCheck.message;
     if (emailCheck.status === "unavailable") newErrors.email = emailCheck.message;
     if (usernameCheck.status === "error") {
-      newErrors.username = "Unable to verify username. Please check your connection.";
+      newErrors.username = usernameCheck.message;
     }
     if (emailCheck.status === "error") {
-      newErrors.email = "Unable to verify email. Please check your connection.";
+      newErrors.email = emailCheck.message;
     }
 
     setErrors(newErrors);
@@ -123,7 +124,7 @@ export function useSignUpForm() {
 
     if (name === "password") {
       if (isEmpty(value)) {
-        setErrors((e) => ({ ...e, [name]: "Please fill out this field." }));
+        setErrors((e) => ({ ...e, [name]: REQUIRED_FIELD_MESSAGE }));
       } else {
         const currentPasswordErrors = validatePassword(value, values.confirmPassword);
         const error = getPasswordGenericError(currentPasswordErrors, value);
@@ -131,14 +132,14 @@ export function useSignUpForm() {
       }
     } else if (name === "confirmPassword") {
       const error = isEmpty(value)
-        ? "Please fill out this field."
+        ? REQUIRED_FIELD_MESSAGE
         : value !== values.password
         ? "Passwords do not match."
         : null;
       setErrors((e) => ({ ...e, [name]: error }));
     } else if (name === "country") {
       const countryValue = value !== undefined ? value : values.country;
-      const error = !countryValue ? "Please fill out this field." : null;
+      const error = !countryValue ? REQUIRED_FIELD_MESSAGE : null;
       setErrors((e) => ({ ...e, [name]: error }));
     } else {
       const error = validateField(name, value, values.password, values.confirmPassword);

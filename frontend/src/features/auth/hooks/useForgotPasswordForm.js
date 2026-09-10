@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { isEmpty, isEmailValid } from "../util/authValidation";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 
 const INITIAL_VALUES = {
   email: "",
@@ -11,11 +12,11 @@ export function useForgotPasswordForm() {
 
   const validateField = (name, value) => {
     if (isEmpty(value)) {
-      return "Please fill out this field.";
+      return REQUIRED_FIELD_MESSAGE;
     }
 
     if (!isEmailValid(value)) {
-      return "Please enter a valid email address.";
+      return "Enter a valid email address.";
     }
 
     return null;

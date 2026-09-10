@@ -14,6 +14,6 @@ export default async function profileStatsLoader() {
       stats: statsRes.data.data,
     };
   } catch (err) {
-    return handleLoaderError(err, { fallbackMessage: "Failed to load profile." });
+    return handleLoaderError(err, { fallbackMessage: "We couldn't load your profile." });
   }
 }

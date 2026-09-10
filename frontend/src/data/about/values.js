@@ -23,6 +23,6 @@ export const VALUES = [
     icon: Zap,
     title: "Performance Matters",
     description:
-      "Lightning-fast load times, smooth interactions, and zero bloat. Speed is a feature, not a luxury.",
+      "Fast load times, smooth interactions, no bloat. We treat speed as a baseline, not an afterthought.",
   },
 ];

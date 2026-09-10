@@ -6,6 +6,6 @@ export default async function userDetailsLoader({ params }) {
     const response = await adminApi.getUserDetails(params.userId);
     return response.data.data;
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load user profile." });
+    return handleLoaderError(error, { fallbackMessage: "Couldn't load this member's profile." });
   }
 }

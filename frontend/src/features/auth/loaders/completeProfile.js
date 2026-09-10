@@ -6,6 +6,6 @@ export default async function completeProfileLoader() {
     await authApi.oauthStatus();
     return null;
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load OAuth session." });
+    return handleLoaderError(error, { fallbackMessage: "We couldn't load your Google sign-in session. Please sign in again."});
   }
 }

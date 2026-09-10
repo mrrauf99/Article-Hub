@@ -45,7 +45,7 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
       console.error("Failed to delete article:", error);
       setDeleteError(
         error.response?.data?.message ||
-          "Failed to delete article. Please try again.",
+          "We couldn't delete the article — try again in a moment.",
       );
     } finally {
       setIsDeleting(false);
@@ -157,9 +157,9 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
 
       <ConfirmDialog
         isOpen={isDeleteModalOpen}
-        title="Delete Article"
-        message={`Are you sure you want to delete "${article.title}"? This action cannot be undone.`}
-        confirmText="Yes, Delete"
+        title="Delete this article?"
+        message={`"${capitalizeFirstLetter(article.title)}" and its cover image will be permanently removed. This can't be undone.`}
+        confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
         isLoading={isDeleting}

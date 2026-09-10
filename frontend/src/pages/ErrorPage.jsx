@@ -16,16 +16,19 @@ function getErrorDetails(error) {
     return {
       code: "Error",
       headline: "Something went wrong.",
-      description:
-        "An unexpected error occurred on our end. Please refresh the page or go back.",
+      description: "Something on our end broke. Try refreshing, or head back.",
     };
   }
+
+  const customDescription =
+    typeof error.data === "string" && error.data.trim() ? error.data : null;
 
   if (error.status === 404) {
     return {
       code: "404",
       headline: "This page is missing.",
       description:
+        customDescription ||
         "We looked through our entire library but couldn't find the page you were searching for. It may have been moved, or the address might be slightly off.",
     };
   }
@@ -35,7 +38,8 @@ function getErrorDetails(error) {
       code: "500",
       headline: "Something went wrong.",
       description:
-        "Our servers ran into an unexpected issue. We're working to fix it, please try again in a few moments.",
+        customDescription ||
+        "Our servers hit a snag. Give it a few moments and try again.",
     };
   }
 
@@ -43,7 +47,9 @@ function getErrorDetails(error) {
     code: String(error.status),
     headline: "Something went wrong.",
     description:
-      error.statusText || "An unexpected error occurred. Please go back and try again.",
+      customDescription ||
+      error.statusText ||
+      "An unexpected error occurred. Please go back and try again.",
   };
 }
 

@@ -11,8 +11,7 @@ export default function CTASection() {
             Your writing deserves an audience that reads.
           </h2>
           <p className="text-paper/65 max-w-xl mx-auto mb-9">
-            Join a platform built for people who care about ideas, not
-            impressions.
+            Join people who care more about ideas than impressions.
           </p>
 
           <Link

@@ -14,9 +14,9 @@ export default function AboutHero() {
               believe great ideas deserve great presentation.
             </p>
             <p>
-              Founded in 2025 out of frustration with cluttered interfaces
-              and algorithm-driven feeds, it was born from a simple question:
-              what if reading and writing online could be beautiful again?
+              Founded in 2025, out of frustration with cluttered interfaces
+              and algorithm-driven feeds. We wanted to know: could reading
+              and writing online be beautiful again?
             </p>
           </div>
         </div>

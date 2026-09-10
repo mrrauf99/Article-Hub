@@ -18,7 +18,7 @@ export default async function editArticleLoader({ params }) {
   } catch (error) {
     return handleLoaderError(error, {
       forbiddenRedirect: "/user/dashboard",
-      fallbackMessage: "Failed to load article.",
+      fallbackMessage: "We couldn't load this article.",
     });
   }
 }

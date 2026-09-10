@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 import { allowedImageTypes } from "@/utils/allowedImagesTypes";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 
 // This ensures consistent character counting between frontend and backend
 const normalizeLineBreaks = (text) => text.replace(/\r\n/g, "\n");
@@ -68,7 +69,7 @@ export function useNewArticleForm(article) {
       };
       setErrors((prev) => ({
         ...prev,
-        [name]: `${fieldLabels[name]} exceeds maximum limit of ${MAX_LENGTHS[name].toLocaleString()} characters`,
+        [name]: `${fieldLabels[name]} is over the ${MAX_LENGTHS[name].toLocaleString()}-character limit.`,
       }));
     } else if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -78,7 +79,7 @@ export function useNewArticleForm(article) {
   const handleBlur = (e) => {
     const { name, value } = e.target;
     if (!value || !value.trim()) {
-      setErrors((prev) => ({ ...prev, [name]: "Please fill out this field." }));
+      setErrors((prev) => ({ ...prev, [name]: REQUIRED_FIELD_MESSAGE }));
     }
   };
 
@@ -126,7 +127,7 @@ export function useNewArticleForm(article) {
     if (!formData.title.trim()) {
       newErrors.title = "Title is required";
     } else if (normalizedTitle.length < MIN_LENGTHS.title) {
-      newErrors.title = `Title should be at least ${MIN_LENGTHS.title} characters`;
+      newErrors.title = `Title must be at least ${MIN_LENGTHS.title} characters`;
     } else if (normalizedTitle.length > MAX_LENGTHS.title) {
       newErrors.title = `Title must be at most ${MAX_LENGTHS.title} characters`;
     }
@@ -137,7 +138,7 @@ export function useNewArticleForm(article) {
     if (!formData.introduction.trim()) {
       newErrors.introduction = "Introduction is required";
     } else if (normalizedIntro.length < MIN_LENGTHS.introduction) {
-      newErrors.introduction = `Introduction should be at least ${MIN_LENGTHS.introduction} characters`;
+      newErrors.introduction = `Introduction must be at least ${MIN_LENGTHS.introduction} characters`;
     } else if (normalizedIntro.length > MAX_LENGTHS.introduction) {
       newErrors.introduction = `Introduction must be at most ${MAX_LENGTHS.introduction.toLocaleString()} characters`;
     }
@@ -146,7 +147,7 @@ export function useNewArticleForm(article) {
     if (!formData.content.trim()) {
       newErrors.content = "Main content is required";
     } else if (normalizedContent.length < MIN_LENGTHS.content) {
-      newErrors.content = `Main content should be at least ${MIN_LENGTHS.content} characters`;
+      newErrors.content = `Main content must be at least ${MIN_LENGTHS.content} characters`;
     } else if (normalizedContent.length > MAX_LENGTHS.content) {
       newErrors.content = `Main content must be at most ${MAX_LENGTHS.content.toLocaleString()} characters`;
     }
@@ -155,13 +156,13 @@ export function useNewArticleForm(article) {
     if (!formData.summary.trim()) {
       newErrors.summary = "Summary is required";
     } else if (normalizedSummary.length < MIN_LENGTHS.summary) {
-      newErrors.summary = `Summary should be at least ${MIN_LENGTHS.summary} characters`;
+      newErrors.summary = `Summary must be at least ${MIN_LENGTHS.summary} characters`;
     } else if (normalizedSummary.length > MAX_LENGTHS.summary) {
       newErrors.summary = `Summary must be at most ${MAX_LENGTHS.summary} characters`;
     }
 
     if (!formData.imageFile && !formData.imageUrl) {
-      newErrors.image = "Featured image is required";
+      newErrors.image = "Cover image is required";
     }
 
     setErrors(newErrors);

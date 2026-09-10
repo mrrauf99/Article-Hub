@@ -14,15 +14,15 @@ export async function adminArticlesAction({ request }) {
     switch (intent) {
       case "approve":
         await adminApi.approveArticle(articleId);
-        return handleActionSuccess("Article approved successfully");
+        return handleActionSuccess("Article approved.");
 
       case "reject":
         await adminApi.rejectArticle(articleId, reason);
-        return handleActionSuccess("Article rejected successfully");
+        return handleActionSuccess("Article rejected.");
 
       case "delete":
         await adminApi.deleteArticle(articleId, reason);
-        return handleActionSuccess("Article deleted successfully");
+        return handleActionSuccess("Article deleted.");
 
       default:
         return { success: false, message: "Unknown action." };

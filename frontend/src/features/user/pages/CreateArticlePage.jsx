@@ -89,7 +89,10 @@ export default function CreateArticlePage() {
       else general.push(err);
     }
     if (actionData?.success === false && general.length === 0 && Object.keys(field).length === 0) {
-      general.push(actionData.message || "Couldn't save the article. Please try again.");
+      general.push(
+        actionData.message ||
+          "We couldn't save the article — check the fields above and try again.",
+      );
     }
     return { fieldErrors: field, generalErrors: general };
   }, [actionData]);

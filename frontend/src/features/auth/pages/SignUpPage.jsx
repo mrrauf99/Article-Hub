@@ -1,5 +1,7 @@
-import { Form, useNavigation } from "react-router-dom";
+import { Form, useActionData, useNavigation } from "react-router-dom";
+import { useEffect, useRef, useState, startTransition } from "react";
 
+import AlertMessageBox from "../components/AlertMessageBox";
 import AuthLayout from "../components/AuthLayout";
 import SignUpFields from "../components/SignUpFields";
 import PasswordRequirements from "../components/PasswordRequirements";
@@ -13,7 +15,28 @@ import { useSignUpForm } from "../hooks/useSignUpForm";
 export default function SignUp() {
   const form = useSignUpForm();
   const navigation = useNavigation();
+  const actionData = useActionData();
   const isSubmitting = navigation.state === "submitting";
+
+  const [alertMessage, setAlertMessage] = useState("");
+  const lastActionDataRef = useRef(null);
+
+  useEffect(() => {
+    if (
+      actionData?.success === false &&
+      actionData !== lastActionDataRef.current
+    ) {
+      lastActionDataRef.current = actionData;
+      const msg = Array.isArray(actionData.message)
+        ? actionData.message.join(" ")
+        : actionData.message ||
+          "We couldn't create your account. Please try again.";
+
+      startTransition(() => {
+        setAlertMessage(msg);
+      });
+    }
+  }, [actionData]);
 
   function handleSubmit(e) {
     if (!form.validate()) {
@@ -23,6 +46,13 @@ export default function SignUp() {
 
   return (
     <AuthLayout title="Create your account" subtitle="Join a space built for focused reading and writing.">
+      {alertMessage && (
+        <AlertMessageBox
+          message={alertMessage}
+          setAlertMessage={setAlertMessage}
+        />
+      )}
+
       <Form
         method="POST"
         className="flex flex-col gap-4"
@@ -37,7 +67,7 @@ export default function SignUp() {
         />
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>
-          {isSubmitting ? "Signing Up..." : "Sign Up"}
+          {isSubmitting ? "Signing up…" : "Sign up"}
         </Button>
       </Form>
 

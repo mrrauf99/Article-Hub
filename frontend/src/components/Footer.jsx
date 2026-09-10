@@ -1,5 +1,6 @@
 import styles from "@/styles/footer.module.css";
 import { Link } from "react-router-dom";
+import { SITE_CONFIG } from "@/config/site.config";
 import {
   Facebook,
   Instagram,
@@ -30,10 +31,7 @@ export default function Footer() {
             <h2 className={styles.title}>Article Hub</h2>
           </div>
 
-          <p className={styles.description}>
-            A moderated platform for publishing thoughtful articles on technology,
-            education, and digital trends.
-          </p>
+          <p className={styles.description}>{SITE_CONFIG.description}</p>
 
           {/* social links */}
           <div className={styles.socials}>
