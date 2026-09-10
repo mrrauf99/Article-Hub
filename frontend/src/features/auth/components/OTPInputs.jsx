@@ -64,7 +64,7 @@ function OTPInputs({
             handleKeyDown(index, e);
           }}
           onPaste={handlePasteWrapper(index)}
-          aria-label={`OTP digit ${index + 1}`}
+          aria-label={`Verification code digit ${index + 1}`}
         />
       ))}
     </div>

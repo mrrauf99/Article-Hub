@@ -236,7 +236,7 @@ export default function ImageCropper({ imageSrc, onClose, onCropComplete }) {
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  Apply Crop
+                  Apply crop
                 </>
               )}
             </button>

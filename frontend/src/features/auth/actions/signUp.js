@@ -28,7 +28,7 @@ export default async function signUpAction({ request }) {
       success: false,
       message:
         err.response?.data?.message ||
-        "Something went wrong. Please try again.",
+        "We couldn't create your account. Please try again.",
     };
   }
 }

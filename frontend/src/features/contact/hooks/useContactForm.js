@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 
 export function useContactForm(initialValues) {
   const [values, setValues] = useState(initialValues);
@@ -6,7 +7,7 @@ export function useContactForm(initialValues) {
 
   const validateField = (name, value) => {
     if (!value || value.trim() === "") {
-      return "Please fill out this field.";
+      return REQUIRED_FIELD_MESSAGE;
     }
 
     switch (name) {
@@ -16,7 +17,7 @@ export function useContactForm(initialValues) {
         break;
 
       case "email":
-        if (!/^\S+@\S+\.\S+$/.test(value)) return "Invalid email address";
+        if (!/^\S+@\S+\.\S+$/.test(value)) return "Enter a valid email address.";
         break;
 
       case "subject":

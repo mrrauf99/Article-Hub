@@ -8,7 +8,7 @@ export default async function passwordResetLoader() {
   } catch (error) {
     return handleLoaderError(error, {
       forbiddenRedirect: "/forgot-password",
-      fallbackMessage: "Failed to load password reset session.",
+      fallbackMessage: "We couldn't load your password reset session. Please request a new code.",
     });
   }
 }

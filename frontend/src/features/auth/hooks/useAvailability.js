@@ -56,7 +56,7 @@ export function useAvailability(value, hasError, type) {
           err.response?.data?.message ||
           (err.request
             ? "Network error. Please check your connection."
-            : "Something went wrong. Please try again.");
+            : "Couldn't check availability right now. Try again in a moment.");
 
         setState((prev) => ({
           ...prev,

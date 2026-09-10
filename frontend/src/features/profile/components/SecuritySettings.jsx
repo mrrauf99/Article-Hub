@@ -9,6 +9,7 @@ import {
   validatePassword,
   getPasswordGenericError,
 } from "@/features/auth/util/authValidation";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 import { BTN_DANGER, BTN_GHOST, BTN_PRIMARY, BTN_SECONDARY, ICON_BTN } from "@/styles/panelClasses";
 
 export default function SecuritySettings() {
@@ -93,14 +94,14 @@ export default function SecuritySettings() {
       const { name, value } = e.target;
 
       if (name === "currentPassword") {
-        const error = isEmpty(value) ? "Please fill out this field." : null;
+        const error = isEmpty(value) ? REQUIRED_FIELD_MESSAGE : null;
         setPasswordErrors((prev) => ({ ...prev, [name]: error }));
         return;
       }
 
       if (name === "newPassword") {
         const error = isEmpty(value)
-          ? "Please fill out this field."
+          ? REQUIRED_FIELD_MESSAGE
           : getPasswordGenericError(passwordRuleErrors, value);
         setPasswordErrors((prev) => ({ ...prev, [name]: error }));
         return;
@@ -108,7 +109,7 @@ export default function SecuritySettings() {
 
       if (name === "confirmPassword") {
         const error = isEmpty(value)
-          ? "Please fill out this field."
+          ? REQUIRED_FIELD_MESSAGE
           : value !== passwordForm.newPassword
             ? "Passwords do not match."
             : null;
@@ -122,11 +123,11 @@ export default function SecuritySettings() {
     const nextErrors = {};
 
     if (isEmpty(passwordForm.currentPassword)) {
-      nextErrors.currentPassword = "Please fill out this field.";
+      nextErrors.currentPassword = REQUIRED_FIELD_MESSAGE;
     }
 
     if (isEmpty(passwordForm.newPassword)) {
-      nextErrors.newPassword = "Please fill out this field.";
+      nextErrors.newPassword = REQUIRED_FIELD_MESSAGE;
     } else {
       const error = getPasswordGenericError(
         passwordRuleErrors,
@@ -136,7 +137,7 @@ export default function SecuritySettings() {
     }
 
     if (isEmpty(passwordForm.confirmPassword)) {
-      nextErrors.confirmPassword = "Please fill out this field.";
+      nextErrors.confirmPassword = REQUIRED_FIELD_MESSAGE;
     } else if (passwordForm.confirmPassword !== passwordForm.newPassword) {
       nextErrors.confirmPassword = "Passwords do not match.";
     }
@@ -180,7 +181,7 @@ export default function SecuritySettings() {
         success: false,
         message:
           err.response?.data?.message ||
-          "Unable to change password. Please try again.",
+          "We couldn't change your password. Check the fields above and try again.",
       });
     } finally {
       setPasswordSaving(false);
@@ -193,7 +194,7 @@ export default function SecuritySettings() {
     setSetupErrors({});
 
     if (isEmpty(setupPassword)) {
-      setSetupErrors({ password: "Please fill out this field." });
+      setSetupErrors({ password: REQUIRED_FIELD_MESSAGE });
       return;
     }
 
@@ -217,7 +218,7 @@ export default function SecuritySettings() {
         success: false,
         message:
           err.response?.data?.message ||
-          "Unable to start 2FA setup. Please try again.",
+          "We couldn't start 2FA setup. Try again in a moment.",
       });
     } finally {
       setSetupLoading(false);
@@ -232,7 +233,7 @@ export default function SecuritySettings() {
     if (isEmpty(setupToken)) {
       setSetupErrors((prev) => ({
         ...prev,
-        token: "Please fill out this field.",
+        token: REQUIRED_FIELD_MESSAGE,
       }));
       return;
     }
@@ -253,7 +254,7 @@ export default function SecuritySettings() {
         success: false,
         message:
           err.response?.data?.message ||
-          "Unable to verify 2FA. Please try again.",
+          "That code didn't work. Check your authenticator app and try again.",
       });
     } finally {
       setVerifyLoading(false);
@@ -267,10 +268,10 @@ export default function SecuritySettings() {
 
     const nextErrors = {};
     if (isEmpty(disablePassword)) {
-      nextErrors.password = "Please fill out this field.";
+      nextErrors.password = REQUIRED_FIELD_MESSAGE;
     }
     if (isEmpty(disableToken)) {
-      nextErrors.token = "Please fill out this field.";
+      nextErrors.token = REQUIRED_FIELD_MESSAGE;
     }
     if (Object.keys(nextErrors).length > 0) {
       setDisableErrors(nextErrors);
@@ -295,7 +296,7 @@ export default function SecuritySettings() {
         success: false,
         message:
           err.response?.data?.message ||
-          "Unable to disable 2FA. Please try again.",
+          "We couldn't turn off 2FA. Try again in a moment.",
       });
     } finally {
       setDisableLoading(false);

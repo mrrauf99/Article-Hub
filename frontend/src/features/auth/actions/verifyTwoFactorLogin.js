@@ -21,7 +21,7 @@ export default async function verifyTwoFactorLoginAction({ request }) {
       success: false,
       message:
         err.response?.data?.message ||
-        "Unable to verify 2FA. Please try again.",
+        "We couldn't verify your code. Please try again.",
     };
   }
 }

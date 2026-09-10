@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { isEmpty, validatePassword, getPasswordGenericError } from "../util/authValidation";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 
 const INITIAL_VALUES = {
   password: "",
@@ -25,14 +26,14 @@ export function usePasswordResetForm() {
     const currentPasswordErrors = validatePassword(values.password, values.confirmPassword);
 
     if (isEmpty(values.password)) {
-      newErrors.password = "Please fill out this field.";
+      newErrors.password = REQUIRED_FIELD_MESSAGE;
     } else {
       const passwordError = getPasswordGenericError(currentPasswordErrors, values.password);
       if (passwordError) newErrors.password = passwordError;
     }
 
     if (isEmpty(values.confirmPassword)) {
-      newErrors.confirmPassword = "Please fill out this field.";
+      newErrors.confirmPassword = REQUIRED_FIELD_MESSAGE;
     } else if (values.confirmPassword !== values.password) {
       newErrors.confirmPassword = "Passwords do not match.";
     }
@@ -81,12 +82,12 @@ export function usePasswordResetForm() {
       if (name === FIELD_NAMES.PASSWORD) {
         const currentPasswordErrors = validatePassword(value, values.confirmPassword);
         const error = isEmpty(value)
-          ? "Please fill out this field."
+          ? REQUIRED_FIELD_MESSAGE
           : getPasswordGenericError(currentPasswordErrors, value);
         setErrors((prev) => ({ ...prev, [name]: error }));
       } else if (name === FIELD_NAMES.CONFIRM_PASSWORD) {
         const error = isEmpty(value)
-          ? "Please fill out this field."
+          ? REQUIRED_FIELD_MESSAGE
           : value !== values.password
           ? "Passwords do not match."
           : null;

@@ -27,7 +27,9 @@ export default function Login() {
       actionData !== lastActionDataRef.current
     ) {
       lastActionDataRef.current = actionData;
-      let msg = actionData.message || "Too many login attempts.";
+      let msg =
+        actionData.message ||
+        "You've made too many attempts. Please wait a few minutes and try again.";
       const seconds = actionData.retryAfterSeconds;
 
       if (seconds && seconds > 0) {
@@ -105,7 +107,7 @@ export default function Login() {
         </div>
 
         <Button disabled={isSubmitting} isLoading={isSubmitting}>
-          {isSubmitting ? "Signing In..." : "Sign In"}
+          {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
       </Form>
 

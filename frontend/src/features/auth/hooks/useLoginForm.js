@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { isEmpty } from "../util/authValidation";
+import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 
 const INITIAL_VALUES = {
   identifier: "",
@@ -12,7 +13,7 @@ export function useLoginForm() {
 
   const validateField = (name, value) => {
     if (isEmpty(value)) {
-      return "Please fill out this field.";
+      return REQUIRED_FIELD_MESSAGE;
     }
 
     if (name === "password") {
@@ -20,7 +21,7 @@ export function useLoginForm() {
         return "Password must be at least 8 characters.";
       }
       if (value.length > 64) {
-        return "Password must be less than 64 characters.";
+        return "Password must be 64 characters or fewer.";
       }
     }
 

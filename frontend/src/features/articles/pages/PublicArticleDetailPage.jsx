@@ -32,7 +32,7 @@ export default function PublicArticleDetailPage() {
   if (!article) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper font-ui">
-        <p className="text-ink-muted">Article not found</p>
+        <p className="text-ink-muted">We couldn't find that article.</p>
       </div>
     );
   }

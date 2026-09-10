@@ -154,7 +154,8 @@ export default function ArticleLedger({ articles, onDeleted }) {
       setTarget(null);
     } catch (error) {
       setDeleteError(
-        error.response?.data?.message || "Couldn't delete the article. Please try again.",
+        error.response?.data?.message ||
+          "We couldn't delete the article — try again in a moment.",
       );
     } finally {
       setIsDeleting(false);

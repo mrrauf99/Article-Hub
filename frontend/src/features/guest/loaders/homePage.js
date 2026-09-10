@@ -6,6 +6,6 @@ export default async function homePageLoader({ request }) {
     const articlesResult = await publicArticlesLoader({ request });
     return articlesResult;
   } catch {
-    throw new Response("Failed to load articles", { status: 500 });
+    throw new Response("We couldn't load articles right now.", { status: 500 });
   }
 }

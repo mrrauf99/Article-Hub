@@ -8,7 +8,7 @@ export default function StorySection() {
 
         <div className="max-w-[58ch] space-y-5 text-ink-muted leading-relaxed">
           <p>
-            It started with a simple frustration. As developers and content
+            We built this out of frustration. As developers and content
             creators ourselves, we were tired of platforms that prioritized
             engagement over experience, quantity over quality, and ad revenue
             over user respect. The best writers we knew were publishing on

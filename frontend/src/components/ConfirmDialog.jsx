@@ -7,14 +7,14 @@ import useModalFocusTrap from "@/hooks/useModalFocusTrap";
 
 export default function ConfirmDialog({
   isOpen,
-  title = "Confirm Action",
+  title = "Confirm",
   message,
   confirmText = "Confirm",
   cancelText = "Cancel",
   variant = "danger", // "danger" | "warning" | "info" | "success"
   icon,
   isLoading = false,
-  loadingText = "Processing",
+  loadingText = "Working on it",
   showLoadingDots = true,
   error = null,
   reasonLabel,

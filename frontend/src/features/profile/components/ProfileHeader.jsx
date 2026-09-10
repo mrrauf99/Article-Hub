@@ -42,9 +42,7 @@ export default function ProfileHeader({ headingLevel = 2 }) {
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      setAvatarError(
-        "Image size should be less than 2MB. Please compress or choose a smaller image.",
-      );
+      setAvatarError("That photo is over 2 MB — please choose a smaller one.");
       return;
     }
 

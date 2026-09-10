@@ -12,7 +12,7 @@ function PageLoader({ fullScreen = false }) {
         <BookOpen className="h-9 w-9 text-ink-muted" strokeWidth={1.5} aria-hidden="true" />
       </div>
 
-      <span className="text-sm font-medium text-ink-muted">Loading...</span>
+      <span className="text-sm font-medium text-ink-muted">Loading</span>
     </div>
   );
 }

@@ -37,7 +37,7 @@ export default async function otpAction({ request }) {
 
     return {
       success: true,
-      message: "OTP verified successfully.",
+      message: "Code verified.",
       next: data.next,
     };
   } catch (err) {
@@ -45,7 +45,7 @@ export default async function otpAction({ request }) {
       success: false,
       message:
         err.response?.data?.message ||
-        "Something went wrong. Please try again.",
+        "We couldn't verify your code. Please try again.",
     };
   }
 }

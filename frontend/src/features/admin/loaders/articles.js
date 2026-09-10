@@ -29,6 +29,6 @@ export default async function articlesLoader({ request }) {
       },
     };
   } catch (error) {
-    return handleLoaderError(error, { fallbackMessage: "Failed to load articles.", forbiddenRedirect: "/user/dashboard" });
+    return handleLoaderError(error, { fallbackMessage: "Couldn't load the articles list.", forbiddenRedirect: "/user/dashboard" });
   }
 }

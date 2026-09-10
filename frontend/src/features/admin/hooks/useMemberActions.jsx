@@ -54,7 +54,7 @@ export default function useMemberActions({ onSuccess, initialNotice = null } = {
       setNotice({ id: Date.now(), text });
       onSuccess?.(done.type, done.member, text);
     } else {
-      setError(fetcher.data.message || "The change couldn't be saved. Please try again.");
+      setError(fetcher.data.message || "That didn't save. Try again in a moment.");
     }
   }, [fetcher.state, fetcher.data, onSuccess]);
 
