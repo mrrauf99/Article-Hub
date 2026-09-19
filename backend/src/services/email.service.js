@@ -287,6 +287,38 @@ Article Hub Security
   });
 }
 
+export async function sendPendingArticleEmail({ articleTitle, authorName }) {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+
+  if (!adminEmail) {
+    throw new Error("ADMIN_EMAIL or SMTP_USER must be configured");
+  }
+
+  await resend.emails.send({
+    from: process.env.MAIL_FROM,
+    to: adminEmail,
+    subject: "New article awaiting review",
+    replyTo: "no-reply@articlehub.me",
+    headers: {
+      "X-Auto-Response-Suppress": "All",
+    },
+    text: `
+A new article is awaiting review in Article Hub.
+
+Title: ${articleTitle}
+Author: ${authorName}
+    `.trim(),
+    html: `
+      <div style="font-family: Arial; line-height: 1.6">
+        <h2>New article awaiting review</h2>
+        <p><strong>Title:</strong> ${articleTitle}</p>
+        <p><strong>Author:</strong> ${authorName}</p>
+        <p>Open the Article Hub admin dashboard to review it.</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendArticleStatusEmail({
   to,
   name,

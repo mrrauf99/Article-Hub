@@ -1,4 +1,5 @@
 import db from "../config/db.config.js";
+import { sendPendingArticleEmail } from "../services/email.service.js";
 import {
   deleteImageFromCloudinary,
   uploadImageToCloudinary,
@@ -225,6 +226,16 @@ export const createArticle = async (req, res) => {
     ],
   );
 
+  const { rows: authorRows } = await db.query(
+    "SELECT name, email FROM users WHERE id = $1",
+    [req.user.userId],
+  );
+
+  await sendPendingArticleEmail({
+    articleTitle: title,
+    authorName: authorRows[0]?.name || authorRows[0]?.email || "Unknown author",
+  });
+
   res.status(201).json({
     success: true,
     message: "Article submitted for approval.",
@@ -301,6 +312,16 @@ export const updateArticle = async (req, res) => {
       articleId,
     ],
   );
+
+  const { rows: authorRows } = await db.query(
+    "SELECT name, email FROM users WHERE id = $1",
+    [req.user.userId],
+  );
+
+  await sendPendingArticleEmail({
+    articleTitle: title,
+    authorName: authorRows[0]?.name || authorRows[0]?.email || "Unknown author",
+  });
 
   res.json({
     success: true,

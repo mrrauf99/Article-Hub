@@ -271,7 +271,7 @@ export async function login(req, res) {
   const ipAddress = req.ip;
   const userAgent = req.get("user-agent");
 
-  sendLoginNotificationEmail({
+  await sendLoginNotificationEmail({
     to: user.email,
     name: user.name,
     ipAddress,
@@ -320,7 +320,7 @@ export async function verifyTwoFactorLogin(req, res) {
   const ipAddress = req.ip;
   const userAgent = req.get("user-agent");
 
-  sendLoginNotificationEmail({
+  await sendLoginNotificationEmail({
     to: user.email,
     name: user.name,
     ipAddress,
@@ -468,6 +468,14 @@ export async function completeGoogleSignup(req, res) {
 
   const token = generateToken(payload, "7d");
   setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
+
+  await sendLoginNotificationEmail({
+    to: email,
+    name,
+    ipAddress: req.ip,
+    userAgent: req.get("user-agent"),
+  });
+
   clearCookie(res, COOKIE_NAMES.OAUTH);
 
   return res.status(200).json({ success: true, redirectTo: "/user/dashboard" });
@@ -483,6 +491,13 @@ export async function googleOAuthCallback(req, res) {
       "7d",
     );
     setCookie(res, COOKIE_NAMES.ACCESS, token, 7 * 24 * 60 * 60 * 1000);
+
+    await sendLoginNotificationEmail({
+      to: user.email,
+      name: user.name,
+      ipAddress: req.ip,
+      userAgent: req.get("user-agent"),
+    });
 
     // Redirect based on role
     const dashboardPath =

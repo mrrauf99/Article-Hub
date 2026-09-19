@@ -5,8 +5,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
  * Industry Standard Pagination Range Generator
  * Used in Shadcn UI, Ant Design, and Material-UI
  */
-function getPaginationRange(currentPage, totalPages, siblingCount = 1) {
-  const totalPageNumbers = siblingCount + 5;
+function getPaginationRange(currentPage, totalPages, siblingCount = 0) {
+  const totalPageNumbers = siblingCount + 3;
 
   if (totalPages <= totalPageNumbers) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -22,13 +22,13 @@ function getPaginationRange(currentPage, totalPages, siblingCount = 1) {
   const lastPageIndex = totalPages;
 
   if (!shouldShowLeftEllipsis && shouldShowRightEllipsis) {
-    const leftItemCount = 3 + 2 * siblingCount;
+    const leftItemCount = 2 + 2 * siblingCount;
     const leftRange = Array.from({ length: leftItemCount }, (_, i) => i + 1);
     return [...leftRange, "...", lastPageIndex];
   }
 
   if (shouldShowLeftEllipsis && !shouldShowRightEllipsis) {
-    const rightItemCount = 3 + 2 * siblingCount;
+    const rightItemCount = 2 + 2 * siblingCount;
     const rightRange = Array.from(
       { length: rightItemCount },
       (_, i) => totalPages - rightItemCount + i + 1,
@@ -62,10 +62,9 @@ const NAV_BTN =
 const NAV_BTN_FULL = `${NAV_BTN} ${INACTIVE_BTN}`;
 const INACTIVE_PAGE_BTN = `${BASE_BTN} ${INACTIVE_BTN}`;
 const ACTIVE_PAGE_BTN = `${BASE_BTN} ${ACTIVE_BTN}`;
-const ELLIPSIS_CLASSES =
-  "px-2 text-slate-400 text-sm font-medium select-none";
+const ELLIPSIS_CLASSES = "px-2 text-slate-400 text-sm font-medium select-none";
 
-function Pagination({ current, total, onChange, siblingCount = 1 }) {
+function Pagination({ current, total, onChange, siblingCount = 0 }) {
   const currentPage = Number(current) || 1;
   const totalPages = Number(total) || 1;
 
