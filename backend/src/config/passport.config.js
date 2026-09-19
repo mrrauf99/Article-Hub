@@ -17,13 +17,18 @@ export default function setupPassport() {
           const avatar = profile.photos?.[0]?.value || null;
 
           const { rows } = await db.query(
-            "SELECT id, role FROM users WHERE email = $1",
+            "SELECT id, role, email, name FROM users WHERE email = $1",
             [email],
           );
 
           // Existing user
           if (rows.length > 0) {
-            return done(null, { id: rows[0].id, role: rows[0].role });
+            return done(null, {
+              id: rows[0].id,
+              role: rows[0].role,
+              email: rows[0].email,
+              name: rows[0].name,
+            });
           }
 
           // New user
