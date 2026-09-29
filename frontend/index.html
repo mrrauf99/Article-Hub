@@ -8,31 +8,14 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- SEO Meta -->
+    <!--
+      Title only — every route renders its own <SEO> component (react-helmet-async),
+      which sets description/robots/canonical/OG/Twitter tags per page. Duplicating
+      those here would create two of each tag once Helmet mounts (react-helmet-async
+      only manages tags it renders itself, so it can't replace these static ones).
+      This title is just the pre-hydration fallback; Helmet overwrites document.title.
+    -->
     <title>Article Hub</title>
-    <meta
-      name="description"
-      content="Article Hub is a modern platform for publishing thoughtful articles on technology, education, and digital trends."
-    />
-    <meta name="robots" content="index, follow" />
-
-    <!-- Open Graph (social preview) -->
-    <meta property="og:title" content="Article Hub" />
-    <meta
-      property="og:description"
-      content="A modern platform for publishing thoughtful articles on technology, education, and digital trends."
-    />
-    <meta property="og:image" content="https://articlehub.me/og-image.png" />
-    <meta property="og:url" content="https://articlehub.me" />
-    <meta property="og:type" content="website" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Article Hub" />
-    <meta
-      name="twitter:description"
-      content="A modern platform for publishing thoughtful articles on technology, education, and digital trends."
-    />
-    <meta name="twitter:image" content="https://articlehub.me/og-image.png" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14140F" />

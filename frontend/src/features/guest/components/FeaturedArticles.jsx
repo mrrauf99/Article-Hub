@@ -3,6 +3,7 @@ import { Eye, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
+import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
 
 export default function FeaturedArticles({ articles }) {
   const featured = articles
@@ -40,10 +41,11 @@ export default function FeaturedArticles({ articles }) {
             >
               <div className="aspect-[16/10] overflow-hidden bg-paper">
                 <img
-                  src={main.image_url}
+                  src={optimizeCloudinaryUrl(main.image_url)}
                   alt={main.title}
                   className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-500"
-                  loading="lazy"
+                  loading="eager"
+                  fetchpriority="high"
                 />
               </div>
               <div className="p-5 sm:p-6">
@@ -85,7 +87,7 @@ export default function FeaturedArticles({ articles }) {
                 >
                   <div className="w-28 sm:w-32 aspect-square shrink-0 rounded-lg overflow-hidden bg-paper">
                     <img
-                      src={article.image_url}
+                      src={optimizeCloudinaryUrl(article.image_url)}
                       alt={article.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"

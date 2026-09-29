@@ -7,6 +7,7 @@ import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
+import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
 
 /**
  * Guest-facing reading view. Kept separate from the shared
@@ -61,10 +62,41 @@ export default function PublicArticleDetailPage() {
   if (article.published_at) articleSchema.datePublished = article.published_at;
   if (article.updated_at) articleSchema.dateModified = article.updated_at;
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_CONFIG.siteUrl },
+      ...(article.category
+        ? [
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: article.category,
+              item: `${SITE_CONFIG.siteUrl}/?category=${encodeURIComponent(article.category)}`,
+            },
+          ]
+        : []),
+      {
+        "@type": "ListItem",
+        position: article.category ? 3 : 2,
+        name: capitalizeFirstLetter(article.title),
+        item: canonicalUrl,
+      },
+    ],
+  };
+
   function buildDescription({ introduction, summary, content }) {
     const preferred = introduction || summary || content || "";
     const cleanText = stripMarkdown(preferred.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " "));
-    return cleanText.slice(0, 180) || SITE_CONFIG.description;
+    return truncateAtWordBoundary(cleanText, 180) || SITE_CONFIG.description;
+  }
+
+  function truncateAtWordBoundary(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    const truncated = text.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(" ");
+    return `${lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated}…`;
   }
 
   async function handleShare() {
@@ -90,7 +122,7 @@ export default function PublicArticleDetailPage() {
         canonicalPath={canonicalPath}
         image={imageUrl}
         type="article"
-        schema={[articleSchema]}
+        schema={[articleSchema, breadcrumbSchema]}
       />
 
       <div className="w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
@@ -149,10 +181,11 @@ export default function PublicArticleDetailPage() {
 
           {article.image_url && (
             <img
-              src={article.image_url}
+              src={optimizeCloudinaryUrl(article.image_url)}
               alt={article.title}
               className="w-full rounded-xl mb-10 object-cover border border-hairline"
-              loading="lazy"
+              loading="eager"
+              fetchpriority="high"
             />
           )}
 

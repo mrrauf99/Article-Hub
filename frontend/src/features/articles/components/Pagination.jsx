@@ -1,4 +1,5 @@
 import { useMemo, useCallback, useTransition, memo } from "react";
+import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
@@ -63,7 +64,7 @@ const INACTIVE_PAGE_BTN = `${BASE_BTN} ${INACTIVE_BTN}`;
 const ACTIVE_PAGE_BTN = `${BASE_BTN} ${ACTIVE_BTN}`;
 const ELLIPSIS_CLASSES = "px-2 text-slate-400 text-sm font-medium select-none";
 
-function Pagination({ current, total, onChange, siblingCount = 0 }) {
+function Pagination({ current, total, onChange, siblingCount = 0, getHref }) {
   const currentPage = Number(current) || 1;
   const totalPages = Number(total) || 1;
 
@@ -104,15 +105,31 @@ function Pagination({ current, total, onChange, siblingCount = 0 }) {
       aria-label="Pagination"
       aria-busy={isPending}
     >
-      <button
-        disabled={currentPage === 1 || isPending}
-        onClick={() => handlePageChange(currentPage - 1)}
-        className={NAV_BTN_FULL}
-        aria-label="Previous page"
-      >
-        <ChevronLeft className="w-4 h-4" />
-        Prev
-      </button>
+      {currentPage === 1 || isPending ? (
+        <button disabled className={NAV_BTN_FULL} aria-label="Previous page">
+          <ChevronLeft className="w-4 h-4" />
+          Prev
+        </button>
+      ) : getHref ? (
+        <Link
+          to={getHref(currentPage - 1)}
+          preventScrollReset
+          className={NAV_BTN_FULL}
+          aria-label="Previous page"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Prev
+        </Link>
+      ) : (
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          className={NAV_BTN_FULL}
+          aria-label="Previous page"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Prev
+        </button>
+      )}
 
       {paginationRange.map((page, index) => {
         if (page === "...") {
@@ -124,27 +141,64 @@ function Pagination({ current, total, onChange, siblingCount = 0 }) {
         }
 
         const isActive = page === currentPage;
+
+        if (isActive) {
+          return (
+            <span key={page} className={ACTIVE_PAGE_BTN} aria-current="page">
+              {page}
+            </span>
+          );
+        }
+
+        if (getHref) {
+          return (
+            <Link
+              key={page}
+              to={getHref(page)}
+              preventScrollReset
+              className={INACTIVE_PAGE_BTN}
+            >
+              {page}
+            </Link>
+          );
+        }
+
         return (
           <button
             key={page}
             onClick={() => handlePageChange(page)}
-            className={isActive ? ACTIVE_PAGE_BTN : INACTIVE_PAGE_BTN}
-            aria-current={isActive ? "page" : undefined}
+            className={INACTIVE_PAGE_BTN}
           >
             {page}
           </button>
         );
       })}
 
-      <button
-        disabled={currentPage === totalPages || isPending}
-        onClick={() => handlePageChange(currentPage + 1)}
-        className={NAV_BTN_FULL}
-        aria-label="Next page"
-      >
-        Next
-        <ChevronRight className="w-4 h-4" />
-      </button>
+      {currentPage === totalPages || isPending ? (
+        <button disabled className={NAV_BTN_FULL} aria-label="Next page">
+          Next
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      ) : getHref ? (
+        <Link
+          to={getHref(currentPage + 1)}
+          preventScrollReset
+          className={NAV_BTN_FULL}
+          aria-label="Next page"
+        >
+          Next
+          <ChevronRight className="w-4 h-4" />
+        </Link>
+      ) : (
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          className={NAV_BTN_FULL}
+          aria-label="Next page"
+        >
+          Next
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      )}
     </nav>
   );
 }

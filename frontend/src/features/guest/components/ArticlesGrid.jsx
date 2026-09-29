@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Layers } from "lucide-react";
 import ArticleCard from "@/features/articles/components/ArticleCard";
 import Pagination from "@/features/articles/components/Pagination";
@@ -18,6 +19,8 @@ export default function ArticlesGrid({
   onPageChange,
   totalCount,
   totalPages,
+  getPageHref,
+  getCategoryHref,
 }) {
   const safePage = Math.min(Math.max(page, 1), totalPages || 1);
   const resolvedTotalCount = totalCount ?? articles.length;
@@ -76,19 +79,38 @@ export default function ArticlesGrid({
         </div>
 
         <div className="hidden lg:flex flex-wrap gap-2 mb-10">
-          {primaryCategories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => onCategorySelect(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                activeCategory === cat
-                  ? "bg-ink text-paper"
-                  : "bg-paper-raised text-ink-muted border border-hairline hover:border-hairline-strong hover:text-ink"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {primaryCategories.map((cat) => {
+            const isActive = activeCategory === cat;
+            const chipClassName = `px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-ink text-paper"
+                : "bg-paper-raised text-ink-muted border border-hairline hover:border-hairline-strong hover:text-ink"
+            }`;
+
+            if (getCategoryHref) {
+              return (
+                <Link
+                  key={cat}
+                  to={getCategoryHref(cat)}
+                  preventScrollReset
+                  aria-current={isActive ? "true" : undefined}
+                  className={chipClassName}
+                >
+                  {cat}
+                </Link>
+              );
+            }
+
+            return (
+              <button
+                key={cat}
+                onClick={() => onCategorySelect(cat)}
+                className={chipClassName}
+              >
+                {cat}
+              </button>
+            );
+          })}
           {overflowCategories.length > 0 && (
             <CategoryFilter
               categories={overflowCategories}
@@ -147,7 +169,12 @@ export default function ArticlesGrid({
 
         {totalPages > 1 && articles.length > 0 && (
           <div className="mt-10">
-            <Pagination current={safePage} total={totalPages} onChange={onPageChange} />
+            <Pagination
+              current={safePage}
+              total={totalPages}
+              onChange={onPageChange}
+              getHref={getPageHref}
+            />
           </div>
         )}
       </div>
