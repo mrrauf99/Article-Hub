@@ -46,7 +46,7 @@ export function ScrollReveal({
   return (
     <div
       ref={ref}
-      className={`transition-all ease-out ${className} ${
+      className={`transition-[opacity,transform] ease-out ${className} ${
         isVisible ? anim.visible : anim.hidden
       }`}
       style={{
@@ -106,7 +106,7 @@ export function StaggerReveal({
         ? children.map((child, index) => (
             <div
               key={index}
-              className={`transition-all ease-out ${childClassName} ${
+              className={`transition-[opacity,transform] ease-out ${childClassName} ${
                 isVisible ? anim.visible : anim.hidden
               }`}
               style={{

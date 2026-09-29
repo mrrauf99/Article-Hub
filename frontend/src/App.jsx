@@ -112,8 +112,12 @@ import UserLayout from "./layouts/UserLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
 
-import ArticleDetailPage from "./features/articles/pages/ArticleDetailPage.jsx";
-import PublicArticleDetailPage from "./features/articles/pages/PublicArticleDetailPage.jsx";
+const ArticleDetailPage = lazy(
+  () => import("./features/articles/pages/ArticleDetailPage.jsx"),
+);
+const PublicArticleDetailPage = lazy(
+  () => import("./features/articles/pages/PublicArticleDetailPage.jsx"),
+);
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
 
 import "./index.css";
