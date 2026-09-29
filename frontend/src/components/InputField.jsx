@@ -117,7 +117,7 @@ export default function InputField({
       </div>
 
       {error && (
-        <p id={errorId} className={`${FIELD_ERROR} mt-1.5`}>
+        <p id={errorId} role="alert" className={`${FIELD_ERROR} mt-1.5`}>
           {error}
         </p>
       )}

@@ -84,6 +84,18 @@ export default function CategoryFilter({
     return () => window.removeEventListener("scroll", handleScroll, true);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen]);
+
   const handleSelect = (category) => {
     onChange(category);
     setIsOpen(false);
@@ -96,6 +108,8 @@ export default function CategoryFilter({
   const dropdownMenu = isOpen && (
     <div
       ref={dropdownRef}
+      role="listbox"
+      aria-label={placeholder}
       style={{
         position: "fixed",
         top: dropdownPosition.top,
@@ -119,6 +133,8 @@ export default function CategoryFilter({
         {displayCategories.map((category) => (
           <button
             type="button"
+            role="option"
+            aria-selected={activeCategory === category}
             key={category}
             onClick={() => handleSelect(category)}
             className={`w-full flex items-center justify-between pl-4 pr-3 py-2.5 text-left transition-colors focus:outline-none ${
@@ -161,6 +177,8 @@ export default function CategoryFilter({
         type="button"
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
         className={
           isMoreButton
           ? `flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${moreButtonBaseClasses} ${
