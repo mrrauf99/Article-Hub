@@ -1,0 +1,12 @@
+# Article Hub
+
+> A modern platform for publishing thoughtful articles on technology, education, and digital trends.
+
+Article Hub is a moderated, multi-author publishing platform. Published articles are
+listed on the homepage and linked from [the sitemap](https://articlehub.me/sitemap.xml).
+
+## Site
+
+- [Home](https://articlehub.me/): latest published articles, browsable by category.
+- [About](https://articlehub.me/about): what Article Hub is and how it works.
+- [Contact](https://articlehub.me/contact): get in touch.

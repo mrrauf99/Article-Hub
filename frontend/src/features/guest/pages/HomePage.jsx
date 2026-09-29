@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useLoaderData, useLocation, useSearchParams } from "react-router-dom";
 
 import HeroSection from "../components/HeroSection";
@@ -52,6 +52,42 @@ export default function HomePage() {
   const totalArticles = meta?.overallCount ?? articles.length;
   const canonicalPath = `${location.pathname}${location.search}`;
 
+  // Loading "/#articles" directly (a shared link, or a browser back/forward
+  // restore) lands before the section has mounted, so the browser's native
+  // scroll-to-anchor attempt fires against an empty page and is never
+  // retried. Re-attempt it once the section exists.
+  useEffect(() => {
+    if (location.hash !== "#articles") return;
+    const timeoutId = setTimeout(() => {
+      requestAnimationFrame(() => {
+        const target = document.getElementById("articles");
+        if (!target) return;
+        const rect = target.getBoundingClientRect();
+        const scrollY = window.pageYOffset || window.scrollY;
+        const top = Math.max(0, rect.top + scrollY - 20);
+        window.scrollTo({ top, behavior: "smooth" });
+      });
+    }, 150);
+    return () => clearTimeout(timeoutId);
+  }, [location.hash]);
+
+  function getPageHref(page) {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  }
+
+  function getCategoryHref(category) {
+    const params = new URLSearchParams(searchParams);
+    if (category === "All") {
+      params.delete("category");
+    } else {
+      params.set("category", category);
+    }
+    params.set("page", "1");
+    return `${location.pathname}?${params.toString()}`;
+  }
+
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -89,7 +125,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-paper font-ui">
       <SEO
-        title={SITE_CONFIG.name}
+        title={`${SITE_CONFIG.name} — ${SITE_CONFIG.tagline}`}
         description={SITE_CONFIG.description}
         canonicalPath={canonicalPath}
         schema={[organizationSchema, websiteSchema]}
@@ -107,6 +143,8 @@ export default function HomePage() {
         onPageChange={handlePageChange}
         totalCount={pagination?.totalCount ?? articles.length}
         totalPages={pagination?.totalPages ?? 1}
+        getPageHref={getPageHref}
+        getCategoryHref={getCategoryHref}
       />
 
       <NewsletterSection />

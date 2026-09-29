@@ -1,23 +1,21 @@
 import { useState, memo } from "react";
 import { Eye, Trash2, Edit, Calendar } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import StatusBadge from "./StatusBadge";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { userApi } from "@/features/api/userApi";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
+import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
 
 function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
   const navigate = useNavigate();
+  const articleUrl = `${basePath}/${article.id}`;
   const [imgLoaded, setImgLoaded] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
-
-  const openArticle = () => {
-    navigate(`${basePath}/${article.id}`);
-  };
 
   const handleEdit = (e) => {
     e.stopPropagation();
@@ -62,23 +60,13 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
   return (
     <>
       <article
-        onClick={openArticle}
-        onKeyDown={(e) => {
-          if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
-            e.preventDefault();
-            openArticle();
-          }
-        }}
-        role="link"
-        tabIndex={0}
-        aria-label={capitalizeFirstLetter(article.title)}
         draggable
         onDragStart={(e) => {
-          const url = `${window.location.origin}${basePath}/${article.id}`;
+          const url = `${window.location.origin}${articleUrl}`;
           e.dataTransfer.setData("text/uri-list", url);
           e.dataTransfer.setData("text/plain", url);
         }}
-        className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 cursor-pointer group overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2"
+        className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-[box-shadow,border-color] duration-300 group overflow-hidden"
       >
         {/* status */}
         {mode !== "guest" && (
@@ -99,60 +87,67 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
           </div>
         )}
 
-        {/* image */}
-        {article.image_url && (
-          <div className="h-48 relative overflow-hidden bg-slate-100">
-            {!imgLoaded && (
-              <div className="absolute inset-0 animate-pulse bg-slate-100" />
-            )}
+        <Link
+          to={articleUrl}
+          aria-label={capitalizeFirstLetter(article.title)}
+          className="block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2 rounded-2xl"
+        >
+          {/* image */}
+          {article.image_url && (
+            <div className="h-48 relative overflow-hidden bg-slate-100">
+              {!imgLoaded && (
+                <div className="absolute inset-0 animate-pulse bg-slate-100" />
+              )}
 
-            <img
-              src={article.image_url}
-              alt={article.title}
-              onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full object-contain transition-transform duration-500 group-hover:scale-105
+              <img
+                src={optimizeCloudinaryUrl(article.image_url)}
+                alt={article.title}
+                loading="lazy"
+                onLoad={() => setImgLoaded(true)}
+                className={`w-full h-full object-contain transition-transform duration-500 group-hover:scale-105
         ${imgLoaded ? "opacity-100" : "opacity-0"}`}
-            />
-          </div>
-        )}
+              />
+            </div>
+          )}
 
-        {/* content */}
-        <div className="p-5">
-          <div className="flex justify-between items-center mb-3">
-            <span className="bg-moss-50 text-moss-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-              {article.category}
-            </span>
+          {/* content */}
+          <div className="p-5">
+            <div className="flex justify-between items-center mb-3">
+              <span className="bg-moss-50 text-moss-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+                {article.category}
+              </span>
 
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full">
-              <Eye className="w-3.5 h-3.5" />
-              <span className="font-medium">{formatCount(article.views)}</span>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full">
+                <Eye className="w-3.5 h-3.5" />
+                <span className="font-medium">{formatCount(article.views)}</span>
+              </div>
+            </div>
+
+            <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-moss-700 transition-colors duration-200">
+              {capitalizeFirstLetter(article.title)}
+            </h3>
+
+            <p className="text-sm text-slate-600 line-clamp-2 mt-2 mb-4 leading-relaxed">
+              {stripMarkdown(article.summary)}
+            </p>
+
+            <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+              <span className="text-sm font-semibold text-slate-700">
+                {article.author_name}
+              </span>
+              <span className="flex items-center gap-1.5 text-xs text-slate-500">
+                <Calendar className="w-3.5 h-3.5" />
+                {article.published_at
+                  ? new Date(article.published_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "Draft"}
+              </span>
             </div>
           </div>
-
-          <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-moss-700 transition-colors duration-200">
-            {capitalizeFirstLetter(article.title)}
-          </h3>
-
-          <p className="text-sm text-slate-600 line-clamp-2 mt-2 mb-4 leading-relaxed">
-            {stripMarkdown(article.summary)}
-          </p>
-
-          <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-            <span className="text-sm font-semibold text-slate-700">
-              {article.author_name}
-            </span>
-            <span className="flex items-center gap-1.5 text-xs text-slate-500">
-              <Calendar className="w-3.5 h-3.5" />
-              {article.published_at
-                ? new Date(article.published_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })
-                : "Draft"}
-            </span>
-          </div>
-        </div>
+        </Link>
       </article>
 
       <ConfirmDialog
@@ -180,7 +175,7 @@ function ActionButton({ children, onClick, title }) {
       onClick={onClick}
       title={title}
       aria-label={title}
-      className="p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110"
+      className="p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg transition-[box-shadow,transform] duration-200 hover:scale-110"
     >
       {children}
     </button>
