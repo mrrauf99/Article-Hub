@@ -8,6 +8,13 @@ export function useScrollReveal(options = {}) {
   const [isVisible, setIsVisible] = useState(prefersReducedMotion);
   const ref = useRef(null);
 
+  // Depend on primitives, not `options` itself — every caller passes a
+  // fresh object literal each render, which previously tore down and
+  // recreated the IntersectionObserver (and re-ran this effect) on every
+  // re-render of every revealed card instead of only on mount.
+  const threshold = options.threshold || 0.1;
+  const rootMargin = options.rootMargin || "0px 0px -50px 0px";
+
   useEffect(() => {
     if (prefersReducedMotion) return;
 
@@ -22,11 +29,7 @@ export function useScrollReveal(options = {}) {
           observer.unobserve(element);
         }
       },
-      {
-        threshold: options.threshold || 0.1,
-        rootMargin: options.rootMargin || "0px 0px -50px 0px",
-        ...options,
-      }
+      { threshold, rootMargin },
     );
 
     observer.observe(element);
@@ -34,7 +37,7 @@ export function useScrollReveal(options = {}) {
     return () => {
       if (element) observer.unobserve(element);
     };
-  }, [options]);
+  }, [prefersReducedMotion, threshold, rootMargin]);
 
   return [ref, isVisible];
 }
