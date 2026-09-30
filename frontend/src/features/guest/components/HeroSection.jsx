@@ -56,9 +56,6 @@ export default function HeroSection({ articleCount, authorCount }) {
                 </div>
               ))}
             </dl>
-            <p className="mt-4 pt-4 border-t border-hairline text-sm text-moss-700 font-medium">
-              No ads. No algorithmic feed. Ever.
-            </p>
           </div>
         </div>
       </div>

@@ -51,7 +51,7 @@ function getPaginationRange(currentPage, totalPages, siblingCount = 0) {
 // Pre-computed class strings — defined once outside the component,
 // never reconstructed during re-renders.
 const BASE_BTN =
-  "min-w-[42px] h-[42px] rounded-xl text-sm font-semibold transition-colors duration-150 ease-out focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moss-600 focus-visible:ring-0";
+  "inline-flex items-center justify-center min-w-[42px] h-[42px] px-3 rounded-xl tabular-nums text-sm font-semibold transition-colors duration-150 ease-out focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moss-600 focus-visible:ring-0";
 const INACTIVE_BTN =
   "bg-white text-slate-600 border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900";
 const ACTIVE_BTN = "bg-moss-700 text-white border border-moss-700";

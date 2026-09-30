@@ -349,7 +349,7 @@ a.active:not(.signupBtn) {
   background: transparent;
   color: rgba(250, 250, 247, 0.75);
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.15s ease-out;
 }
 
 .mobileToggle:hover,
@@ -428,8 +428,11 @@ a.active:not(.signupBtn) {
   .mobileBackdrop,
   .mobileBackdropOpen,
   .mobileMenu,
-  .mobileMenu.open {
+  .mobileMenu.open,
+  .mobileMenuClose svg,
+  .iconTransition {
     transition-duration: 0.01ms;
+    transition-delay: 0s;
   }
 }
 
@@ -453,7 +456,27 @@ a.active:not(.signupBtn) {
   background: transparent;
   color: rgba(250, 250, 247, 0.75);
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.15s ease-out;
+}
+
+/* The drawer covers the navbar toggle, so its own X carries the open morph. */
+.mobileMenuClose svg {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+  transition:
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobileMenu.open .mobileMenuClose svg {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+  transition-delay: 0.1s;
+}
+
+.mobileMenuClose:active,
+.mobileToggle:active {
+  transform: scale(0.9);
 }
 
 .mobileMenuClose:hover {
