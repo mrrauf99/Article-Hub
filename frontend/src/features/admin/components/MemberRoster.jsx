@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 
 import MemberAvatar from "./MemberAvatar";
-import { ROLE_LABEL } from "./RoleDialog";
-import { BTN_GHOST_SM, ICON_BTN } from "@/styles/panelClasses";
+import { ICON_BTN } from "@/styles/panelClasses";
 import { formatDate, plural } from "../utils/format";
+
+const ROLE_LABEL = { user: "Writer", admin: "Administrator" };
 
 // Breakpoint matches the sidebar's lg switch; the Articles count track is
 // trimmed so the flexible name column stays readable down to a 1024px viewport.
@@ -29,14 +30,6 @@ function RosterRow({ member, isSelf, onAction }) {
     <span className="text-sm text-ink-faint">Your account</span>
   ) : (
     <div className="-ml-3 flex items-center gap-2 lg:ml-0 lg:justify-end">
-      <button
-        type="button"
-        onClick={() => onAction("role", member)}
-        className={BTN_GHOST_SM}
-        aria-label={`Change role for ${name}`}
-      >
-        Change role
-      </button>
       <button
         type="button"
         onClick={() => onAction("delete", member)}

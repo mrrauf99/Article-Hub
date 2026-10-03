@@ -142,9 +142,6 @@ export default function AdminUserProfilePage() {
           </Link>
         ) : (
           <div className="-mr-3 flex items-center gap-2">
-            <button type="button" onClick={() => members.open("role", member)} className={BTN_SECONDARY}>
-              Change role
-            </button>
             <button
               type="button"
               onClick={() => members.open("delete", member)}
