@@ -11,12 +11,6 @@ export async function adminUsersAction({ request }) {
 
   try {
     switch (intent) {
-      case "changeRole": {
-        const newRole = formData.get("newRole");
-        await adminApi.updateUserRole(userId, newRole);
-        return handleActionSuccess("Role updated.");
-      }
-
       case "delete":
         await adminApi.deleteUser(userId);
         return handleActionSuccess("Member deleted.");

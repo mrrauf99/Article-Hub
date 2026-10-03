@@ -2,7 +2,6 @@ const VERB = {
   approve: "approve the article",
   reject: "reject the article",
   delete: "delete it",
-  changeRole: "change the role",
 };
 
 // Prefers the server's message when one was sent.
