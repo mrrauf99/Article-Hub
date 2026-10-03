@@ -6,13 +6,17 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "lint": "oxlint ."
+    "lint": "oxlint .",
+    "test": "node --test tests/**/*.test.js",
+    "prisma:generate": "prisma generate"
   },
   "keywords": [],
   "author": "Abdul Rauf",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.8.0",
     "compression": "^1.8.1",
@@ -29,9 +33,11 @@
     "pg": "^8.16.3",
     "qrcode": "^1.5.4",
     "resend": "^6.17.2",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
-    "oxlint": "latest"
+    "oxlint": "latest",
+    "prisma": "7.10.0"
   }
 }

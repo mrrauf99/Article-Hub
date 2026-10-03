@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               String         @id(map: "users_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String         @db.VarChar(100)
+  username         String         @unique(map: "users_username_key") @db.VarChar(50)
+  email            String         @unique(map: "users_email_key") @db.VarChar(255)
+  password         String         @db.Text
+  gender           String?        @db.VarChar(20)
+  avatarUrl        String?        @map("avatar_url") @db.Text
+  avatarPublicId   String?        @map("avatar_public_id") @db.Text
+  bio              String?        @db.Text
+  instagramUrl     String?        @map("instagram_url") @db.Text
+  xUrl             String?        @map("x_url") @db.Text
+  facebookUrl      String?        @map("facebook_url") @db.Text
+  country          String?        @db.VarChar(100)
+  joinedAt         DateTime       @default(now()) @map("joined_at") @db.Timestamptz(6)
+  role             String         @default("user") @db.VarChar(20)
+  expertise        String?        @db.Text
+  portfolioUrl     String?        @map("portfolio_url") @db.Text
+  linkedinUrl      String?        @map("linkedin_url") @db.Text
+  twoFactorEnabled Boolean        @default(false) @map("two_factor_enabled") @db.Boolean
+  twoFactorSecret  String?        @map("two_factor_secret") @db.Text
+  authProvider     String         @default("local") @map("auth_provider") @db.VarChar(50)
+  articles         Article[]
+  savedArticles    SavedArticle[]
+
+  @@index([role, joinedAt(sort: Desc)], map: "idx_users_role_joined")
+  @@index([joinedAt(sort: Desc)], map: "users_joined_at_idx")
+  @@map("users")
+}
+
+model Article {
+  id            String         @id(map: "articles_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title         String         @db.Text
+  introduction  String         @db.Text
+  content       String         @db.Text
+  summary       String         @db.Text
+  category      String         @db.VarChar(100)
+  status        String         @default("pending") @db.VarChar(20)
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  publishedAt   DateTime?      @map("published_at") @db.Timestamp(6)
+  imageUrl      String         @map("image_url") @db.Text
+  imagePublicId String         @map("image_public_id") @db.Text
+  views         Int            @default(0) @db.Integer
+  authorId      String         @map("author_id") @db.Uuid
+  author        User           @relation(fields: [authorId], references: [id], onDelete: Cascade, map: "fk_articles_user")
+  savedArticles SavedArticle[]
+
+  @@index([authorId, createdAt(sort: Desc)], map: "idx_articles_author_created")
+  @@index([authorId], map: "idx_articles_author_id")
+  @@index([status, category, publishedAt(sort: Desc)], map: "idx_articles_status_category_published")
+  @@index([status, createdAt(sort: Desc)], map: "idx_articles_status_created")
+  @@index([status, publishedAt(sort: Desc)], map: "idx_articles_status_published")
+  @@map("articles")
+}
+
+model SavedArticle {
+  userId    String   @map("user_id") @db.Uuid
+  articleId String   @map("article_id") @db.Uuid
+  savedAt   DateTime @default(now()) @map("saved_at") @db.Timestamptz(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "saved_articles_user_id_fkey")
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade, map: "saved_articles_article_id_fkey")
+
+  @@id([userId, articleId], map: "saved_articles_pkey")
+  @@index([articleId], map: "idx_saved_articles_article_id")
+  @@map("saved_articles")
+}
