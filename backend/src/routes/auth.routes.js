@@ -20,29 +20,43 @@ import { rateLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
 import { clearCookie } from "../config/cookie.js";
+import { validateRequest } from "../validations/common.validation.js";
+import {
+  emailAvailabilitySchema,
+  googleCompleteSchema,
+  loginSchema,
+  otpSchema,
+  passwordResetSchema,
+  signUpSchema,
+  twoFactorCodeSchema,
+  usernameAvailabilitySchema,
+} from "../validations/auth.validation.js";
 
 const authRoutes = Router();
 
-// Register new user
-authRoutes.post("/register", rateLimiter, signUp);
+authRoutes.post(
+  "/register",
+  rateLimiter,
+  validateRequest(signUpSchema, { format: "messageArray" }),
+  signUp,
+);
 
-// Verify OTP for signup
 authRoutes.post(
   "/signup/verify-otp",
   rateLimiter,
   authenticate(COOKIE_NAMES.SIGNUP),
+  validateRequest(otpSchema),
   verifyOtp,
 );
 
-// Verify OTP for password reset
 authRoutes.post(
   "/password-reset/verify-otp",
   rateLimiter,
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
+  validateRequest(otpSchema),
   verifyOtp,
 );
 
-// Resend OTP for signup
 authRoutes.post(
   "/signup/resend-otp",
   rateLimiter,
@@ -50,7 +64,6 @@ authRoutes.post(
   resendOtp,
 );
 
-// Resend OTP for password reset
 authRoutes.post(
   "/password-reset/resend-otp",
   rateLimiter,
@@ -58,17 +71,15 @@ authRoutes.post(
   resendOtp,
 );
 
-// User login
-authRoutes.post("/login", rateLimiter, login);
+authRoutes.post("/login", rateLimiter, validateRequest(loginSchema), login);
 
-// Verify 2FA code during login
 authRoutes.post(
   "/2fa/verify-login",
   authenticate(COOKIE_NAMES.TWO_FACTOR),
+  validateRequest(twoFactorCodeSchema),
   verifyTwoFactorLogin,
 );
 
-// Logout user (clear access token cookie)
 authRoutes.post("/logout", (req, res) => {
   clearCookie(res, COOKIE_NAMES.ACCESS);
 
@@ -78,10 +89,10 @@ authRoutes.post("/logout", (req, res) => {
   });
 });
 
-// Complete Google signup (username)
 authRoutes.post(
   "/oauth/complete",
   authenticate(COOKIE_NAMES.OAUTH),
+  validateRequest(googleCompleteSchema),
   completeGoogleSignup,
 );
 
@@ -103,25 +114,32 @@ authRoutes.get(
   googleOAuthCallback,
 );
 
-// Check availability of email
-authRoutes.post("/check-email", checkEmailAvailability);
+authRoutes.post(
+  "/check-email",
+  validateRequest(emailAvailabilitySchema),
+  checkEmailAvailability,
+);
 
-// Check availability of username
-authRoutes.post("/check-username", checkUsernameAvailability);
+authRoutes.post(
+  "/check-username",
+  validateRequest(usernameAvailabilitySchema),
+  checkUsernameAvailability,
+);
 
-// Initiate forgot password request
-authRoutes.post("/forgot-password", rateLimiter, forgetPassword);
+authRoutes.post(
+  "/forgot-password",
+  rateLimiter,
+  validateRequest(emailAvailabilitySchema),
+  forgetPassword,
+);
 
-// Reset password after OTP verification
 authRoutes.post(
   "/password-reset",
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
+  validateRequest(passwordResetSchema),
   passwordReset,
 );
 
-/* =========== FRONTEND LOADERS & TOKEN VERIFICATION =========== */
-
-// Verify signup token status
 authRoutes.get(
   "/signup-status",
   authenticate(COOKIE_NAMES.SIGNUP),
@@ -130,7 +148,6 @@ authRoutes.get(
   },
 );
 
-// Verify password-reset token status
 authRoutes.get(
   "/password-reset-status",
   authenticate(COOKIE_NAMES.PASSWORD_RESET),
@@ -139,7 +156,6 @@ authRoutes.get(
   },
 );
 
-// Verify OAuth profile completion token status
 authRoutes.get(
   "/oauth-status",
   authenticate(COOKIE_NAMES.OAUTH),
@@ -148,14 +164,12 @@ authRoutes.get(
   },
 );
 
-// Verify 2FA token status
 authRoutes.get(
   "/2fa-status",
   authenticate(COOKIE_NAMES.TWO_FACTOR),
   (req, res) => res.json({ success: true }),
 );
 
-// Check current user authentication status
 authRoutes.get("/status", authenticate(COOKIE_NAMES.ACCESS), (req, res) => {
   res.json({
     success: true,
