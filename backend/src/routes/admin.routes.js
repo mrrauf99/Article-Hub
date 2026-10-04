@@ -11,29 +11,54 @@ import {
   deleteArticle,
   getUsers,
   getUserDetails,
-  updateUserRole,
   deleteUser,
 } from "../controllers/admin.controller.js";
+import {
+  validateArticleIdParam,
+  validateUserIdParam,
+} from "../middlewares/validateArticleIdParam.middleware.js";
+import { validateRequest } from "../validations/common.validation.js";
+import {
+  adminArticlesQuerySchema,
+  adminUsersQuerySchema,
+  deletionReasonSchema,
+  reasonSchema,
+} from "../validations/article.validation.js";
 
 const adminRoutes = Router();
 
-// Dashboard
+adminRoutes.param("articleId", validateArticleIdParam);
+adminRoutes.param("userId", validateUserIdParam);
+
 adminRoutes.get("/dashboard/stats", getDashboardStats);
 adminRoutes.get("/dashboard/summary", getDashboardSummary);
 adminRoutes.get("/dashboard/recent", getDashboardRecentActivity);
 
-// Articles
-adminRoutes.get("/articles", getArticles);
+adminRoutes.get(
+  "/articles",
+  validateRequest(adminArticlesQuerySchema, { source: "query" }),
+  getArticles,
+);
 adminRoutes.get("/articles/pending", getPendingArticles);
 adminRoutes.get("/articles/:articleId", getArticleDetails);
 adminRoutes.patch("/articles/:articleId/approve", approveArticle);
-adminRoutes.patch("/articles/:articleId/reject", rejectArticle);
-adminRoutes.delete("/articles/:articleId", deleteArticle);
+adminRoutes.patch(
+  "/articles/:articleId/reject",
+  validateRequest(reasonSchema),
+  rejectArticle,
+);
+adminRoutes.delete(
+  "/articles/:articleId",
+  validateRequest(deletionReasonSchema),
+  deleteArticle,
+);
 
-// Users
-adminRoutes.get("/users", getUsers);
+adminRoutes.get(
+  "/users",
+  validateRequest(adminUsersQuerySchema, { source: "query" }),
+  getUsers,
+);
 adminRoutes.get("/users/:userId", getUserDetails);
-adminRoutes.patch("/users/:userId/role", updateUserRole);
 adminRoutes.delete("/users/:userId", deleteUser);
 
 export default adminRoutes;

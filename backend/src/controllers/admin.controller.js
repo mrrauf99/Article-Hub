@@ -1,75 +1,26 @@
-import db from "../config/db.config.js";
+import {
+  approveArticle as approveArticleRecord,
+  deleteAdminArticle,
+  deleteAdminUser,
+  getAdminArticleDetails,
+  getAdminArticles,
+  getAdminUserDetails,
+  getAdminUsers,
+  getDashboardStats as fetchDashboardStats,
+  getPendingArticles as fetchPendingArticles,
+  getRecentActivity as fetchRecentActivity,
+  rejectArticle as rejectArticleRecord,
+} from "../services/admin.service.js";
 import { deleteImageFromCloudinary } from "../services/cloudinary.service.js";
 import { sendArticleStatusEmail } from "../services/email.service.js";
 
-const ROLE_LABEL = { user: "Writer", admin: "Administrator" };
-
-async function fetchArticleAuthorDetails(articleId) {
-  const { rows } = await db.query(
-    `SELECT
-      a.id,
-      a.title,
-      u.name AS author_name,
-      u.email AS author_email
-     FROM articles a
-     JOIN users u ON u.id = a.author_id
-     WHERE a.id = $1`,
-    [articleId],
-  );
-
-  return rows[0] || null;
-}
-
-async function fetchDashboardStats() {
-  const { rows } = await db.query(`
-    SELECT
-      (SELECT COUNT(*) FROM users WHERE role = 'user') AS total_users,
-      (SELECT COUNT(*) FROM users WHERE role = 'admin') AS total_admins,
-      (SELECT COUNT(*) FROM articles) AS total_articles,
-      (SELECT COUNT(*) FROM articles WHERE status = 'approved') AS approved_articles,
-      (SELECT COUNT(*) FROM articles WHERE status = 'pending') AS pending_articles,
-      (SELECT COUNT(*) FROM articles WHERE status = 'rejected') AS rejected_articles,
-      (SELECT COALESCE(SUM(views), 0) FROM articles) AS total_views
-  `);
-
-  return rows[0];
-}
-
-async function fetchRecentActivity() {
-  const recentArticles = await db.query(`
-    SELECT
-      a.id,
-      a.title,
-      a.status,
-      a.created_at,
-      u.name AS author_name,
-      u.avatar_url AS author_avatar
-    FROM articles a
-    JOIN users u ON u.id = a.author_id
-    ORDER BY a.created_at DESC
-    LIMIT 5
-  `);
-
-  const recentUsers = await db.query(`
-    SELECT id, username, name, email, avatar_url, role, joined_at
-    FROM users
-    ORDER BY joined_at DESC
-    LIMIT 5
-  `);
-
-  return {
-    recentArticles: recentArticles.rows,
-    recentUsers: recentUsers.rows,
-  };
-}
-
-export const getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (_req, res) => {
   const [stats, recent] = await Promise.all([
     fetchDashboardStats(),
     fetchRecentActivity(),
   ]);
 
-  res.json({
+  return res.json({
     success: true,
     data: {
       stats,
@@ -79,381 +30,109 @@ export const getDashboardStats = async (req, res) => {
   });
 };
 
-export const getDashboardSummary = async (req, res) => {
+export const getDashboardSummary = async (_req, res) => {
   const stats = await fetchDashboardStats();
-  res.json({
-    success: true,
-    data: { stats },
-  });
+  return res.json({ success: true, data: { stats } });
 };
 
-export const getDashboardRecentActivity = async (req, res) => {
+export const getDashboardRecentActivity = async (_req, res) => {
   const recent = await fetchRecentActivity();
-  res.json({
-    success: true,
-    data: recent,
-  });
+  return res.json({ success: true, data: recent });
 };
 
 export const getArticles = async (req, res) => {
-  const { status = "all", search = "" } = req.query;
-
-  const page = Math.max(parseInt(req.query.page) || 1, 1);
-  const limit = Math.min(Math.max(parseInt(req.query.limit) || 9, 1), 45);
-
-  const offset = (page - 1) * limit;
-
-  let whereClause = "WHERE 1=1";
-  const params = [];
-  let paramIndex = 1;
-
-  if (status && status !== "all") {
-    whereClause += ` AND a.status = $${paramIndex}`;
-    params.push(status);
-    paramIndex++;
-  }
-
-  if (search) {
-    whereClause += ` AND (a.title ILIKE $${paramIndex} OR u.name ILIKE $${paramIndex})`;
-    params.push(`%${search}%`);
-    paramIndex++;
-  }
-
-  const countQuery = await db.query(
-    `SELECT COUNT(*) FROM articles a JOIN users u ON u.id = a.author_id ${whereClause}`,
-    params,
-  );
-  const totalCount = parseInt(countQuery.rows[0].count);
-
-  const articlesQuery = await db.query(
-    `SELECT
-        a.id,
-        a.title,
-        a.summary,
-        a.category,
-        a.status,
-        a.views,
-        a.image_url,
-        a.created_at,
-        a.published_at,
-        u.id AS author_id,
-        u.name AS author_name,
-        u.avatar_url AS author_avatar
-       FROM articles a
-       JOIN users u ON u.id = a.author_id
-       ${whereClause}
-       ORDER BY a.created_at DESC
-       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
-    [...params, limit, offset],
-  );
-
-  res.json({
-    success: true,
-    data: {
-      articles: articlesQuery.rows,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalCount,
-        totalPages: Math.ceil(totalCount / limit),
-      },
-    },
-  });
+  const data = await getAdminArticles(req.validated.query);
+  return res.json({ success: true, data });
 };
 
 export const getArticleDetails = async (req, res) => {
-  const { articleId } = req.params;
-  const { rows } = await db.query(
-    `SELECT
-        a.*,
-        u.id AS author_id,
-        u.name AS author_name,
-        u.email AS author_email,
-        u.avatar_url AS author_avatar
-       FROM articles a
-       JOIN users u ON u.id = a.author_id
-       WHERE a.id = $1`,
-    [articleId],
-  );
-
-  if (!rows.length) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Article not found." });
+  const article = await getAdminArticleDetails(req.params.articleId);
+  if (!article) {
+    return res.status(404).json({ success: false, message: "Article not found." });
   }
-
-  res.json({ success: true, data: rows[0] });
+  return res.json({ success: true, data: article });
 };
 
-export const getPendingArticles = async (req, res) => {
-  const { rows } = await db.query(
-    `SELECT
-        a.id,
-        a.title,
-        a.created_at,
-        u.name AS author_name
-       FROM articles a
-       JOIN users u ON u.id = a.author_id
-       WHERE a.status = 'pending'
-       ORDER BY a.created_at ASC`,
-  );
-
-  res.json({ success: true, data: rows });
+export const getPendingArticles = async (_req, res) => {
+  const articles = await fetchPendingArticles();
+  return res.json({ success: true, data: articles });
 };
 
 export const approveArticle = async (req, res) => {
-  const { articleId } = req.params;
+  const article = await approveArticleRecord(req.params.articleId);
+  if (!article) {
+    return res.status(404).json({ success: false, message: "Article not found." });
+  }
 
-  const { rowCount } = await db.query(
-    `UPDATE articles
-       SET status = 'approved',
-           published_at = NOW()
-       WHERE id = $1 AND status != 'approved'`,
-    [articleId],
-  );
-
-  if (!rowCount) {
-    return res.status(404).json({
-      success: false,
-      message: "Article not found.",
+  if (article.author.email) {
+    await sendArticleStatusEmail({
+      to: article.author.email,
+      name: article.author.name || "Author",
+      articleTitle: article.title,
+      status: "approved",
     });
   }
 
-  const authorDetails = await fetchArticleAuthorDetails(articleId);
-
-  if (!authorDetails) {
-    return res.status(404).json({
-      success: false,
-      message: "Article not found.",
-    });
-  }
-
-  await sendArticleStatusEmail({
-    to: authorDetails.author_email,
-    name: authorDetails.author_name,
-    articleTitle: authorDetails.title,
-    status: "approved",
-  });
-
-  res.json({ success: true, message: "Article approved." });
+  return res.json({ success: true, message: "Article approved." });
 };
 
 export const rejectArticle = async (req, res) => {
-  const { articleId } = req.params;
-  const reason = req.body.reason?.trim();
+  const reason = req.body.reason.trim();
+  const article = await rejectArticleRecord(req.params.articleId);
+  if (!article) {
+    return res.status(404).json({ success: false, message: "Article not found." });
+  }
 
-  if (!reason) {
-    return res.status(400).json({
-      success: false,
-      message: "Rejection reason is required.",
+  if (article.author.email) {
+    await sendArticleStatusEmail({
+      to: article.author.email,
+      name: article.author.name || "Author",
+      articleTitle: article.title,
+      status: "rejected",
+      reason,
     });
   }
 
-  const { rowCount } = await db.query(
-    `UPDATE articles
-       SET status = 'rejected',
-           published_at = NULL
-       WHERE id = $1 AND status != 'rejected'`,
-    [articleId],
-  );
-
-  if (!rowCount) {
-    return res.status(404).json({
-      success: false,
-      message: "Article not found.",
-    });
-  }
-
-  const authorDetails = await fetchArticleAuthorDetails(articleId);
-
-  if (!authorDetails) {
-    return res.status(404).json({
-      success: false,
-      message: "Article not found.",
-    });
-  }
-
-  await sendArticleStatusEmail({
-    to: authorDetails.author_email,
-    name: authorDetails.author_name,
-    articleTitle: authorDetails.title,
-    status: "rejected",
-    reason,
-  });
-
-  res.json({ success: true, message: "Article rejected." });
+  return res.json({ success: true, message: "Article rejected." });
 };
 
 export const deleteArticle = async (req, res) => {
-  const { articleId } = req.params;
-  const reason = req.body.reason?.trim();
-
-  if (!reason) {
-    return res.status(400).json({
-      success: false,
-      message: "Deletion reason is required.",
-    });
+  const reason = req.body.reason.trim();
+  const article = await deleteAdminArticle(req.params.articleId);
+  if (!article) {
+    return res.status(404).json({ success: false, message: "Article not found." });
   }
-
-  const { rows } = await db.query(
-    `SELECT
-        a.image_public_id,
-        a.title,
-        u.name AS author_name,
-        u.email AS author_email
-       FROM articles a
-       JOIN users u ON u.id = a.author_id
-       WHERE a.id = $1`,
-    [articleId],
-  );
-
-  if (rows.length === 0) {
-    return res.status(404).json({
-      success: false,
-      message: "Article not found.",
-    });
-  }
-
-  await db.query(`DELETE FROM articles WHERE id = $1`, [articleId]);
-
-  const article = rows[0];
-  const imagePublicId = article.image_public_id;
 
   try {
-    await deleteImageFromCloudinary(imagePublicId);
+    await deleteImageFromCloudinary(article.imagePublicId);
   } catch (deleteErr) {
-    // Best effort; the article is already deleted.
     console.error("Failed to delete image from Cloudinary:", deleteErr);
   }
 
-  await sendArticleStatusEmail({
-    to: article.author_email,
-    name: article.author_name,
-    articleTitle: article.title,
-    status: "deleted",
-    reason,
-  });
+  if (article.author.email) {
+    await sendArticleStatusEmail({
+      to: article.author.email,
+      name: article.author.name || "Author",
+      articleTitle: article.title,
+      status: "deleted",
+      reason,
+    });
+  }
 
-  res.json({ success: true, message: "Article deleted." });
+  return res.json({ success: true, message: "Article deleted." });
 };
 
 export const getUsers = async (req, res) => {
-  const { role = "all", search = "" } = req.query;
-  const page = Math.max(parseInt(req.query.page) || 1, 1);
-  const limit = Math.min(Math.max(parseInt(req.query.limit) || 9, 1), 45);
-  const offset = (page - 1) * limit;
-
-  let whereClause = "WHERE 1=1";
-  const params = [];
-  let paramIndex = 1;
-
-  if (role !== "all") {
-    whereClause += ` AND role = $${paramIndex}`;
-    params.push(role);
-    paramIndex++;
-  }
-
-  if (search) {
-    whereClause += ` AND (name ILIKE $${paramIndex} OR email ILIKE $${paramIndex} OR username ILIKE $${paramIndex})`;
-    params.push(`%${search}%`);
-    paramIndex++;
-  }
-
-  const countQuery = await db.query(
-    `SELECT COUNT(*) FROM users ${whereClause}`,
-    params,
-  );
-  const totalCount = parseInt(countQuery.rows[0].count);
-
-  const usersQuery = await db.query(
-    `SELECT
-        id,
-        username,
-        name,
-        email,
-        avatar_url,
-        role,
-        bio,
-        joined_at,
-        (SELECT COUNT(*) FROM articles WHERE author_id = users.id) AS article_count
-       FROM users
-       ${whereClause}
-       ORDER BY joined_at DESC
-       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
-    [...params, limit, offset],
-  );
-
-  res.json({
-    success: true,
-    data: {
-      users: usersQuery.rows,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalCount,
-        totalPages: Math.ceil(totalCount / limit),
-      },
-    },
-  });
+  const data = await getAdminUsers(req.validated.query);
+  return res.json({ success: true, data });
 };
 
 export const getUserDetails = async (req, res) => {
-  const { userId } = req.params;
-  const userQuery = await db.query(
-    `SELECT id, username, name, email, avatar_url, role, bio, expertise, gender, country, portfolio_url, x_url, linkedin_url, facebook_url, instagram_url, joined_at
-       FROM users WHERE id = $1`,
-    [userId],
-  );
-
-  if (!userQuery.rows.length) {
+  const data = await getAdminUserDetails(req.params.userId);
+  if (!data) {
     return res.status(404).json({ success: false, message: "User not found." });
   }
-
-  const articlesQuery = await db.query(
-    `SELECT id, title, status, created_at, views
-       FROM articles WHERE author_id = $1
-       ORDER BY created_at DESC`,
-    [userId],
-  );
-
-  res.json({
-    success: true,
-    data: {
-      user: userQuery.rows[0],
-      articles: articlesQuery.rows,
-    },
-  });
-};
-
-export const updateUserRole = async (req, res) => {
-  const { userId } = req.params;
-  const { role } = req.body;
-  const adminId = req.user.userId;
-
-  if (!["user", "admin"].includes(role)) {
-    return res.status(400).json({
-      success: false,
-      message: "That's not a valid role. Choose Writer or Administrator.",
-    });
-  }
-
-  if (userId === adminId) {
-    return res.status(400).json({
-      success: false,
-      message: "You can't change your own role.",
-    });
-  }
-
-  const { rowCount } = await db.query(
-    `UPDATE users SET role = $1 WHERE id = $2`,
-    [role, userId],
-  );
-
-  if (!rowCount) {
-    return res.status(404).json({ success: false, message: "User not found." });
-  }
-
-  res.json({ success: true, message: `Role updated to ${ROLE_LABEL[role]}.` });
+  return res.json({ success: true, data });
 };
 
 export const deleteUser = async (req, res) => {
@@ -461,56 +140,30 @@ export const deleteUser = async (req, res) => {
   const adminId = req.user.userId;
 
   if (userId === adminId) {
-    return res.status(400).json({
-      success: false,
-      message: "You can't delete your own account.",
-    });
+    return res.status(400).json({ success: false, message: "You can't delete your own account." });
   }
 
-  const userQuery = await db.query(
-    `SELECT avatar_public_id FROM users WHERE id = $1`,
-    [userId],
-  );
-
-  if (userQuery.rows.length === 0) {
+  const user = await deleteAdminUser(userId);
+  if (!user) {
     return res.status(404).json({ success: false, message: "User not found." });
   }
 
-  const { rows: articles } = await db.query(
-    `
-    DELETE FROM articles
-    WHERE author_id = $1
-    RETURNING image_public_id
-    `,
-    [userId],
-  );
-
   const deleteResults = await Promise.allSettled(
-    articles.map((article) =>
-      deleteImageFromCloudinary(article.image_public_id),
-    ),
+    user.articles.map((article) => deleteImageFromCloudinary(article.imagePublicId)),
   );
-
   deleteResults.forEach((result) => {
     if (result.status === "rejected") {
-      console.error(
-        "Failed to delete article image from Cloudinary:",
-        result.reason,
-      );
+      console.error("Failed to delete article image from Cloudinary:", result.reason);
     }
   });
 
-  await db.query(`DELETE FROM users WHERE id = $1`, [userId]);
-
-  const { avatar_public_id } = userQuery.rows[0];
-
-  if (avatar_public_id) {
+  if (user.avatarPublicId) {
     try {
-      await deleteImageFromCloudinary(avatar_public_id);
+      await deleteImageFromCloudinary(user.avatarPublicId);
     } catch (deleteErr) {
       console.error("Failed to delete avatar from Cloudinary:", deleteErr);
     }
   }
 
-  res.json({ success: true, message: "Member deleted." });
+  return res.json({ success: true, message: "Member deleted." });
 };
