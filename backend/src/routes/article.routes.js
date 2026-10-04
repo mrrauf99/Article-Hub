@@ -10,30 +10,42 @@ import {
 } from "../controllers/article.controller.js";
 
 import { uploadImage } from "../middlewares/uploadImage.middleware.js";
-import { authenticate } from "../middlewares/authenticate.middleware.js";
+import { authenticate, optionalAuthenticate } from "../middlewares/authenticate.middleware.js";
 import { COOKIE_NAMES } from "../constants/cookieNames.js";
 import { requireRole } from "../middlewares/requireRole.middleware.js";
 import { requireArticleOwner } from "../middlewares/requireArticleOwner.middleware.js";
+import { validateArticleIdParam } from "../middlewares/validateArticleIdParam.middleware.js";
+import { validateRequest } from "../validations/common.validation.js";
+import {
+  approvedArticlesQuerySchema,
+  articleWriteSchema,
+} from "../validations/article.validation.js";
 
 const articleRoutes = Router();
 
-articleRoutes.get("/", getApprovedArticles);
+articleRoutes.param("articleId", validateArticleIdParam);
+
+articleRoutes.get(
+  "/",
+  optionalAuthenticate(COOKIE_NAMES.ACCESS),
+  validateRequest(approvedArticlesQuerySchema, { source: "query" }),
+  getApprovedArticles,
+);
 
 articleRoutes.get("/me", authenticate(COOKIE_NAMES.ACCESS), getMyArticles);
 
-// For guest
-articleRoutes.get("/:articleId", getArticleById);
+articleRoutes.get("/:articleId", optionalAuthenticate(COOKIE_NAMES.ACCESS), getArticleById);
 
-// For user (approved , rejected, pending article)
+// Owners may read their articles at any moderation status.
 articleRoutes.get("/me/:articleId", authenticate(COOKIE_NAMES.ACCESS), requireArticleOwner, getArticleById);
 
-// Increment views
-articleRoutes.post("/:articleId/view", incrementArticleViews);
+articleRoutes.post("/:articleId/view", optionalAuthenticate(COOKIE_NAMES.ACCESS), incrementArticleViews);
 
 articleRoutes.post(
   "/",
   authenticate(COOKIE_NAMES.ACCESS),
   uploadImage.single("image"),
+  validateRequest(articleWriteSchema, { status: 422, format: "errors" }),
   createArticle,
 );
 
@@ -43,6 +55,7 @@ articleRoutes.patch(
   requireRole("user"),
   requireArticleOwner,
   uploadImage.single("image"),
+  validateRequest(articleWriteSchema, { status: 422, format: "errors" }),
   updateArticle,
 );
 

@@ -23,3 +23,20 @@ export const authenticate = (cookieName) => (req, res, next) => {
     });
   }
 };
+
+export const optionalAuthenticate = (cookieName) => (req, res, next) => {
+  try {
+    const token = req.cookies?.[cookieName];
+
+    if (token) {
+      const decoded = verifyToken(token);
+      req.user = decoded.user;
+      req.auth = decoded.auth;
+      req.type = decoded.type;
+    }
+  } catch {
+    // Ignore invalid/expired token for optional authentication
+  }
+
+  next();
+};

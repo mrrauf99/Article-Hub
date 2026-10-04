@@ -1,35 +1,24 @@
-import db from "../config/db.config.js";
-
-// Check article exists and user owns the article
+import { getArticleOwnership } from "../services/article.service.js";
 
 export async function requireArticleOwner(req, res, next) {
   const { articleId } = req.params;
-  const { userId } = req.user;
+  const article = await getArticleOwnership(articleId);
 
-  const { rows, rowCount } = await db.query(
-    `
-      SELECT author_id, image_url, image_public_id
-      FROM articles
-      WHERE id = $1
-    `,
-    [articleId],
-  );
-
-  if (rowCount === 0) {
+  if (!article) {
     return res.status(404).json({
       success: false,
       message: "Article not found.",
     });
   }
 
-  if (rows[0].author_id !== userId) {
+  if (article.author_id !== req.user.userId) {
     return res.status(403).json({
       success: false,
       message: "You can only edit or delete articles you wrote.",
     });
   }
 
-  req.article = rows[0];
+  req.article = article;
 
   next();
 }
