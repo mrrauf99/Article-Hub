@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
+import { OAuth2Client } from "google-auth-library";
 import {
   sendEmailVerificationOtp,
   sendLoginNotificationEmail,
@@ -11,6 +12,7 @@ import { COOKIE_NAMES } from "../constants/cookieNames.js";
 import {
   createGoogleUser,
   createSignupUser,
+  findUserForGoogleLogin,
   findUserForLogin,
   getPasswordByEmail,
   getTwoFactorLoginUser,
@@ -22,6 +24,7 @@ import {
 
 const MAX_VERIFY_ATTEMPTS = 5;
 const MAX_RESEND_COUNT = 3;
+const googleAuthClient = new OAuth2Client();
 
 export async function signUp(req, res) {
   const { email, username, name, password, country } = req.body;
@@ -436,10 +439,40 @@ export async function completeGoogleSignup(req, res) {
 }
 
 export async function googleOAuthCallback(req, res) {
-  const user = req.user;
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    return res.status(401).json({
+      success: false,
+      message: "Google sign-in could not be verified. Please try again.",
+    });
+  }
 
-  // Existing user
-  if (user.id) {
+  let googleProfile;
+  try {
+    const ticket = await googleAuthClient.verifyIdToken({
+      idToken: req.validated.body.credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    googleProfile = ticket.getPayload();
+  } catch {
+    return res.status(401).json({
+      success: false,
+      message: "Google sign-in could not be verified. Please try again.",
+    });
+  }
+
+  if (
+    !googleProfile?.email ||
+    googleProfile.email_verified !== true
+  ) {
+    return res.status(401).json({
+      success: false,
+      message: "Google sign-in could not be verified. Please try again.",
+    });
+  }
+
+  const user = await findUserForGoogleLogin(googleProfile.email);
+
+  if (user) {
     const token = generateToken(
       { type: "access", user: { userId: user.id, role: user.role } },
       "7d",
@@ -453,19 +486,19 @@ export async function googleOAuthCallback(req, res) {
       userAgent: req.get("user-agent"),
     });
 
-    // Redirect based on role
     const dashboardPath =
       user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
-    return res.redirect(`${process.env.CLIENT_BASE_URL}${dashboardPath}`);
+    return res.json({ success: true, redirectTo: dashboardPath });
   }
 
-  // New OAuth user, store temporary data
+  const name = googleProfile.name || googleProfile.email.split("@")[0];
+  const avatar = googleProfile.picture || null;
   const payload = {
     type: "oauth",
     user: {
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
+      email: googleProfile.email,
+      name,
+      avatar,
       completed: false,
     },
   };
@@ -473,5 +506,5 @@ export async function googleOAuthCallback(req, res) {
   const token = generateToken(payload, "5min");
   setCookie(res, COOKIE_NAMES.OAUTH, token, 5 * 60 * 1000);
 
-  return res.redirect(`${process.env.CLIENT_BASE_URL}/complete-profile`);
+  return res.json({ success: true, redirectTo: "/complete-profile" });
 }

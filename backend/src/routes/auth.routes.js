@@ -1,5 +1,4 @@
 import { Router } from "express";
-import passport from "passport";
 
 import {
   signUp,
@@ -30,6 +29,7 @@ import {
   signUpSchema,
   twoFactorCodeSchema,
   usernameAvailabilitySchema,
+  googleCredentialSchema,
 } from "../validations/auth.validation.js";
 
 const authRoutes = Router();
@@ -96,21 +96,12 @@ authRoutes.post(
   completeGoogleSignup,
 );
 
-// Redirect user to Google OAuth provider
-authRoutes.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  }),
-);
-
-// Google OAuth callback handler
-authRoutes.get(
+authRoutes.get("/google", (_req, res) => res.redirect(`${process.env.CLIENT_BASE_URL}/login`));
+authRoutes.get("/google/callback", (_req, res) => res.redirect(`${process.env.CLIENT_BASE_URL}/login`));
+authRoutes.post(
   "/google/callback",
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: `${process.env.CLIENT_BASE_URL}/login`,
-  }),
+  rateLimiter,
+  validateRequest(googleCredentialSchema),
   googleOAuthCallback,
 );
 

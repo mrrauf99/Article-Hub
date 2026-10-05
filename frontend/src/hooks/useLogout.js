@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { googleLogout } from "@react-oauth/google";
 import { authApi } from "@/features/api/authApi";
 
 export function useLogout() {
@@ -8,6 +9,7 @@ export function useLogout() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
+    googleLogout();
     try {
       await authApi.logout();
       navigate("/login", { replace: true });
