@@ -27,6 +27,8 @@ export const authApi = {
 
   oauthStatus: () => apiClient.get("auth/oauth-status"),
 
+  googleLogin: (data) => apiClient.post("auth/google/callback", data),
+
   // Check if the signup or password reset flow is still active
   checkSignupStatus: () => apiClient.get("auth/signup-status"),
 
