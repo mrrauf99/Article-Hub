@@ -4,12 +4,12 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
 
-
 import contactRoutes from "./routes/contact.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import articleRoutes from "./routes/article.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import savedArticleRoutes from "./routes/savedArticle.routes.js";
 
 import { authenticate } from "./middlewares/authenticate.middleware.js";
 import { requireRole } from "./middlewares/requireRole.middleware.js";
@@ -33,15 +33,17 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/health", (req, res) => {
-  return res
-    .status(200)
-    .json({ success: true, message: "Server is up and running." });
-});
-
-app.use("/api/contact", contactRoutes);
-app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/user", authenticate(COOKIE_NAMES.ACCESS), userRoutes);
+
+app.use(
+  "/api/saved-articles",
+  authenticate(COOKIE_NAMES.ACCESS),
+  requireRole("user"),
+  savedArticleRoutes,
+);
 
 app.use(
   "/api/admin",
@@ -50,7 +52,11 @@ app.use(
   adminRoutes,
 );
 
-app.use("/api/user", authenticate(COOKIE_NAMES.ACCESS), userRoutes);
+app.use("/health", (req, res) => {
+  return res
+    .status(200)
+    .json({ success: true, message: "Server is up and running." });
+});
 
 app.use((req, res) => {
   res.status(404).json({
