@@ -15,11 +15,6 @@ export default async function articleDetailLoader({ params, request }) {
 
     const article = data.data;
 
-    // Only increment views on public/user routes
-    if (!isAdminRoute) {
-      apiClient.post(`articles/${id}/view`).catch(() => {});
-    }
-
     return { article };
   } catch (error) {
     return handleLoaderError(error, {

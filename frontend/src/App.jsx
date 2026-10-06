@@ -119,6 +119,7 @@ const PublicArticleDetailPage = lazy(
   () => import("./features/articles/pages/PublicArticleDetailPage.jsx"),
 );
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
+import savedArticleAction from "./features/articles/actions/savedArticle.js";
 
 import "./index.css";
 
@@ -131,6 +132,10 @@ const router = createBrowserRouter([
       </Suspense>
     ),
     children: [
+      {
+        path: "saved-articles/:articleId",
+        action: savedArticleAction,
+      },
       /* ---------- PUBLIC ---------- */
       {
         id: "public-layout",

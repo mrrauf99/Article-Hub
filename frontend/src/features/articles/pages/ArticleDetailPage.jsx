@@ -10,6 +10,8 @@ import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 import { ARTICLE_PROSE, BTN_SECONDARY } from "@/styles/panelClasses";
 import StatusPill from "@/features/user/components/StatusPill";
 import AdminDecisionBar from "@/features/admin/components/AdminDecisionBar";
+import SaveArticleButton from "../components/SaveArticleButton";
+import useArticleView from "../hooks/useArticleView";
 
 const OWNER_NOTES = {
   pending: {
@@ -27,26 +29,25 @@ const OWNER_NOTES = {
 export default function ArticleDetailPage() {
   const { article } = useLoaderData();
   const location = useLocation();
+  const inAdmin = location.pathname.startsWith("/admin");
+  useArticleView(article, !inAdmin);
 
   const userPanel = useRouteLoaderData("user-layout");
   const [shareState, setShareState] = useState(null);
 
-  // Ensure page scrolls to top on mount (especially important for mobile)
   useEffect(() => {
     if (!article) return;
 
-    // Immediate scroll
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
-    // Additional scroll after render to handle mobile layout shifts
+    // Repeat after layout settles on mobile.
     const timeoutId = setTimeout(() => {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }, 0);
 
     return () => clearTimeout(timeoutId);
-  }, [article]); // Re-run if article changes
+  }, [article]);
 
-  /* ---------------- Guards ---------------- */
   if (!article) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center font-ui">
@@ -99,7 +100,6 @@ export default function ArticleDetailPage() {
     articleSchema.dateModified = article.updated_at;
   }
 
-  /* ---------------- Utils ---------------- */
   function buildDescription({ introduction, summary, content }) {
     const preferred = introduction || summary || content || "";
     const cleanText = stripMarkdown(preferred.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " "));
@@ -130,9 +130,11 @@ export default function ArticleDetailPage() {
     }
   }
 
-  const inAdmin = location.pathname.startsWith("/admin");
   const isOwner =
-    Boolean(userPanel) && (article.status !== "approved" || Boolean(location.state?.owned));
+    Boolean(userPanel) &&
+    (article.status !== "approved" ||
+      Boolean(article.author_id && userPanel.user?.id && article.author_id === userPanel.user.id) ||
+      Boolean(location.state?.owned));
   const back = inAdmin
     ? { to: "/admin/articles", label: "Articles" }
     : isOwner
@@ -227,6 +229,8 @@ export default function ArticleDetailPage() {
                 Edit
               </Link>
             )}
+
+            {!inAdmin && <SaveArticleButton article={article} />}
 
             {article.status === "approved" && (
               <button

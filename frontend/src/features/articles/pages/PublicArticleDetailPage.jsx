@@ -8,16 +8,13 @@ import { SITE_CONFIG } from "@/config/site.config";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
+import SaveArticleButton from "../components/SaveArticleButton";
+import useArticleView from "../hooks/useArticleView";
 
-/**
- * Guest-facing reading view. Kept separate from the shared
- * `ArticleDetailPage` — that component is also rendered inside the User and
- * Admin panels (`/user/articles/:id`, `/admin/articles/:id`), so it stays
- * untouched. Only the public `/articles/:id` route points here.
- */
 export default function PublicArticleDetailPage() {
   const { article } = useLoaderData();
   const location = useLocation();
+  useArticleView(article);
 
   const [copied, setCopied] = useState(false);
 
@@ -110,7 +107,7 @@ export default function PublicArticleDetailPage() {
         setTimeout(() => setCopied(false), 2000);
       }
     } catch {
-      // silent fail (user canceled share)
+      return;
     }
   }
 
@@ -168,6 +165,8 @@ export default function PublicArticleDetailPage() {
                 <Eye className="w-4 h-4 text-ink-faint" />
                 {formatCount(article.views)}
               </span>
+
+              <SaveArticleButton article={article} />
 
               <button
                 onClick={handleShare}

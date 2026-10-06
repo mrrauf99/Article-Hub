@@ -1,6 +1,6 @@
 import { useState, memo } from "react";
 import { Eye, Trash2, Edit, Calendar } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useMatches } from "react-router-dom";
 
 import StatusBadge from "./StatusBadge";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -8,8 +8,12 @@ import { userApi } from "@/features/api/userApi";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
 import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
+import SaveArticleButton from "./SaveArticleButton";
 
 function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
+  const matches = useMatches();
+  const user = matches.find((match) => match.data?.user)?.data.user;
+  const isAdmin = user?.role === "admin";
   const navigate = useNavigate();
   const articleUrl = `${basePath}/${article.id}`;
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -34,7 +38,6 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
     try {
       await userApi.deleteArticle(article.id);
 
-      // Call the onDelete callback if provided
       if (onDelete) {
         onDelete(article.id);
       }
@@ -68,7 +71,6 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
         }}
         className="relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-[box-shadow,border-color] duration-300 group overflow-hidden"
       >
-        {/* status */}
         {mode !== "guest" && (
           <div className="absolute top-3 left-3 z-10">
             <StatusBadge status={article.status} />
@@ -92,7 +94,6 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
           aria-label={capitalizeFirstLetter(article.title)}
           className="block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-2 rounded-2xl"
         >
-          {/* image */}
           {article.image_url && (
             <div className="h-48 relative overflow-hidden bg-slate-100">
               {!imgLoaded && (
@@ -110,7 +111,6 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
             </div>
           )}
 
-          {/* content */}
           <div className="p-5">
             <div className="flex justify-between items-center mb-3">
               <span className="bg-moss-50 text-moss-700 text-xs font-semibold px-3 py-1.5 rounded-full">
@@ -148,6 +148,11 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
             </div>
           </div>
         </Link>
+        {!isAdmin && (mode === "guest" || article.status === "approved") && (
+          <div className="border-t border-hairline px-5 py-3">
+            <SaveArticleButton article={article} />
+          </div>
+        )}
       </article>
 
       <ConfirmDialog
