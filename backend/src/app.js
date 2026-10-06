@@ -1,11 +1,9 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import passport from "passport";
 import helmet from "helmet";
 import compression from "compression";
 
-import setupPassport from "./config/passport.config.js";
 
 import contactRoutes from "./routes/contact.routes.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -34,9 +32,6 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
-
-setupPassport();
-app.use(passport.initialize());
 
 app.use("/health", (req, res) => {
   return res
