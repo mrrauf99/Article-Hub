@@ -119,7 +119,9 @@ const PublicArticleDetailPage = lazy(
   () => import("./features/articles/pages/PublicArticleDetailPage.jsx"),
 );
 import articleDetailLoader from "./features/articles/loaders/articleDetail.js";
+import savedArticlesLoader from "./features/articles/loaders/savedArticles.js";
 import savedArticleAction from "./features/articles/actions/savedArticle.js";
+const SavedArticlesPage = lazy(() => import("./features/articles/pages/SavedArticlesPage.jsx"));
 
 import "./index.css";
 
@@ -225,6 +227,11 @@ const router = createBrowserRouter([
         element: <UserLayout />,
         loader: userProfileLoader,
         children: [
+          {
+            path: "saved-articles",
+            element: <SavedArticlesPage />,
+            loader: savedArticlesLoader,
+          },
           {
             index: true,
             element: <Navigate to="dashboard" replace />,

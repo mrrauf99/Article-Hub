@@ -5,6 +5,7 @@ import {
   LogOut,
   ChevronDown,
   Shield,
+  Bookmark,
 } from "lucide-react";
 import styles from "@/styles/navbar.module.css";
 
@@ -126,6 +127,16 @@ export default function UserMenu({ role, userName, avatar, onLogout }) {
         <div className={styles.dropdownDivider} />
 
         <div className={styles.dropdownBody}>
+          {!isAdmin && (
+            <Link
+              to="/user/saved-articles"
+              className={styles.dropdownItem}
+              onClick={() => setOpen(false)}
+            >
+              <Bookmark className={styles.dropdownItemIcon} />
+              Saved articles
+            </Link>
+          )}
           <Link
             to={profilePath}
             className={styles.dropdownItem}

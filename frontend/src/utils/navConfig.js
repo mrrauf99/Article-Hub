@@ -7,6 +7,7 @@ import {
   PenSquare,
   Info,
   Mail,
+  Bookmark,
 } from "lucide-react";
 
 export function getNavItemsForRole(role) {
@@ -14,6 +15,7 @@ export function getNavItemsForRole(role) {
     return [
       { label: "Dashboard", href: "/user/dashboard", icon: LayoutDashboard },
       { label: "Explore", href: "/user/articles", icon: Compass },
+      { label: "Saved articles", href: "/user/saved-articles", icon: Bookmark },
       { label: "New article", href: "/user/articles/new", icon: PenSquare },
     ];
   }

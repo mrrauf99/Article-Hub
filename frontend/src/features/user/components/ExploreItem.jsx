@@ -4,11 +4,13 @@ import { FileText } from "lucide-react";
 
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
+import SaveArticleButton from "@/features/articles/components/SaveArticleButton";
+import StatusPill from "./StatusPill";
 
 // Reader-side list item for Explore inside the User Panel. The shared
 // ArticleCard stays on the Guest homepage; this one follows the panel's
 // hairline, no-card language.
-export default function ExploreItem({ article }) {
+export default function ExploreItem({ article, basePath = "/user/articles", showSavedAt = false }) {
   const [failed, setFailed] = useState(false);
   const title = capitalizeFirstLetter(article.title);
   const date = article.published_at
@@ -41,7 +43,7 @@ export default function ExploreItem({ article }) {
 
       <h2 className="mt-1.5 font-editorial text-xl leading-snug text-ink">
         <Link
-          to={`/user/articles/${article.id}`}
+          to={`${basePath}/${article.id}`}
           className="rounded-sm transition-colors after:absolute after:inset-0 after:content-[''] group-hover:text-moss-800 focus-visible:outline-none focus-visible:after:rounded-lg focus-visible:after:ring-2 focus-visible:after:ring-moss-600 focus-visible:after:ring-offset-4 focus-visible:after:ring-offset-paper"
         >
           {title}
@@ -59,6 +61,15 @@ export default function ExploreItem({ article }) {
         {date && <span>{date}</span>}
         <span className="tabular-nums">{formatCount(article.views)} {Number(article.views) === 1 ? "read" : "reads"}</span>
       </p>
+      {article.status && article.status !== "approved" && (
+        <div className="mt-3"><StatusPill status={article.status} /></div>
+      )}
+      {showSavedAt && article.saved_at && (
+        <p className="mt-3 text-sm text-ink-muted">
+          Saved <time dateTime={article.saved_at}>{new Date(article.saved_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</time>
+        </p>
+      )}
+      <div className="mt-4"><SaveArticleButton article={article} /></div>
     </article>
   );
 }
