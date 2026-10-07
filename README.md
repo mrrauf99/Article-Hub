@@ -83,21 +83,3 @@ Install and run the frontend separately from `frontend/`. When `VITE_GOOGLE_CLIE
 ## 📄 License
 
 This project is licensed under the **MIT License**.
-
----
-
-## 👨‍💻 Author
-
-<div align="center">
-
-**Made with ❤️ by Abdul Rauf**
-
-[GitHub](https://github.com/mrrauf99) •
-[LinkedIn](https://www.linkedin.com/in/abdul-rauf-026852381/) •
-[Email](mailto:itxrauf99@gmail.com)
-
-</div>
-
----
-
-⭐ If you find this project helpful, consider giving it a star!

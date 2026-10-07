@@ -17,9 +17,11 @@ frontend/dist/
 CLAUDE.md
 
 .impeccable/
-*.md
 .playwright-mcp/
-
+AGENTS.md
+graphify-out/
+.agents/
+.codex/
 
 # IDE
 .vscode/
