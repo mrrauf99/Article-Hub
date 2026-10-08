@@ -35,11 +35,6 @@ export const getDashboardSummary = async (_req, res) => {
   return res.json({ success: true, data: { stats } });
 };
 
-export const getDashboardRecentActivity = async (_req, res) => {
-  const recent = await fetchRecentActivity();
-  return res.json({ success: true, data: recent });
-};
-
 export const getArticles = async (req, res) => {
   const data = await getAdminArticles(req.validated.query);
   return res.json({ success: true, data });

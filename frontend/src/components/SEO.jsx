@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { SITE_CONFIG } from "@/config/site.config";
+import toCanonicalUrl from "@/utils/canonicalUrl";
 
 const DEFAULT_LOCALE = "en_US";
 
@@ -30,17 +31,14 @@ export default function SEO({
   schema = [],
 }) {
   const siteUrl = SITE_CONFIG.siteUrl || "https://articlehub.me";
-  const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+  const canonicalUrl = toCanonicalUrl(canonicalPath);
   const metaDescription = description || SITE_CONFIG.description;
   const metaTitle = buildTitle(title);
   const isDefaultImage = !image;
   const imageUrl = toAbsoluteUrl(image || SITE_CONFIG.ogImage);
   const robots = `${noindex ? "noindex" : "index"}, ${nofollow ? "nofollow" : "follow"}`;
 
-  // Pages that don't build their own schema (About, Contact, Privacy,
-  // Terms, …) still get a minimal, accurate WebPage entry from the same
-  // title/description/url every page already renders as meta tags —
-  // nothing here is data the frontend doesn't already have.
+  // Give pages without route-specific structured data a basic WebPage entry.
   const schemaEntries =
     schema.length > 0
       ? schema

@@ -13,6 +13,9 @@ export default function CountryDropdown({
   required,
 }) {
   const triggerId = id || name;
+  const labelId = `${triggerId}-label`;
+  const valueId = `${triggerId}-value`;
+  const requiredId = `${triggerId}-required`;
   const errorId = `${triggerId}-error`;
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -54,14 +57,20 @@ export default function CountryDropdown({
 
   return (
     <div ref={dropdownRef} className="relative">
-      <label htmlFor={triggerId} className={styles.label}>
+      <span id={labelId} className={styles.label}>
         Country/Region
-      </label>
+      </span>
+      {required && (
+        <span id={requiredId} className="sr-only">
+          Required
+        </span>
+      )}
 
       <div
         id={triggerId}
         role="button"
         tabIndex={0}
+        aria-labelledby={`${labelId} ${valueId}`}
         onClick={handleToggle}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -71,14 +80,14 @@ export default function CountryDropdown({
         }}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-required={required || undefined}
         aria-invalid={hasError || undefined}
-        aria-describedby={hasError ? errorId : undefined}
+        aria-describedby={hasError ? errorId : required ? requiredId : undefined}
         className={`${styles.input} ${hasError ? styles.inputError : ""}`}
       >
         <Globe className="w-5 h-5 text-ink-faint" aria-hidden="true" />
 
         <span
+          id={valueId}
           className={
             isPlaceholder ? styles.placeholderValue : styles.selectedValue
           }
@@ -98,6 +107,8 @@ export default function CountryDropdown({
 
             <input
               type="text"
+              aria-label="Search countries"
+              autoComplete="off"
               placeholder="Search countries..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

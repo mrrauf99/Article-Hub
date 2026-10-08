@@ -19,9 +19,8 @@ export const adminArticlesQuerySchema = paginationQuerySchema.extend({
 });
 
 export const adminUsersQuerySchema = paginationQuerySchema.extend({
-  role: z.string().default("all"),
   search: z.string().default(""),
-});
+}).strict();
 
 export const reasonSchema = z.object({
   reason: z.string().trim().min(1, "Rejection reason is required."),

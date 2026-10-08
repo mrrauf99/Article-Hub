@@ -5,11 +5,10 @@ import {
   Navigate,
 } from "react-router-dom";
 
+import LoginPage from "./features/auth/pages/LoginPage.jsx";
 import PageLoader from "./components/PageLoader.jsx";
 
-// Auth - Critical (keep static)
-import LoginPage from "./features/auth/pages/LoginPage.jsx";
-import SignUpPage from "./features/auth/pages/SignUpPage.jsx";
+const SignUpPage = lazy(() => import("./features/auth/pages/SignUpPage.jsx"));
 
 // Auth - Secondary (lazy load)
 const ForgotPasswordPage = lazy(

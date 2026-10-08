@@ -37,7 +37,7 @@ export default function AuthLayout({ title, subtitle, children }) {
       {/* Spacer that reserves the fixed panel's width in normal flow */}
       <div className="hidden lg:block lg:w-[42%] shrink-0" aria-hidden="true" />
 
-      <div className="flex-1 flex flex-col justify-center px-5 py-10 sm:px-10 sm:py-14 lg:px-16 xl:px-24">
+      <main className="flex-1 flex flex-col justify-center px-5 py-10 sm:px-10 sm:py-14 lg:px-16 xl:px-24">
         <div className="w-full max-w-sm mx-auto">
           <Link
             to="/"
@@ -68,7 +68,7 @@ export default function AuthLayout({ title, subtitle, children }) {
 
           {children}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

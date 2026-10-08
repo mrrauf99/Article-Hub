@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
   getDashboardStats,
   getDashboardSummary,
-  getDashboardRecentActivity,
   getArticles,
   getArticleDetails,
   getPendingArticles,
@@ -32,7 +31,6 @@ adminRoutes.param("userId", validateUserIdParam);
 
 adminRoutes.get("/dashboard/stats", getDashboardStats);
 adminRoutes.get("/dashboard/summary", getDashboardSummary);
-adminRoutes.get("/dashboard/recent", getDashboardRecentActivity);
 
 adminRoutes.get(
   "/articles",

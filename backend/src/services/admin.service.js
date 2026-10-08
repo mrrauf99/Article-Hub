@@ -10,8 +10,8 @@ function pagination(page, limit, totalCount) {
 }
 
 export async function getDashboardStats() {
-  const [userCounts, articleCounts, articleTotal, views] = await Promise.all([
-    prisma.user.groupBy({ by: ["role"], _count: { _all: true } }),
+  const [totalUsers, articleCounts, articleTotal, views] = await Promise.all([
+    prisma.user.count({ where: { role: "user" } }),
     prisma.article.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.article.count(),
     prisma.article.aggregate({ _sum: { views: true } }),
@@ -21,8 +21,7 @@ export async function getDashboardStats() {
     String(rows.find((row) => row[field] === value)?._count._all ?? 0);
 
   return {
-    total_users: countBy(userCounts, "role", "user"),
-    total_admins: countBy(userCounts, "role", "admin"),
+    total_users: String(totalUsers),
     total_articles: String(articleTotal),
     approved_articles: countBy(articleCounts, "status", "approved"),
     pending_articles: countBy(articleCounts, "status", "pending"),
@@ -45,13 +44,12 @@ export async function getRecentActivity() {
       take: 5,
     }),
     prisma.user.findMany({
+      where: { role: "user" },
       select: {
         id: true,
         username: true,
         name: true,
-        email: true,
         avatarUrl: true,
-        role: true,
         joinedAt: true,
       },
       orderBy: { joinedAt: "desc" },
@@ -72,9 +70,7 @@ export async function getRecentActivity() {
       id: user.id,
       username: user.username,
       name: user.name,
-      email: user.email,
       avatar_url: user.avatarUrl,
-      role: user.role,
       joined_at: user.joinedAt,
     })),
   };
@@ -227,9 +223,9 @@ export async function deleteAdminArticle(articleId) {
   });
 }
 
-export async function getAdminUsers({ role, search, page, limit }) {
+export async function getAdminUsers({ search, page, limit }) {
   const where = {
-    ...(role !== "all" ? { role } : {}),
+    role: "user",
     ...(search
       ? {
           OR: [
@@ -250,7 +246,6 @@ export async function getAdminUsers({ role, search, page, limit }) {
         name: true,
         email: true,
         avatarUrl: true,
-        role: true,
         bio: true,
         joinedAt: true,
         _count: { select: { articles: true } },
@@ -268,7 +263,6 @@ export async function getAdminUsers({ role, search, page, limit }) {
       name: user.name,
       email: user.email,
       avatar_url: user.avatarUrl,
-      role: user.role,
       bio: user.bio,
       joined_at: user.joinedAt,
       article_count: String(user._count.articles),
@@ -278,36 +272,34 @@ export async function getAdminUsers({ role, search, page, limit }) {
 }
 
 export async function getAdminUserDetails(userId) {
-  const [user, articles] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        email: true,
-        avatarUrl: true,
-        role: true,
-        bio: true,
-        expertise: true,
-        gender: true,
-        country: true,
-        portfolioUrl: true,
-        xUrl: true,
-        linkedinUrl: true,
-        facebookUrl: true,
-        instagramUrl: true,
-        joinedAt: true,
-      },
-    }),
-    prisma.article.findMany({
-      where: { authorId: userId },
-      select: { id: true, title: true, status: true, createdAt: true, views: true },
-      orderBy: { createdAt: "desc" },
-    }),
-  ]);
+  const user = await prisma.user.findFirst({
+    where: { id: userId, role: "user" },
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      email: true,
+      avatarUrl: true,
+      bio: true,
+      expertise: true,
+      gender: true,
+      country: true,
+      portfolioUrl: true,
+      xUrl: true,
+      linkedinUrl: true,
+      facebookUrl: true,
+      instagramUrl: true,
+      joinedAt: true,
+    },
+  });
 
   if (!user) return null;
+  const articles = await prisma.article.findMany({
+    where: { authorId: userId },
+    select: { id: true, title: true, status: true, createdAt: true, views: true },
+    orderBy: { createdAt: "desc" },
+  });
+
   return {
     user: {
       id: user.id,
@@ -315,7 +307,6 @@ export async function getAdminUserDetails(userId) {
       name: user.name,
       email: user.email,
       avatar_url: user.avatarUrl,
-      role: user.role,
       bio: user.bio,
       expertise: user.expertise,
       gender: user.gender,
@@ -339,8 +330,8 @@ export async function getAdminUserDetails(userId) {
 
 export async function deleteAdminUser(userId) {
   return prisma.$transaction(async (transaction) => {
-    const user = await transaction.user.findUnique({
-      where: { id: userId },
+    const user = await transaction.user.findFirst({
+      where: { id: userId, role: "user" },
       select: {
         avatarPublicId: true,
         articles: { select: { id: true, imagePublicId: true } },

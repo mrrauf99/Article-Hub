@@ -142,7 +142,12 @@ export default function ExploreArticlesPage() {
 
   return (
     <div>
-      <SEO title="Explore" canonicalPath="/user/articles" noindex nofollow />
+      <SEO
+        title={activeCategory === "All" ? "Explore Articles" : `${activeCategory} Articles`}
+        canonicalPath="/user/articles"
+        noindex
+        nofollow
+      />
 
       <PageHeader
         title={activeCategory === "All" ? "Explore" : activeCategory}

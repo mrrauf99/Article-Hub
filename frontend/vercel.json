@@ -1,11 +1,29 @@
 {
   "rewrites": [
     {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap?resource=index"
+    },
+    {
+      "source": "/sitemap-static.xml",
+      "destination": "/api/sitemap?resource=static"
+    },
+    {
+      "source": "/sitemaps/articles/(.*)",
+      "destination": "/api/sitemap?resource=articles&page=$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [

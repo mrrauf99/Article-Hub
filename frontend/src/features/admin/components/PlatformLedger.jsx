@@ -74,9 +74,8 @@ export default function PlatformLedger({ stats }) {
         <Row label="Rejected" value={formatCount(rejected)} to="/admin/articles?status=rejected" swatch="bg-red-600" />
       </ul>
 
-      <ul className="mt-5 border-t border-hairline" aria-label="Members and reads">
-        <Row label="Writers" value={formatCount(toInt(stats.total_users))} to="/admin/users?role=user" />
-        <Row label="Administrators" value={formatCount(toInt(stats.total_admins))} to="/admin/users?role=admin" />
+      <ul className="mt-5 border-t border-hairline" aria-label="Writers and reads">
+        <Row label="Writers" value={formatCount(toInt(stats.total_users))} to="/admin/users" />
         <Row label="Reads, all time" value={formatCount(toInt(stats.total_views))} />
       </ul>
     </section>

@@ -19,6 +19,20 @@ import { getNavItemsForRole } from "@/utils/navConfig";
 
 const POLLING_INTERVAL = 45000;
 
+function getAdminPageTitle(pathname) {
+  const path = pathname.replace(/\/+$/, "") || "/";
+
+  if (path === "/admin/dashboard" || path === "/admin") {
+    return "Review Queue";
+  }
+  if (path === "/admin/articles") return "Article Management";
+  if (path.startsWith("/admin/articles/")) return "Article Review";
+  if (/^\/admin\/users\/[^/]+$/.test(path)) return "Writer Profile";
+  if (path === "/admin/users") return "Writers";
+  if (path === "/admin/profile") return "Account Settings";
+  return "Admin";
+}
+
 export default function AdminLayout() {
   const { user, pendingCount = 0 } = useLoaderData();
   const location = useLocation();
@@ -64,7 +78,12 @@ export default function AdminLayout() {
 
   return (
     <div data-panel="admin" className="min-h-[100dvh] bg-paper font-ui text-ink">
-      <SEO title="Admin" canonicalPath={location.pathname} noindex nofollow />
+      <SEO
+        title={getAdminPageTitle(location.pathname)}
+        canonicalPath={location.pathname}
+        noindex
+        nofollow
+      />
       <ScrollToTop />
       <NavigationProgress />
 

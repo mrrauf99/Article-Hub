@@ -103,7 +103,7 @@ export default function InputField({
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="text-ink-faint hover:text-ink-muted transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-1 rounded"
+              className="flex h-6 min-w-6 items-center justify-center rounded text-ink-faint transition-colors hover:text-ink-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-600 focus-visible:ring-offset-1"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (

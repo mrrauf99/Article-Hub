@@ -3,7 +3,12 @@ import { Eye, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
-import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
+import optimizeCloudinaryUrl, {
+  buildCloudinarySrcSet,
+} from "@/utils/cloudinaryImage";
+
+const MAIN_IMAGE_WIDTHS = [320, 480, 768, 1200];
+const SIDE_IMAGE_WIDTHS = [240, 320, 480];
 
 export default function FeaturedArticles({ articles }) {
   const featured = articles
@@ -41,11 +46,15 @@ export default function FeaturedArticles({ articles }) {
             >
               <div className="aspect-[16/10] overflow-hidden bg-paper">
                 <img
-                  src={optimizeCloudinaryUrl(main.image_url)}
+                  src={optimizeCloudinaryUrl(main.image_url, { width: 1200 })}
+                  srcSet={buildCloudinarySrcSet(
+                    main.image_url,
+                    MAIN_IMAGE_WIDTHS,
+                  )}
+                  sizes="(min-width: 1280px) 710px, (min-width: 1024px) 55vw, calc(100vw - 2rem)"
                   alt={main.title}
                   className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-500"
-                  loading="eager"
-                  fetchpriority="high"
+                  loading="lazy"
                 />
               </div>
               <div className="p-5 sm:p-6">
@@ -87,7 +96,14 @@ export default function FeaturedArticles({ articles }) {
                 >
                   <div className="w-28 sm:w-32 aspect-square shrink-0 rounded-lg overflow-hidden bg-paper">
                     <img
-                      src={optimizeCloudinaryUrl(article.image_url)}
+                      src={optimizeCloudinaryUrl(article.image_url, {
+                        width: 480,
+                      })}
+                      srcSet={buildCloudinarySrcSet(
+                        article.image_url,
+                        SIDE_IMAGE_WIDTHS,
+                      )}
+                      sizes="(min-width: 640px) 128px, 112px"
                       alt={article.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"

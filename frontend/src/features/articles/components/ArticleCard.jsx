@@ -7,8 +7,12 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { userApi } from "@/features/api/userApi";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
-import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
+import optimizeCloudinaryUrl, {
+  buildCloudinarySrcSet,
+} from "@/utils/cloudinaryImage";
 import SaveArticleButton from "./SaveArticleButton";
+
+const ARTICLE_IMAGE_WIDTHS = [320, 480, 768, 1200];
 
 function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
   const matches = useMatches();
@@ -101,7 +105,14 @@ function ArticleCard({ article, mode, onDelete, basePath = "/user/articles" }) {
               )}
 
               <img
-                src={optimizeCloudinaryUrl(article.image_url)}
+                src={optimizeCloudinaryUrl(article.image_url, {
+                  width: 1200,
+                })}
+                srcSet={buildCloudinarySrcSet(
+                  article.image_url,
+                  ARTICLE_IMAGE_WIDTHS,
+                )}
+                sizes="(min-width: 1280px) 384px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, calc(100vw - 2rem)"
                 alt={article.title}
                 loading="lazy"
                 onLoad={() => setImgLoaded(true)}

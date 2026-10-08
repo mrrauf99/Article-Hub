@@ -9,15 +9,15 @@ export default function NewestMembers({ users }) {
     <section aria-labelledby="members-heading">
       <div className="flex items-baseline justify-between gap-3">
         <h2 id="members-heading" className="text-sm font-semibold text-ink">
-          Newest members
+          Newest writers
         </h2>
         <Link to="/admin/users" className={`${LINK} text-sm`}>
-          All members
+          All writers
         </Link>
       </div>
 
       {users.length === 0 ? (
-        <p className="mt-3 text-sm text-ink-muted">No members yet.</p>
+        <p className="mt-3 text-sm text-ink-muted">No writers yet.</p>
       ) : (
         <ul className="mt-2">
           {users.map((user) => (
@@ -33,7 +33,6 @@ export default function NewestMembers({ users }) {
                   </span>
                   <span className="block truncate text-xs text-ink-muted">
                     Joined {formatAge(user.joined_at)}
-                    {user.role === "admin" && " · Administrator"}
                   </span>
                 </span>
               </Link>

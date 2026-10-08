@@ -51,7 +51,7 @@ export default function ProfilePage() {
   const handleCancel = useCallback(() => {
     if (isSaving) return;
 
-    resetForm(); // restore original data
+    resetForm();
     setIsEditing(false);
   }, [isSaving, resetForm]);
 
@@ -60,7 +60,6 @@ export default function ProfilePage() {
 
     const submitData = new FormData();
 
-    // Add text fields
     submitData.append("name", formData.name);
     submitData.append("expertise", formData.expertise);
     submitData.append("bio", formData.bio);
@@ -72,7 +71,6 @@ export default function ProfilePage() {
     submitData.append("facebook_url", formData.facebook_url);
     submitData.append("instagram_url", formData.instagram_url);
 
-    // Add avatar file if selected
     if (formData.avatarFile) {
       submitData.append("avatar", formData.avatarFile);
     }
@@ -91,7 +89,6 @@ export default function ProfilePage() {
       setFeedback(actionData);
       if (actionData.success) {
         setIsEditing(false);
-        // Revalidate to get the latest data from the server
         revalidator.revalidate();
       }
     });
@@ -124,7 +121,7 @@ export default function ProfilePage() {
 
   return (
     <ProfileProvider value={profileValue}>
-      <SEO title="Profile & security" canonicalPath={location.pathname} noindex nofollow />
+      <SEO title="Profile & Security" canonicalPath={location.pathname} noindex nofollow />
 
       <div className="font-ui">
         <PageHeader

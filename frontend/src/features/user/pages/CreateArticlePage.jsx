@@ -12,7 +12,12 @@ import { AlertCircle, ArrowLeft, Check, Circle, Info, Loader2, Send } from "luci
 import SEO from "@/components/SEO";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { BTN_PRIMARY } from "@/styles/panelClasses";
-import { useNewArticleForm, MIN_LENGTHS, MAX_LENGTHS } from "../hooks/useNewArticleForm.js";
+import {
+  useNewArticleForm,
+  normalizeLineBreaks,
+  MIN_LENGTHS,
+  MAX_LENGTHS,
+} from "../hooks/useNewArticleForm.js";
 import PageHeader from "../components/PageHeader";
 import TextArea from "../components/new-article/TextArea.jsx";
 import Category from "../components/new-article/Category.jsx";
@@ -44,8 +49,7 @@ const SUBMIT_LABELS = {
   rejected: "Resubmit for review",
 };
 
-// Mirrors validateForm: blank counts as zero, otherwise the normalized length.
-const count = (text = "") => (text.trim() ? text.replace(/\r\n/g, "\n").length : 0);
+const count = (text = "") => (text.trim() ? normalizeLineBreaks(text).length : 0);
 
 function MarkdownHint() {
   return (
@@ -174,7 +178,12 @@ export default function CreateArticlePage() {
 
   return (
     <div>
-      <SEO title={isEditing ? "Edit article" : "New article"} canonicalPath="/user/articles/new" noindex nofollow />
+      <SEO
+        title={isEditing ? "Edit Article" : "Create Article"}
+        canonicalPath="/user/articles/new"
+        noindex
+        nofollow
+      />
 
       <Link
         to="/user/dashboard"

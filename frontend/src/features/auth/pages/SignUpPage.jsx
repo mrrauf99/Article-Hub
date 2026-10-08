@@ -17,6 +17,8 @@ export default function SignUp() {
   const navigation = useNavigation();
   const actionData = useActionData();
   const isSubmitting = navigation.state === "submitting";
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const isAuthSubmitting = isSubmitting || isGoogleSubmitting;
 
   const [alertMessage, setAlertMessage] = useState("");
   const lastActionDataRef = useRef(null);
@@ -58,7 +60,7 @@ export default function SignUp() {
         className="flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
-        <SignUpFields form={form} isDisabled={isSubmitting} />
+        <SignUpFields form={form} isDisabled={isAuthSubmitting} />
 
         <PasswordRequirements
           errors={form.passwordErrors}
@@ -66,13 +68,22 @@ export default function SignUp() {
           confirmEntered={form.values.confirmPassword.length > 0}
         />
 
-        <Button disabled={isSubmitting} isLoading={isSubmitting}>
-          {isSubmitting ? "Signing up…" : "Sign up"}
+        <Button disabled={isAuthSubmitting} isLoading={isAuthSubmitting}>
+          {isGoogleSubmitting
+            ? "Connecting to Google…"
+            : isSubmitting
+              ? "Signing up…"
+              : "Sign up"}
         </Button>
       </Form>
 
       <OrDivider />
-      <GoogleAuthButton>Sign up with Google</GoogleAuthButton>
+      <GoogleAuthButton
+        disabled={isSubmitting}
+        onSubmittingChange={setIsGoogleSubmitting}
+      >
+        Sign up with Google
+      </GoogleAuthButton>
 
       <SwitchPage
         question="Already have an account?"

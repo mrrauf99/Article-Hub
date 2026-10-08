@@ -3,8 +3,7 @@ import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 import { allowedImageTypes } from "@/utils/allowedImagesTypes";
 import { REQUIRED_FIELD_MESSAGE } from "@/utils/validationMessages";
 
-// This ensures consistent character counting between frontend and backend
-const normalizeLineBreaks = (text) => text.replace(/\r\n/g, "\n");
+export const normalizeLineBreaks = (text) => text.replace(/\r\n/g, "\n");
 
 // Max character limits matching backend validation
 export const MAX_LENGTHS = {

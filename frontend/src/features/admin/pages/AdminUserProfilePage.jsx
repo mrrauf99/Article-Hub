@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Link, useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, Trash2 } from "lucide-react";
 
 import ProfileHeader from "@/features/profile/components/ProfileHeader";
@@ -10,13 +10,12 @@ import StatusPill from "@/features/user/components/StatusPill";
 import EmptyState from "@/features/user/components/EmptyState";
 import formatCount from "@/utils/formatCount";
 import { capitalizeFirstLetter } from "@/utils/stringUtils";
-import { BTN_GHOST, BTN_SECONDARY } from "@/styles/panelClasses";
+import { BTN_GHOST } from "@/styles/panelClasses";
 import ArticleReviewDialog from "../components/ArticleReviewDialog";
 import ActionNotice from "../components/ActionNotice";
 import useArticleModeration from "../hooks/useArticleModeration";
 import useMemberActions from "../hooks/useMemberActions";
 import { formatDate, plural } from "../utils/format";
-import { isSelfMember } from "../utils/identity";
 
 const noop = () => {};
 
@@ -54,7 +53,6 @@ function ArticleRows({ articles, authorName, onReview }) {
 
 export default function AdminUserProfilePage() {
   const { user, articles } = useLoaderData();
-  const { user: currentUser } = useOutletContext() ?? {};
   const navigate = useNavigate();
   const [reviewing, setReviewing] = useState(null);
 
@@ -70,8 +68,6 @@ export default function AdminUserProfilePage() {
   const members = useMemberActions({ onSuccess: onMemberSuccess });
 
   const displayName = user.name || user.username;
-  const isSelf = isSelfMember(currentUser, user);
-  const showArticles = user.role !== "admin" || articles.length > 0;
 
   const tally = articles.reduce(
     (acc, article) => {
@@ -133,25 +129,19 @@ export default function AdminUserProfilePage() {
           className="inline-flex items-center gap-1.5 rounded-sm text-sm text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-600"
         >
           <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-          Members
+          Writers
         </Link>
 
-        {isSelf ? (
-          <Link to="/admin/profile" className={BTN_SECONDARY}>
-            Edit your profile
-          </Link>
-        ) : (
-          <div className="-mr-3 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => members.open("delete", member)}
-              className={`${BTN_GHOST} hover:bg-rejected-red-bg hover:text-rejected-red-text`}
-            >
-              <Trash2 className="h-4 w-4" aria-hidden="true" />
-              Delete member
-            </button>
-          </div>
-        )}
+        <div className="-mr-3 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => members.open("delete", member)}
+            className={`${BTN_GHOST} hover:bg-rejected-red-bg hover:text-rejected-red-text`}
+          >
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
+            Delete writer
+          </button>
+        </div>
       </div>
 
       <div className="mt-6">
@@ -162,36 +152,34 @@ export default function AdminUserProfilePage() {
         <ProfileHeader headingLevel={1} />
       </div>
 
-      {showArticles && (
-        <section aria-labelledby="member-articles" className="mt-12">
-          <h2 id="member-articles" className="font-editorial text-2xl text-ink">
-            Articles
-          </h2>
-          <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-muted">
-            {articles.length === 0 ? (
-              `${displayName} hasn't written anything yet.`
-            ) : (
-              <>
-                <Figure>{plural(articles.length, "article")}</Figure>: {tally.approved} published,{" "}
-                {tally.pending} in review, {tally.rejected} rejected.{" "}
-                <Figure>{formatCount(tally.views)}</Figure> reads in total.
-              </>
-            )}
-          </p>
-
+      <section aria-labelledby="member-articles" className="mt-12">
+        <h2 id="member-articles" className="font-editorial text-2xl text-ink">
+          Articles
+        </h2>
+        <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-muted">
           {articles.length === 0 ? (
-            <div className="mt-6 border-y border-hairline">
-              <EmptyState icon={FileText} title="No articles yet">
-                Anything this member submits will show up here and in the review queue.
-              </EmptyState>
-            </div>
+            `${displayName} hasn't written anything yet.`
           ) : (
-            <div className="mt-6">
-              <ArticleRows articles={articles} authorName={displayName} onReview={setReviewing} />
-            </div>
+            <>
+              <Figure>{plural(articles.length, "article")}</Figure>: {tally.approved} published,{" "}
+              {tally.pending} in review, {tally.rejected} rejected.{" "}
+              <Figure>{formatCount(tally.views)}</Figure> reads in total.
+            </>
           )}
-        </section>
-      )}
+        </p>
+
+        {articles.length === 0 ? (
+          <div className="mt-6 border-y border-hairline">
+            <EmptyState icon={FileText} title="No articles yet">
+              Anything this writer submits will show up here and in the review queue.
+            </EmptyState>
+          </div>
+        ) : (
+          <div className="mt-6">
+            <ArticleRows articles={articles} authorName={displayName} onReview={setReviewing} />
+          </div>
+        )}
+      </section>
 
       <div className="mt-12 border-b border-hairline [&>section]:px-0">
         <AuthorInfo />

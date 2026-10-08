@@ -16,7 +16,9 @@ export default function Login() {
   const form = useLoginForm();
   const navigation = useNavigation();
   const actionData = useActionData();
-  const isSubmitting = navigation.state === "submitting";
+  const isEmailSubmitting = navigation.state === "submitting";
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const isAuthSubmitting = isEmailSubmitting || isGoogleSubmitting;
 
   const [alertMessage, setAlertMessage] = useState("");
   const lastActionDataRef = useRef(null);
@@ -76,11 +78,12 @@ export default function Login() {
           label="Username or email"
           icon={User}
           name="identifier"
+          autoComplete="username"
           value={form.values.identifier}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           error={form.errors.identifier}
-          disabled={isSubmitting}
+          disabled={isAuthSubmitting}
           aria-required="true"
         />
 
@@ -89,11 +92,12 @@ export default function Login() {
           icon={Lock}
           type="password"
           name="password"
+          autoComplete="current-password"
           value={form.values.password}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           error={form.errors.password}
-          disabled={isSubmitting}
+          disabled={isAuthSubmitting}
           aria-required="true"
         />
 
@@ -106,13 +110,18 @@ export default function Login() {
           </Link>
         </div>
 
-        <Button disabled={isSubmitting} isLoading={isSubmitting}>
-          {isSubmitting ? "Signing in…" : "Sign in"}
+        <Button disabled={isAuthSubmitting} isLoading={isEmailSubmitting}>
+          {isEmailSubmitting ? "Signing in..." : "Sign in"}
         </Button>
       </Form>
 
       <OrDivider />
-      <GoogleAuthButton>Sign in with Google</GoogleAuthButton>
+      <GoogleAuthButton
+        disabled={isAuthSubmitting}
+        onSubmittingChange={setIsGoogleSubmitting}
+      >
+        Sign in with Google
+      </GoogleAuthButton>
 
       <SwitchPage
         question="Don't have an account?"

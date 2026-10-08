@@ -4,8 +4,8 @@ import { ARTICLE_CATEGORIES } from "@/data/articleCategories";
 
 export default function HeroSection({ articleCount, authorCount }) {
   const stats = [
-    { value: articleCount || "0", label: "Articles published" },
-    { value: authorCount || "0", label: "Writers publishing" },
+    { value: articleCount ?? "—", label: "Articles published" },
+    { value: authorCount ?? "—", label: "Writers publishing" },
     { value: ARTICLE_CATEGORIES.length, label: "Categories to explore" },
   ];
 

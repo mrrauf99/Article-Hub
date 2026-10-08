@@ -4,9 +4,11 @@ Disallow: /admin
 Disallow: /user
 Disallow: /login
 Disallow: /register
+Disallow: /verify-otp
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /two-factor
 Disallow: /complete-profile
+Disallow: /saved-articles
 
 Sitemap: https://articlehub.me/sitemap.xml

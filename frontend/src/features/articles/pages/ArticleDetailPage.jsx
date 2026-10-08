@@ -5,13 +5,15 @@ import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Calendar, Check, Eye, PenLine, Share2, Tag, User } from "lucide-react";
 import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
+import toCanonicalUrl from "@/utils/canonicalUrl";
 import formatCount from "@/utils/formatCount";
-import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
 import { ARTICLE_PROSE, BTN_SECONDARY } from "@/styles/panelClasses";
 import StatusPill from "@/features/user/components/StatusPill";
 import AdminDecisionBar from "@/features/admin/components/AdminDecisionBar";
 import SaveArticleButton from "../components/SaveArticleButton";
 import useArticleView from "../hooks/useArticleView";
+import { buildArticleDescription, createArticleSchema } from "../utils/articleMetadata";
 
 const OWNER_NOTES = {
   pending: {
@@ -57,54 +59,10 @@ export default function ArticleDetailPage() {
   }
 
   const canonicalPath = location.pathname;
-  const metaDescription = buildDescription(article);
+  const metaDescription = buildArticleDescription(article);
   const imageUrl = article.image_url || SITE_CONFIG.ogImage;
-  const canonicalUrl = new URL(canonicalPath, SITE_CONFIG.siteUrl).toString();
-  const publisherLogo = new URL(
-    SITE_CONFIG.logo,
-    SITE_CONFIG.siteUrl,
-  ).toString();
-
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: capitalizeFirstLetter(article.title),
-    description: metaDescription,
-    image: imageUrl
-      ? [new URL(imageUrl, SITE_CONFIG.siteUrl).toString()]
-      : undefined,
-    author: {
-      "@type": "Person",
-      name: article.author_name || SITE_CONFIG.name,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: SITE_CONFIG.name,
-      logo: {
-        "@type": "ImageObject",
-        url: publisherLogo,
-      },
-    },
-    mainEntityOfPage: canonicalUrl,
-  };
-
-  if (article.category) {
-    articleSchema.articleSection = article.category;
-  }
-
-  if (article.published_at) {
-    articleSchema.datePublished = article.published_at;
-  }
-
-  if (article.updated_at) {
-    articleSchema.dateModified = article.updated_at;
-  }
-
-  function buildDescription({ introduction, summary, content }) {
-    const preferred = introduction || summary || content || "";
-    const cleanText = stripMarkdown(preferred.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " "));
-    return cleanText.slice(0, 180) || SITE_CONFIG.description;
-  }
+  const canonicalUrl = toCanonicalUrl(canonicalPath);
+  const articleSchema = createArticleSchema(article, canonicalUrl, metaDescription);
 
   async function handleShare() {
     const url = window.location.href;
@@ -145,7 +103,7 @@ export default function ArticleDetailPage() {
   return (
     <article className="font-ui">
       <SEO
-        title={article.title}
+        title={capitalizeFirstLetter(article.title)}
         description={metaDescription}
         canonicalPath={canonicalPath}
         image={imageUrl}

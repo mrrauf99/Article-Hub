@@ -2,18 +2,34 @@
 <html lang="en" class="h-full overflow-x-hidden">
   <head>
     <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-5T72PSLPM3"
-    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
       gtag("config", "G-5T72PSLPM3");
+
+      function loadAnalytics() {
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-5T72PSLPM3";
+        document.head.append(script);
+      }
+
+      window.addEventListener(
+        "load",
+        () => {
+          window.setTimeout(() => {
+            if ("requestIdleCallback" in window) {
+              window.requestIdleCallback(loadAnalytics, { timeout: 5000 });
+            } else {
+              loadAnalytics();
+            }
+          }, 2000);
+        },
+        { once: true },
+      );
     </script>
     <meta charset="UTF-8" />
 
@@ -29,7 +45,7 @@
       only manages tags it renders itself, so it can't replace these static ones).
       This title is just the pre-hydration fallback; Helmet overwrites document.title.
     -->
-    <title>Article Hub</title>
+    <title>Home | Article Hub</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14140F" />

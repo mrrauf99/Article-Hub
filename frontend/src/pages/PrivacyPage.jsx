@@ -10,12 +10,12 @@ export default function PrivacyPage() {
   return (
     <>
       <SEO
-        title="Privacy & Data"
+        title="Privacy Policy"
         description="We respect your privacy. Learn how Article Hub collects and uses data."
         canonicalPath={location.pathname}
       />
       <LegalLayout
-        title="Privacy & Data"
+        title="Privacy Policy"
         description="We respect your privacy. This page explains how your data is collected and used."
       >
         {PRIVACY_SECTIONS.map((section) => (

@@ -23,7 +23,7 @@ export default function SavedArticlesPage() {
 
   return (
     <div aria-busy={loading}>
-      <SEO title="Saved articles" canonicalPath={location.pathname} noindex nofollow />
+      <SEO title="Saved Articles" canonicalPath={location.pathname} noindex nofollow />
       <PageHeader title="Saved articles" description="Your reading list, with the most recently saved articles first." />
       <p role="status" className="mt-4 text-sm text-ink-muted">
         {loading ? "Updating saved articles…" : pagination ? `${pagination.totalCount} ${pagination.totalCount === 1 ? "article" : "articles"} saved` : ""}

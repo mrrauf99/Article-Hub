@@ -13,7 +13,7 @@ function GoogleButtonPlaceholder({ isLoading }) {
       disabled
       aria-busy={isLoading}
     >
-      {isLoading ? "Connecting to Google…" : "Continue with Google"}
+      {isLoading ? "Connecting to Google..." : "Continue with Google"}
     </button>
   );
 }
@@ -29,24 +29,61 @@ function GoogleAuthFallback() {
   );
 }
 
-function ConfiguredGoogleAuthButton() {
+function ConfiguredGoogleAuthButton({ disabled, onSubmittingChange }) {
   const { clientId, scriptLoadedSuccessfully } = useGoogleOAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const requestInFlight = useRef(false);
+  const attemptPending = useRef(false);
+  const disabledRef = useRef(disabled);
   const buttonContainerRef = useRef(null);
+  disabledRef.current = disabled;
+
+  const setGoogleSubmitting = useCallback(
+    (value) => {
+      setIsSubmitting(value);
+      onSubmittingChange?.(value);
+    },
+    [onSubmittingChange],
+  );
+
+  const clearPendingAttempt = useCallback(() => {
+    if (!attemptPending.current || requestInFlight.current) return;
+    attemptPending.current = false;
+    setGoogleSubmitting(false);
+  }, [setGoogleSubmitting]);
+
+  const handleButtonClick = useCallback(() => {
+    if (disabledRef.current || attemptPending.current || requestInFlight.current) {
+      return;
+    }
+    attemptPending.current = true;
+    setError("");
+    setGoogleSubmitting(true);
+  }, [setGoogleSubmitting]);
+
+  useEffect(() => {
+    const handleWindowFocus = () => {
+      window.setTimeout(clearPendingAttempt, 0);
+    };
+    window.addEventListener("focus", handleWindowFocus);
+    return () => window.removeEventListener("focus", handleWindowFocus);
+  }, [clearPendingAttempt]);
 
   const handleCredential = useCallback(
     async (response) => {
       if (requestInFlight.current) return;
       if (!response.credential) {
         setError("Google sign-in could not be verified. Please try again.");
+        attemptPending.current = false;
+        setGoogleSubmitting(false);
         return;
       }
 
       requestInFlight.current = true;
-      setIsSubmitting(true);
+      attemptPending.current = false;
+      setGoogleSubmitting(true);
       setError("");
 
       try {
@@ -61,10 +98,10 @@ function ConfiguredGoogleAuthButton() {
         );
       } finally {
         requestInFlight.current = false;
-        setIsSubmitting(false);
+        setGoogleSubmitting(false);
       }
     },
-    [navigate],
+    [navigate, setGoogleSubmitting],
   );
 
   useEffect(() => {
@@ -92,6 +129,7 @@ function ConfiguredGoogleAuthButton() {
           shape: "pill",
           logo_alignment: "left",
           width: Math.min(400, Math.floor(buttonContainer.clientWidth)),
+          click_listener: handleButtonClick,
         });
       }
 
@@ -106,12 +144,12 @@ function ConfiguredGoogleAuthButton() {
     }
 
     return () => googleIdentity.cancel();
-  }, [clientId, handleCredential, scriptLoadedSuccessfully]);
+  }, [clientId, handleButtonClick, handleCredential, scriptLoadedSuccessfully]);
 
   if (!scriptLoadedSuccessfully) {
     return (
       <div className="mt-3 flex w-full flex-col items-center justify-center gap-2">
-        <GoogleButtonPlaceholder isLoading />
+        <GoogleButtonPlaceholder isLoading={!disabled} />
         {error && (
           <p className="text-center text-sm text-red-600" role="alert">
             {error}
@@ -123,11 +161,16 @@ function ConfiguredGoogleAuthButton() {
 
   return (
     <div className="mt-3 flex w-full flex-col items-center justify-center gap-2">
-      <div
-        className={`w-full rounded-full transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none ${isSubmitting ? "pointer-events-none opacity-65" : ""}`}
-        aria-busy={isSubmitting}
-      >
-        <div ref={buttonContainerRef} className="flex w-full justify-center" />
+      <div className="relative min-h-12 w-full">
+        <div
+          ref={buttonContainerRef}
+          className={`flex w-full justify-center rounded-full transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none ${disabled || isSubmitting ? "invisible pointer-events-none" : ""}`}
+        />
+        {(disabled || isSubmitting) && (
+          <div className="absolute inset-0">
+            <GoogleButtonPlaceholder isLoading={isSubmitting} />
+          </div>
+        )}
       </div>
       {error && (
         <p className="text-center text-sm text-red-600" role="alert">
@@ -138,10 +181,15 @@ function ConfiguredGoogleAuthButton() {
   );
 }
 
-export default function GoogleAuthButton() {
+export default function GoogleAuthButton({ disabled = false, onSubmittingChange }) {
   if (!import.meta.env.VITE_GOOGLE_CLIENT_ID) {
     return <GoogleAuthFallback />;
   }
 
-  return <ConfiguredGoogleAuthButton />;
+  return (
+    <ConfiguredGoogleAuthButton
+      disabled={disabled}
+      onSubmittingChange={onSubmittingChange}
+    />
+  );
 }

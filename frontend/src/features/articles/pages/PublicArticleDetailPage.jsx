@@ -1,19 +1,24 @@
-import { useLoaderData, useLocation, Link } from "react-router-dom";
+import { useLoaderData, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 
 import { Calendar, User, Tag, Share2, Eye, ArrowLeft, Check } from "lucide-react";
 import SEO from "@/components/SEO";
 import { SITE_CONFIG } from "@/config/site.config";
+import toCanonicalUrl from "@/utils/canonicalUrl";
 import formatCount from "@/utils/formatCount";
-import { capitalizeFirstLetter, stripMarkdown } from "@/utils/stringUtils";
-import optimizeCloudinaryUrl from "@/utils/cloudinaryImage";
+import { capitalizeFirstLetter } from "@/utils/stringUtils";
+import optimizeCloudinaryUrl, {
+  buildCloudinarySrcSet,
+} from "@/utils/cloudinaryImage";
 import SaveArticleButton from "../components/SaveArticleButton";
 import useArticleView from "../hooks/useArticleView";
+import { buildArticleDescription, createArticleSchema } from "../utils/articleMetadata";
+
+const ARTICLE_IMAGE_WIDTHS = [320, 480, 768, 1200];
 
 export default function PublicArticleDetailPage() {
   const { article } = useLoaderData();
-  const location = useLocation();
   useArticleView(article);
 
   const [copied, setCopied] = useState(false);
@@ -35,29 +40,11 @@ export default function PublicArticleDetailPage() {
     );
   }
 
-  const canonicalPath = location.pathname;
-  const metaDescription = buildDescription(article);
+  const canonicalPath = "/articles/" + encodeURIComponent(article.id);
+  const metaDescription = buildArticleDescription(article);
   const imageUrl = article.image_url || SITE_CONFIG.ogImage;
-  const canonicalUrl = new URL(canonicalPath, SITE_CONFIG.siteUrl).toString();
-  const publisherLogo = new URL(SITE_CONFIG.logo, SITE_CONFIG.siteUrl).toString();
-
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: capitalizeFirstLetter(article.title),
-    description: metaDescription,
-    image: imageUrl ? [new URL(imageUrl, SITE_CONFIG.siteUrl).toString()] : undefined,
-    author: { "@type": "Person", name: article.author_name || SITE_CONFIG.name },
-    publisher: {
-      "@type": "Organization",
-      name: SITE_CONFIG.name,
-      logo: { "@type": "ImageObject", url: publisherLogo },
-    },
-    mainEntityOfPage: canonicalUrl,
-  };
-  if (article.category) articleSchema.articleSection = article.category;
-  if (article.published_at) articleSchema.datePublished = article.published_at;
-  if (article.updated_at) articleSchema.dateModified = article.updated_at;
+  const canonicalUrl = toCanonicalUrl(canonicalPath);
+  const articleSchema = createArticleSchema(article, canonicalUrl, metaDescription);
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -83,19 +70,6 @@ export default function PublicArticleDetailPage() {
     ],
   };
 
-  function buildDescription({ introduction, summary, content }) {
-    const preferred = introduction || summary || content || "";
-    const cleanText = stripMarkdown(preferred.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " "));
-    return truncateAtWordBoundary(cleanText, 180) || SITE_CONFIG.description;
-  }
-
-  function truncateAtWordBoundary(text, maxLength) {
-    if (text.length <= maxLength) return text;
-    const truncated = text.slice(0, maxLength);
-    const lastSpace = truncated.lastIndexOf(" ");
-    return `${lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated}…`;
-  }
-
   async function handleShare() {
     const url = window.location.href;
     try {
@@ -114,11 +88,13 @@ export default function PublicArticleDetailPage() {
   return (
     <article className="min-h-screen bg-paper font-ui">
       <SEO
-        title={article.title}
+        title={capitalizeFirstLetter(article.title)}
         description={metaDescription}
         canonicalPath={canonicalPath}
         image={imageUrl}
         type="article"
+        noindex={article.status !== "approved"}
+        nofollow={article.status !== "approved"}
         schema={[articleSchema, breadcrumbSchema]}
       />
 
@@ -180,9 +156,16 @@ export default function PublicArticleDetailPage() {
 
           {article.image_url && (
             <img
-              src={optimizeCloudinaryUrl(article.image_url)}
+              src={optimizeCloudinaryUrl(article.image_url, { width: 1200 })}
+              srcSet={buildCloudinarySrcSet(
+                article.image_url,
+                ARTICLE_IMAGE_WIDTHS,
+              )}
+              sizes="(min-width: 704px) 672px, calc(100vw - 2rem)"
               alt={article.title}
               className="w-full rounded-xl mb-10 object-cover border border-hairline"
+              width={1200}
+              height={675}
               loading="eager"
               fetchpriority="high"
             />

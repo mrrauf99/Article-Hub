@@ -120,7 +120,7 @@ export default function UserDashBoardPage() {
 
   return (
     <div>
-      <SEO title="Your articles" canonicalPath="/user/dashboard" noindex nofollow />
+      <SEO title="Article Dashboard" canonicalPath="/user/dashboard" noindex nofollow />
 
       <PageHeader
         title="Your articles"

@@ -1,15 +1,9 @@
-import { useCallback, useState } from "react";
-import {
-  useLoaderData,
-  useLocation,
-  useOutletContext,
-  useSearchParams,
-} from "react-router-dom";
+import { useState } from "react";
+import { useLoaderData, useLocation, useSearchParams } from "react-router-dom";
 import { SearchX, Users } from "lucide-react";
 
 import Pagination from "@/features/articles/components/Pagination";
 import PageHeader from "@/features/user/components/PageHeader";
-import StatusTabs from "@/features/user/components/StatusTabs";
 import SearchField from "@/features/user/components/SearchField";
 import EmptyState from "@/features/user/components/EmptyState";
 import useScrollOnChange from "@/hooks/useScrollOnChange";
@@ -17,26 +11,13 @@ import { BTN_SECONDARY } from "@/styles/panelClasses";
 import MemberRoster from "../components/MemberRoster";
 import ActionNotice from "../components/ActionNotice";
 import useMemberActions from "../hooks/useMemberActions";
-import { isSelfMember } from "../utils/identity";
-
-const ROLE_TABS = [
-  { value: "all", label: "All" },
-  { value: "user", label: "Writers" },
-  { value: "admin", label: "Administrators" },
-];
 
 export default function AdminUsersPage() {
-  const { users, pagination, filters, counts } = useLoaderData();
-  const { user: currentUser } = useOutletContext() ?? {};
+  const { users, pagination, filters } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState(filters.search);
   const location = useLocation();
   const members = useMemberActions({ initialNotice: location.state?.notice ?? null });
-
-  const isSelf = useCallback(
-    (member) => isSelfMember(currentUser, member),
-    [currentUser],
-  );
 
   const updateParams = (mutate) => {
     const params = new URLSearchParams(searchParams);
@@ -44,9 +25,6 @@ export default function AdminUsersPage() {
     params.delete("page");
     setSearchParams(params, { preventScrollReset: true });
   };
-
-  const handleRoleChange = (role) =>
-    updateParams((p) => (role === "all" ? p.delete("role") : p.set("role", role)));
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -73,27 +51,20 @@ export default function AdminUsersPage() {
   return (
     <>
       <PageHeader
-        title="Members"
-        description="Everyone with an Article Hub account, newest first. Deleting a member also deletes every article they wrote."
+        title="Writers"
+        description="Writer accounts, newest first. Deleting a writer also deletes every article they wrote."
       />
 
       <div className="mt-8">
         <ActionNotice notice={members.notice} onDismiss={members.dismissNotice} />
       </div>
 
-      <div className="flex flex-col gap-4 border-b border-hairline md:flex-row md:items-end md:justify-between">
-        <StatusTabs
-          value={filters.role}
-          counts={counts}
-          onChange={handleRoleChange}
-          tabs={ROLE_TABS}
-          label="Filter by role"
-        />
-        <form role="search" onSubmit={handleSearch} className="pb-3 md:w-72">
+      <div className="flex justify-end border-b border-hairline">
+        <form role="search" onSubmit={handleSearch} className="w-full pb-3 md:w-72">
           <SearchField
             id="admin-member-search"
-            label="Search members by name, username or email"
-            placeholder="Search name, username or email"
+            label="Search writers by name, username or email"
+            placeholder="Search writers"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
           />
@@ -104,7 +75,7 @@ export default function AdminUsersPage() {
         filters.search ? (
           <EmptyState
             icon={SearchX}
-            title={`No members match "${filters.search}"`}
+            title={`No writers match "${filters.search}"`}
             action={
               <button type="button" onClick={clearSearch} className={BTN_SECONDARY}>
                 Clear search
@@ -114,16 +85,7 @@ export default function AdminUsersPage() {
             Search looks at names, usernames and email addresses.
           </EmptyState>
         ) : (
-          <EmptyState
-            icon={Users}
-            title={
-              filters.role === "admin"
-                ? "No administrators"
-                : filters.role === "user"
-                  ? "No writers yet"
-                  : "No members yet"
-            }
-          />
+          <EmptyState icon={Users} title="No writers yet" />
         )
       ) : (
         <>
@@ -146,7 +108,7 @@ export default function AdminUsersPage() {
             )}
           </p>
 
-          <MemberRoster members={users} isSelf={isSelf} onAction={members.open} />
+          <MemberRoster members={users} onAction={members.open} />
 
           {pagination.totalPages > 1 && (
             <div className="mt-8">

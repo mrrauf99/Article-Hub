@@ -8,6 +8,7 @@ import contactRoutes from "./routes/contact.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import articleRoutes from "./routes/article.routes.js";
+import sitemapRoutes from "./routes/sitemap.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import savedArticleRoutes from "./routes/savedArticle.routes.js";
 
@@ -34,6 +35,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/articles", articleRoutes);
+app.use("/api/sitemaps", sitemapRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/user", authenticate(COOKIE_NAMES.ACCESS), userRoutes);

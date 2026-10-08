@@ -57,7 +57,7 @@ export default function useMemberActions({ onSuccess, initialNotice = null } = {
   const dialog = (
     <ConfirmDialog
       isOpen={request?.type === "delete"}
-      title="Delete this member?"
+      title="Delete this writer?"
       message={
         member
           ? `${displayName(member)}'s account${
@@ -76,7 +76,7 @@ export default function useMemberActions({ onSuccess, initialNotice = null } = {
           ""
         )
       }
-      confirmText="Delete member"
+      confirmText="Delete writer"
       cancelText="Cancel"
       variant="danger"
       isLoading={busy}
