@@ -5,15 +5,14 @@ import { authApi } from "../../api/authApi";
 
 let hasAttemptedOneTap = false;
 
-function GoogleButtonPlaceholder({ isLoading }) {
+function GoogleButtonPlaceholder() {
   return (
     <button
       type="button"
-      className="flex w-full items-center justify-center rounded-full border border-hairline-strong bg-paper-raised px-4 py-3 font-ui text-[0.9375rem] font-medium text-ink opacity-65"
+      className="flex w-full items-center justify-center rounded-full border border-hairline-strong bg-paper-raised px-4 py-3 font-ui text-[0.9375rem] font-medium text-ink"
       disabled
-      aria-busy={isLoading}
     >
-      {isLoading ? "Connecting to Google..." : "Continue with Google"}
+      Continue with Google
     </button>
   );
 }
@@ -21,7 +20,7 @@ function GoogleButtonPlaceholder({ isLoading }) {
 function GoogleAuthFallback() {
   return (
     <div className="mt-3 flex w-full flex-col items-center justify-center gap-2">
-      <GoogleButtonPlaceholder isLoading={false} />
+      <GoogleButtonPlaceholder />
       <p className="text-center text-sm text-red-600" role="alert">
         Google sign-in is not configured for this site.
       </p>
@@ -29,80 +28,119 @@ function GoogleAuthFallback() {
   );
 }
 
-function ConfiguredGoogleAuthButton({ disabled, onSubmittingChange }) {
+function ConfiguredGoogleAuthButton({ disabled, onAuthStateChange }) {
   const { clientId, scriptLoadedSuccessfully } = useGoogleOAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const requestInFlight = useRef(false);
-  const attemptPending = useRef(false);
+  const [authAttempt, setAuthAttempt] = useState(null);
+  const activeAttemptRef = useRef(null);
   const disabledRef = useRef(disabled);
+  const mountedRef = useRef(true);
   const buttonContainerRef = useRef(null);
+  const requestAbortControllerRef = useRef(null);
+  const windowBlurredRef = useRef(false);
   disabledRef.current = disabled;
 
-  const setGoogleSubmitting = useCallback(
-    (value) => {
-      setIsSubmitting(value);
-      onSubmittingChange?.(value);
+  const updateAuthAttempt = useCallback(
+    (attempt) => {
+      activeAttemptRef.current = attempt;
+      if (!mountedRef.current) return;
+      setAuthAttempt(attempt);
+      onAuthStateChange?.(attempt);
     },
-    [onSubmittingChange],
+    [onAuthStateChange],
   );
 
-  const clearPendingAttempt = useCallback(() => {
-    if (!attemptPending.current || requestInFlight.current) return;
-    attemptPending.current = false;
-    setGoogleSubmitting(false);
-  }, [setGoogleSubmitting]);
-
   const handleButtonClick = useCallback(() => {
-    if (disabledRef.current || attemptPending.current || requestInFlight.current) {
-      return;
-    }
-    attemptPending.current = true;
-    setError("");
-    setGoogleSubmitting(true);
-  }, [setGoogleSubmitting]);
+    if (disabledRef.current || activeAttemptRef.current) return;
 
-  useEffect(() => {
-    const handleWindowFocus = () => {
-      window.setTimeout(clearPendingAttempt, 0);
-    };
-    window.addEventListener("focus", handleWindowFocus);
-    return () => window.removeEventListener("focus", handleWindowFocus);
-  }, [clearPendingAttempt]);
+    windowBlurredRef.current = false;
+    setError("");
+    updateAuthAttempt({ phase: "waiting", source: "button" });
+  }, [updateAuthAttempt]);
 
   const handleCredential = useCallback(
     async (response) => {
-      if (requestInFlight.current) return;
-      if (!response.credential) {
+      if (!mountedRef.current) return;
+
+      const activeAttempt = activeAttemptRef.current;
+      const selectBy = response?.select_by || "";
+      const isButtonCredential =
+        selectBy.startsWith("btn") || selectBy.startsWith("fedcm_button");
+      const source = isButtonCredential || (!selectBy && activeAttempt?.source === "button")
+        ? "button"
+        : "one_tap";
+
+      if (activeAttempt?.phase === "signing_in") return;
+      if (activeAttempt?.source === "button" && source !== "button") return;
+      if (!response?.credential) {
         setError("Google sign-in could not be verified. Please try again.");
-        attemptPending.current = false;
-        setGoogleSubmitting(false);
+        updateAuthAttempt(null);
         return;
       }
 
-      requestInFlight.current = true;
-      attemptPending.current = false;
-      setGoogleSubmitting(true);
+      const attempt = { phase: "signing_in", source };
+      updateAuthAttempt(attempt);
       setError("");
 
+      const controller = new AbortController();
+      requestAbortControllerRef.current = controller;
+
       try {
-        const result = await authApi.googleLogin({
-          credential: response.credential,
-        });
-        navigate(result.data.redirectTo, { replace: true });
-      } catch (requestError) {
-        setError(
-          requestError.response?.data?.message ||
-            "Google sign-in failed. Please try again.",
+        const result = await authApi.googleLogin(
+          { credential: response.credential },
+          { signal: controller.signal },
         );
+        if (mountedRef.current) {
+          navigate(result.data.redirectTo, { replace: true });
+        }
+      } catch (requestError) {
+        if (requestError.code !== "ERR_CANCELED" && mountedRef.current) {
+          setError(
+            requestError.response?.data?.message ||
+              "Google sign-in failed. Please try again.",
+          );
+        }
       } finally {
-        requestInFlight.current = false;
-        setGoogleSubmitting(false);
+        if (requestAbortControllerRef.current === controller) {
+          requestAbortControllerRef.current = null;
+        }
+        if (mountedRef.current && activeAttemptRef.current === attempt) {
+          updateAuthAttempt(null);
+        }
       }
     },
-    [navigate, setGoogleSubmitting],
+    [navigate, updateAuthAttempt],
   );
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      requestAbortControllerRef.current?.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleWindowBlur = () => {
+      windowBlurredRef.current = true;
+    };
+    const handleWindowFocus = () => {
+      if (!windowBlurredRef.current) return;
+      windowBlurredRef.current = false;
+
+      if (activeAttemptRef.current?.phase === "waiting") {
+        updateAuthAttempt(null);
+      }
+    };
+
+    window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
+    return () => {
+      window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [updateAuthAttempt]);
 
   useEffect(() => {
     if (!clientId || !scriptLoadedSuccessfully) return undefined;
@@ -146,10 +184,12 @@ function ConfiguredGoogleAuthButton({ disabled, onSubmittingChange }) {
     return () => googleIdentity.cancel();
   }, [clientId, handleButtonClick, handleCredential, scriptLoadedSuccessfully]);
 
+  const isDisabled = disabled || authAttempt !== null;
+
   if (!scriptLoadedSuccessfully) {
     return (
       <div className="mt-3 flex w-full flex-col items-center justify-center gap-2">
-        <GoogleButtonPlaceholder isLoading={!disabled} />
+        <GoogleButtonPlaceholder />
         {error && (
           <p className="text-center text-sm text-red-600" role="alert">
             {error}
@@ -164,11 +204,12 @@ function ConfiguredGoogleAuthButton({ disabled, onSubmittingChange }) {
       <div className="relative min-h-12 w-full">
         <div
           ref={buttonContainerRef}
-          className={`flex w-full justify-center rounded-full transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none ${disabled || isSubmitting ? "invisible pointer-events-none" : ""}`}
+          aria-hidden={isDisabled}
+          className={`flex w-full justify-center rounded-full transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none ${isDisabled ? "invisible pointer-events-none" : ""}`}
         />
-        {(disabled || isSubmitting) && (
+        {isDisabled && (
           <div className="absolute inset-0">
-            <GoogleButtonPlaceholder isLoading={isSubmitting} />
+            <GoogleButtonPlaceholder />
           </div>
         )}
       </div>
@@ -181,7 +222,10 @@ function ConfiguredGoogleAuthButton({ disabled, onSubmittingChange }) {
   );
 }
 
-export default function GoogleAuthButton({ disabled = false, onSubmittingChange }) {
+export default function GoogleAuthButton({
+  disabled = false,
+  onAuthStateChange,
+}) {
   if (!import.meta.env.VITE_GOOGLE_CLIENT_ID) {
     return <GoogleAuthFallback />;
   }
@@ -189,7 +233,7 @@ export default function GoogleAuthButton({ disabled = false, onSubmittingChange 
   return (
     <ConfiguredGoogleAuthButton
       disabled={disabled}
-      onSubmittingChange={onSubmittingChange}
+      onAuthStateChange={onAuthStateChange}
     />
   );
 }

@@ -17,8 +17,10 @@ export default function Login() {
   const navigation = useNavigation();
   const actionData = useActionData();
   const isEmailSubmitting = navigation.state === "submitting";
-  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
-  const isAuthSubmitting = isEmailSubmitting || isGoogleSubmitting;
+  const [googleAuthAttempt, setGoogleAuthAttempt] = useState(null);
+  const isAuthSubmitting = isEmailSubmitting || googleAuthAttempt !== null;
+  const isSigningIn =
+    isEmailSubmitting || googleAuthAttempt?.phase === "signing_in";
 
   const [alertMessage, setAlertMessage] = useState("");
   const lastActionDataRef = useRef(null);
@@ -110,18 +112,16 @@ export default function Login() {
           </Link>
         </div>
 
-        <Button disabled={isAuthSubmitting} isLoading={isEmailSubmitting}>
-          {isEmailSubmitting ? "Signing in..." : "Sign in"}
+        <Button disabled={isAuthSubmitting} isLoading={isSigningIn}>
+          {isSigningIn ? "Signing in..." : "Sign in"}
         </Button>
       </Form>
 
       <OrDivider />
       <GoogleAuthButton
         disabled={isAuthSubmitting}
-        onSubmittingChange={setIsGoogleSubmitting}
-      >
-        Sign in with Google
-      </GoogleAuthButton>
+        onAuthStateChange={setGoogleAuthAttempt}
+      />
 
       <SwitchPage
         question="Don't have an account?"

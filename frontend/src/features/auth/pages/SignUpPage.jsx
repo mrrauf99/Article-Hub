@@ -17,8 +17,10 @@ export default function SignUp() {
   const navigation = useNavigation();
   const actionData = useActionData();
   const isSubmitting = navigation.state === "submitting";
-  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
-  const isAuthSubmitting = isSubmitting || isGoogleSubmitting;
+  const [googleAuthAttempt, setGoogleAuthAttempt] = useState(null);
+  const isAuthSubmitting = isSubmitting || googleAuthAttempt !== null;
+  const isSigningUp =
+    isSubmitting || googleAuthAttempt?.phase === "signing_in";
 
   const [alertMessage, setAlertMessage] = useState("");
   const lastActionDataRef = useRef(null);
@@ -68,22 +70,16 @@ export default function SignUp() {
           confirmEntered={form.values.confirmPassword.length > 0}
         />
 
-        <Button disabled={isAuthSubmitting} isLoading={isAuthSubmitting}>
-          {isGoogleSubmitting
-            ? "Connecting to Google…"
-            : isSubmitting
-              ? "Signing up…"
-              : "Sign up"}
+        <Button disabled={isAuthSubmitting} isLoading={isSigningUp}>
+          {isSigningUp ? "Signing up…" : "Sign up"}
         </Button>
       </Form>
 
       <OrDivider />
       <GoogleAuthButton
-        disabled={isSubmitting}
-        onSubmittingChange={setIsGoogleSubmitting}
-      >
-        Sign up with Google
-      </GoogleAuthButton>
+        disabled={isAuthSubmitting}
+        onAuthStateChange={setGoogleAuthAttempt}
+      />
 
       <SwitchPage
         question="Already have an account?"
