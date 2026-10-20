@@ -1,6 +1,7 @@
 import { useLoaderData, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
+import { normalizeMarkdown } from "@/utils/stringUtils";
 
 import { Calendar, User, Tag, Share2, Eye, ArrowLeft, Check } from "lucide-react";
 import SEO from "@/components/SEO";
@@ -181,14 +182,14 @@ export default function PublicArticleDetailPage() {
           >
             {article.introduction && (
               <ReactMarkdown>
-                {article.introduction.replace(/\n{3,}/g, "\n\n")}
+                {normalizeMarkdown(article.introduction)}
               </ReactMarkdown>
             )}
             {article.content && (
-              <ReactMarkdown>{article.content.replace(/\n{3,}/g, "\n\n")}</ReactMarkdown>
+              <ReactMarkdown>{normalizeMarkdown(article.content)}</ReactMarkdown>
             )}
             {article.summary && (
-              <ReactMarkdown>{article.summary.replace(/\n{3,}/g, "\n\n")}</ReactMarkdown>
+              <ReactMarkdown>{normalizeMarkdown(article.summary)}</ReactMarkdown>
             )}
           </div>
         </div>

@@ -10,6 +10,18 @@ export function capitalizeFirstLetter(str) {
 }
 
 /**
+ * Normalizes common formatting mistakes before Markdown is rendered.
+ */
+export function normalizeMarkdown(str) {
+  if (!str || typeof str !== "string") return "";
+
+  return str
+    .replace(/\r\n?/g, "\n")
+    .replace(/\*\*(#{1,6})[ \t]+([^\n]+?)[ \t]*(?:\*\*|\n[ \t]*\*\*(?=\n))/g, "\n\n$1 $2\n\n")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+/**
  * Strips the Markdown syntax produced by MarkdownEditor (headings, bold,
  * italic, links, lists, quotes, code) for contexts that render plain text
  * instead of going through ReactMarkdown, e.g. card/list/table summaries.

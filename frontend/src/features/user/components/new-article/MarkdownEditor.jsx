@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { ARTICLE_PROSE, FOCUS } from "@/styles/panelClasses";
+import { normalizeMarkdown } from "@/utils/stringUtils";
 import FieldShell, { describedBy } from "./FieldShell";
 
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
@@ -237,7 +238,7 @@ export default function MarkdownEditor({
           <div className="min-h-[24rem] px-5 py-4" aria-live="polite">
             {value.trim() ? (
               <div className={ARTICLE_PROSE}>
-                <ReactMarkdown>{value.replace(/\n{3,}/g, "\n\n")}</ReactMarkdown>
+                <ReactMarkdown>{normalizeMarkdown(value)}</ReactMarkdown>
               </div>
             ) : (
               <p className="text-sm text-ink-muted">Nothing to preview yet. Switch to Write to start.</p>
