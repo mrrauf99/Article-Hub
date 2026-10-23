@@ -64,7 +64,14 @@ const INACTIVE_PAGE_BTN = `${BASE_BTN} ${INACTIVE_BTN}`;
 const ACTIVE_PAGE_BTN = `${BASE_BTN} ${ACTIVE_BTN}`;
 const ELLIPSIS_CLASSES = "px-2 text-slate-400 text-sm font-medium select-none";
 
-function Pagination({ current, total, onChange, siblingCount = 0, getHref }) {
+function Pagination({
+  current,
+  total,
+  onChange,
+  onPageNavigate,
+  siblingCount = 0,
+  getHref,
+}) {
   const currentPage = Number(current) || 1;
   const totalPages = Number(total) || 1;
 
@@ -89,10 +96,29 @@ function Pagination({ current, total, onChange, siblingCount = 0, getHref }) {
       }
       // Wrap in startTransition so page navigation doesn't block the UI
       startTransition(() => {
+        onPageNavigate?.(page);
         onChange(page);
       });
     },
-    [currentPage, totalPages, onChange, startTransition],
+    [currentPage, totalPages, onChange, onPageNavigate, startTransition],
+  );
+
+  const handlePageLinkClick = useCallback(
+    (event, page) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      onPageNavigate?.(page);
+    },
+    [onPageNavigate],
   );
 
   if (totalPages <= 1) return null;
@@ -114,6 +140,7 @@ function Pagination({ current, total, onChange, siblingCount = 0, getHref }) {
         <Link
           to={getHref(currentPage - 1)}
           preventScrollReset
+          onClick={(event) => handlePageLinkClick(event, currentPage - 1)}
           className={NAV_BTN_FULL}
           aria-label="Previous page"
         >
@@ -156,6 +183,7 @@ function Pagination({ current, total, onChange, siblingCount = 0, getHref }) {
               key={page}
               to={getHref(page)}
               preventScrollReset
+              onClick={(event) => handlePageLinkClick(event, page)}
               className={INACTIVE_PAGE_BTN}
             >
               {page}
@@ -183,6 +211,7 @@ function Pagination({ current, total, onChange, siblingCount = 0, getHref }) {
         <Link
           to={getHref(currentPage + 1)}
           preventScrollReset
+          onClick={(event) => handlePageLinkClick(event, currentPage + 1)}
           className={NAV_BTN_FULL}
           aria-label="Next page"
         >

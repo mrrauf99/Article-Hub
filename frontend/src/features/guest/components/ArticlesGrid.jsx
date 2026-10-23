@@ -25,6 +25,15 @@ export default function ArticlesGrid({
   const safePage = Math.min(Math.max(page, 1), totalPages || 1);
   const resolvedTotalCount = totalCount ?? articles.length;
 
+  function scrollToArticles() {
+    const target = document.getElementById("articles");
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+    const scrollY = window.pageYOffset || window.scrollY;
+    window.scrollTo({ top: Math.max(0, rect.top + scrollY - 20), behavior: "smooth" });
+  }
+
   useScrollOnChange({
     deps: [safePage, activeCategory],
     behavior: "smooth",
@@ -173,6 +182,7 @@ export default function ArticlesGrid({
               current={safePage}
               total={totalPages}
               onChange={onPageChange}
+              onPageNavigate={scrollToArticles}
               getHref={getPageHref}
             />
           </div>
